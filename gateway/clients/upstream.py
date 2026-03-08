@@ -1,4 +1,3 @@
-from fastapi import HTTPException
 from openai import AsyncOpenAI
 
 # Upstream client LLM Proxy.
