@@ -13,12 +13,12 @@ router  = APIRouter(prefix="/v1/chat", tags=["chat"])
 def get_upstream_client(request: Request):
     return request.app.state.upstream_client
 
-@router.post("/completions")
+@router.post("/completions", description="Forward a chat completion request to the upstream LLM", tags=["chat"])
 async def forward_request(request: Request, validated_request: ValidatedRequest = Depends(check_limits_costs)):
     upstream_client = get_upstream_client(request)
     payload = validated_request.body.model_dump(exclude_unset=True)
     chat_completion = None
-    
+
     upstream_latency = 0.0
 
     try:
