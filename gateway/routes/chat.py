@@ -6,11 +6,12 @@ import asyncio
 from ..models.pydantic.quotas import ValidatedRequest
 from ..limits.quota import check_limits_costs
 from ..logging.metadata import mock_async_logger
+from ..clients.upstream import UpstreamClient
 
 
 router  = APIRouter(prefix="/v1/chat", tags=["chat"])
 
-def get_upstream_client(request: Request):
+def get_upstream_client(request: Request) -> UpstreamClient:
     return request.app.state.upstream_client
 
 @router.post("/completions", description="Forward a chat completion request to the upstream LLM", tags=["chat"])
@@ -23,7 +24,7 @@ async def forward_request(request: Request, validated_request: ValidatedRequest 
 
     try:
         upstream_start = time.perf_counter()
-        chat_completion = await upstream_client.chat.completions.create(**payload)
+        chat_completion = await upstream_client.create_chat_completion(payload)
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"LLM error: {str(e)}")
     finally:
