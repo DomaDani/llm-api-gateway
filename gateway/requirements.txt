@@ -3,3 +3,4 @@ uvicorn
 openai
 tiktoken
 dotenv
+sqlalchemy
