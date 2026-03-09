@@ -1,6 +1,6 @@
 import asyncio
 
-from ..db.mock_db import mock_limit_change, mock_db_limit_check
+from gateway.db import mock_limit_change, mock_db_limit_check
 
 async def mock_async_logger(metadata: dict):
     mock_limit_change(metadata["key_id"], metadata["total_tokens"]-metadata["estimated_tokens"])

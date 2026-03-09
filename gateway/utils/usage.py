@@ -1,5 +1,5 @@
 import tiktoken
-from ..models.pydantic.openai import OpenAIMessage
+from gateway.models import OpenAIMessage
 from typing import List
 
 # Utilities for calculating usage metrics.

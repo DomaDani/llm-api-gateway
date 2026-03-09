@@ -1,4 +1,4 @@
-from ..utils.hashing import hash_key
+from gateway.utils import hash_key
 
 fake_db = {
     "API_KEYS": {

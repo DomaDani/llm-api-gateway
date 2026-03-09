@@ -1,11 +1,11 @@
 from fastapi import HTTPException, Security
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from ..utils.hashing import verify_key
-from ..db.mock_db import mock_db_key_check, mock_db_limit_check
-from ..models.pydantic.quotas import KeyInfo
+from gateway.utils import verify_key
+from gateway.db import mock_db_key_check, mock_db_limit_check
+from gateway.models import KeyInfo
 
-from ..config import EXPECTED_KEY_LENGTH
+from gateway.config import EXPECTED_KEY_LENGTH
 
 # Key validation module
 

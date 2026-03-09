@@ -1,13 +1,12 @@
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from ..models.pydantic.quotas import KeyInfo, ValidatedRequest
-from ..models.pydantic.openai import OpenAIRequest
-from ..auth.keys import validate_api_key
-from ..utils.usage import get_token_count
-from ..db.mock_db import mock_limit_change
+from gateway.models import KeyInfo, ValidatedRequest, OpenAIRequest
+from gateway.auth import validate_api_key
+from gateway.utils import get_token_count
+from gateway.db import mock_limit_change
 
-from ..config import DEFAULT_MAX_COMPLETION_TOKENS, QUOTA_STRICTNESS
+from gateway.config import DEFAULT_MAX_COMPLETION_TOKENS, QUOTA_STRICTNESS
 
 async def check_limits_costs(body: OpenAIRequest, key_info: KeyInfo = Depends(validate_api_key)) -> ValidatedRequest:
     # est_input_tokens = await run_in_threadpool(get_token_count, body.messages)
