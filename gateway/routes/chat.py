@@ -3,10 +3,10 @@ from fastapi import Request, HTTPException, Depends
 import time
 import asyncio
 
-from ..models.pydantic.quotas import ValidatedRequest
-from ..limits.quota import check_limits_costs
-from ..logging.metadata import mock_async_logger
-from ..clients.upstream import UpstreamClient
+from gateway.models import ValidatedRequest
+from gateway.limits.quota import check_limits_costs
+from gateway.logging import mock_async_logger
+from gateway.clients import UpstreamClient
 
 
 router  = APIRouter(prefix="/v1/chat", tags=["chat"])
