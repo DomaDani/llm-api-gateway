@@ -5,10 +5,9 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from ..clients.upstream import UpstreamClient
-from ..routes.chat import router as chat_router
-from ..routes.health import router as health_router
-from .middleware import init_middleware
+from gateway.clients import UpstreamClient
+from gateway.routes import chat_router, health_router
+from gateway.app.middleware import init_middleware
 
 load_dotenv()
 
