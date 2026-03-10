@@ -17,4 +17,7 @@ class Quota(SQLAlchemyBase):
     period : Mapped[Period] = mapped_column(SQLAlchemyEnum(Period))
     expires_at : Mapped[Optional[datetime]]
     status : Mapped[Status] = mapped_column(SQLAlchemyEnum(Status), default=Status.ACTIVE)
-    
+
+    project = relationship("Project", back_populates="quotas")
+    api_key = relationship("APIKey", back_populates="quotas")
+    limit = relationship("Limit", back_populates="quotas")
