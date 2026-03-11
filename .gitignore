@@ -46,7 +46,7 @@ build/
 # Add Pip-specific ignores here
 
 # PostgreSQL
-# Add PostgreSQL-specific ignores here
+postgreSQL/
 
 # Docker
 docker-compose.override.yml
