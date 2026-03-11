@@ -6,7 +6,7 @@ from gateway.auth import validate_api_key
 from gateway.utils import get_token_count
 from gateway.db import mock_limit_change
 
-from llm_api_gateway_config.config import DEFAULT_MAX_COMPLETION_TOKENS, QUOTA_STRICTNESS
+from shared.config import DEFAULT_MAX_COMPLETION_TOKENS, QUOTA_STRICTNESS
 
 async def check_limits_costs(body: OpenAIRequest, key_info: KeyInfo = Depends(validate_api_key)) -> ValidatedRequest:
     # est_input_tokens = await run_in_threadpool(get_token_count, body.messages)

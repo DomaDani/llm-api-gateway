@@ -5,7 +5,7 @@ from gateway.utils import verify_key
 from gateway.db import mock_db_key_check, mock_db_limit_check
 from gateway.models import KeyInfo
 
-from llm_api_gateway_config.config import EXPECTED_KEY_LENGTH
+from shared.config import EXPECTED_KEY_LENGTH
 
 # Key validation module
 

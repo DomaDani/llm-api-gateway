@@ -7,7 +7,7 @@ from gateway.clients import UpstreamClient
 from gateway.routes import chat_router, health_router
 from gateway.app.middleware import init_middleware
 
-from llm_api_gateway_config.config import TARGET_URL, TARGET_KEY
+from shared.config import TARGET_URL, TARGET_KEY
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
