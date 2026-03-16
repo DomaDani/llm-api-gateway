@@ -54,24 +54,24 @@ def create_mock_data():
         session.add_all([role1, role2])
 
         project_permission1 = ProjectPermission(
-            project_id=project.id,
-            user_id=user1.id,
-            role_id=role1.id,
+            project=project,
+            user=user1,
+            role=role1,
             join_date=datetime.now(timezone.utc)
         )
 
         project_permission2 = ProjectPermission(
-            project_id=project.id,
-            user_id=user2.id,
-            role_id=role2.id,
+            project=project,
+            user=user2,
+            role=role2,
             join_date=datetime.now(timezone.utc)
         )
 
         session.add_all([project_permission1, project_permission2])
 
         api_key = APIKey(
-            project_id=project.id,
-            user_id=user2.id,
+            project=project,
+            user=user2,
             name="Test API Key",
             fingerprint="TTcj1lxYOY9d",
             key_hash=hash_key("TTcj1lxYOY9dB25bVh6IKfOrwW8ERIWHXJKqxYYwxHM-_LHTf3isqFhitJxpVGiZaLf2GVwiKsQZLhnR-xYJ2Q"),
@@ -89,8 +89,8 @@ def create_mock_data():
         session.add(limit)
 
         quota = Quota(
-            key_id=api_key.id,
-            limit_id=limit.id,
+            api_key=api_key,
+            limit=limit,
             limit_value=5000,
             period=Period.MINUTE,
             status=Status.ACTIVE
