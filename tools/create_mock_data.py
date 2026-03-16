@@ -76,7 +76,7 @@ def create_mock_data():
             fingerprint="TTcj1lxYOY9d",
             key_hash=hash_key("TTcj1lxYOY9dB25bVh6IKfOrwW8ERIWHXJKqxYYwxHM-_LHTf3isqFhitJxpVGiZaLf2GVwiKsQZLhnR-xYJ2Q"),
             create_date=datetime.now(timezone.utc),
-            key_status=Status.ACTIVE
+            status=Status.ACTIVE
         )
 
         session.add(api_key)
