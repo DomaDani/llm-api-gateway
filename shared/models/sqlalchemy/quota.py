@@ -12,8 +12,8 @@ class Quota(SQLAlchemyBase):
     __tablename__ = "quotas"
 
     id : Mapped[int] = mapped_column(primary_key=True)
-    project_id : Mapped[int] = mapped_column(ForeignKey("projects.id"))
-    key_id : Mapped[int] = mapped_column(ForeignKey("api_keys.id"))
+    project_id : Mapped[Optional[int]] = mapped_column(ForeignKey("projects.id"))
+    key_id : Mapped[Optional[int]] = mapped_column(ForeignKey("api_keys.id"))
     limit_id : Mapped[int] = mapped_column(ForeignKey("limits.id"))
     limit_value : Mapped[int]
     period : Mapped[Period] = mapped_column(SQLAlchemyEnum(Period))
