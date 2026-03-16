@@ -5,6 +5,7 @@ from sqlalchemy import Enum as SQLAlchemyEnum
 
 from .base import Base as SQLAlchemyBase
 from .status_enum import Status
+from .quota import Quota
 
 class APIKey(SQLAlchemyBase):
     __tablename__ = "api_keys"
@@ -20,3 +21,4 @@ class APIKey(SQLAlchemyBase):
 
     project = relationship("Project", back_populates="api_keys")
     user = relationship("User", back_populates="api_keys")
+    quotas : Mapped[list["Quota"]] = relationship("Quota", back_populates="api_key")

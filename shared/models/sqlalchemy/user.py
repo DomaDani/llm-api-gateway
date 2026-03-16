@@ -1,9 +1,11 @@
 from sqlalchemy import String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import Optional
 from datetime import datetime
 
 from .base import Base as SQLAlchemyBase
+from .project_permission import ProjectPermission
+from .api_key import APIKey
 
 class User(SQLAlchemyBase):
     __tablename__ = "users"
@@ -16,4 +18,7 @@ class User(SQLAlchemyBase):
     joined_date : Mapped[datetime]
     last_login : Mapped[Optional[datetime]]
     password_expires_at : Mapped[Optional[datetime]]
+
+    permissions : Mapped[list["ProjectPermission"]] = relationship("ProjectPermission", back_populates="user")
+    api_keys : Mapped[list["APIKey"]] = relationship("APIKey", back_populates="user")
 
