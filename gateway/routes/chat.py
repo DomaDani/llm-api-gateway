@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 
 from gateway.models import ValidatedRequest
 from gateway.limits.quota import check_limits_costs
-from gateway.logging import mock_async_logger
+from gateway.logging import usage_logger
 from gateway.clients import UpstreamClient
 from gateway.models.pydantic.usage import UsageLogEntry
 
@@ -66,6 +66,6 @@ async def forward_request(request: Request, validated_request: ValidatedRequest 
         )
 
 
-        asyncio.create_task(mock_async_logger(metadata))
+        asyncio.create_task(usage_logger(metadata))
 
     return chat_completion
