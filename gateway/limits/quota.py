@@ -30,6 +30,5 @@ async def check_limits_costs(body: OpenAIRequest, key_info: KeyInfo = Depends(va
         user_id=key_info.user_id,
         body=body,
         estimated_tokens=estimated_total_tokens,
-        internal_cost=None, # None for now, change later.
-        key_id=key_info.id
+        internal_cost=None # None for now, change later.
     )

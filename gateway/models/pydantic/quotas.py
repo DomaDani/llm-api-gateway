@@ -19,4 +19,3 @@ class ValidatedRequest(BaseModel):
     body: OpenAIRequest
     estimated_tokens: int
     internal_cost: Optional[float]
-    key_id: int
