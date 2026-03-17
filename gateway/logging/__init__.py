@@ -1,3 +1,3 @@
-from .metadata import mock_async_logger
+from .metadata import usage_logger
 
-__all__ = ["mock_async_logger"]
+__all__ = ["usage_logger"]
