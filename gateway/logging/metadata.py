@@ -17,7 +17,8 @@ async def mock_async_logger(metadata: dict):
 async def usage_logger(entry: UsageLogEntry):
     async with get_transactional_session() as session:
         # For now, this is still a mock function.
-        mock_limit_change(entry.key_id, entry.total_tokens-entry.estimated_tokens)
+        total_tokens = entry.total_tokens or 0
+        mock_limit_change(entry.key_id, total_tokens-entry.estimated_tokens)
 
         entry_dict = entry.model_dump()
 
