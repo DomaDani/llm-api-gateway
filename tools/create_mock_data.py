@@ -11,12 +11,16 @@ if __package__ is None:
 
 from shared.models import *
 from gateway.utils import hash_key
+
 from shared.db import get_transactional_session
 
 ph = PasswordHasher()
 
-def create_mock_data():
-    with get_transactional_session() as session:
+import asyncio
+
+
+async def create_mock_data():
+    async with get_transactional_session() as session:
         
         user1 = User(
             email="gipsz.jakab@teshervaals.com",
@@ -100,4 +104,4 @@ def create_mock_data():
 
 
 if __name__ == "__main__":
-    create_mock_data()
+    asyncio.run(create_mock_data())
