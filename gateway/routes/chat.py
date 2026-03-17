@@ -43,7 +43,7 @@ async def forward_request(request: Request, validated_request: ValidatedRequest 
             key_id=validated_request.key_id,
             project_id=validated_request.project_id,
             user_id=validated_request.user_id,
-            request_id=validated_request.body.request_id,
+            request_id=getattr(chat_completion, "id", None),
             timestamp=datetime.now(timezone.utc),
             request_type=validated_request.body.request_type,
             estimated_tokens=validated_request.estimated_tokens,
