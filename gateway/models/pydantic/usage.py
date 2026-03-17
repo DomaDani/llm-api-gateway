@@ -3,10 +3,9 @@ from typing import Optional
 from datetime import datetime
 
 class UsageLogEntry(BaseModel):
-    id : int
     key_id : int
     project_id : int
-    user_id : Optional[int]
+    user_id : int
     request_id : str
     timestamp : datetime
 
@@ -22,6 +21,7 @@ class UsageLogEntry(BaseModel):
 
     model : Optional[str]
     temperature : Optional[float]
+    top_p : Optional[float]
     top_k : Optional[int]
     finish_reason : Optional[str]
 

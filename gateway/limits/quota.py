@@ -25,7 +25,11 @@ async def check_limits_costs(body: OpenAIRequest, key_info: KeyInfo = Depends(va
     mock_limit_change(key_info.id, estimated_total_tokens)
 
     return ValidatedRequest(
+        key_id=key_info.id,
+        project_id=key_info.project_id,
+        user_id=key_info.user_id,
         body=body,
         estimated_tokens=estimated_total_tokens,
+        internal_cost=None, # None for now, change later.
         key_id=key_info.id
     )

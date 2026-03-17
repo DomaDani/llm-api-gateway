@@ -12,7 +12,7 @@ class UsageLog(SQLAlchemyBase):
     id: Mapped[int] = mapped_column(primary_key=True)
     key_id: Mapped[int] = mapped_column(ForeignKey("api_keys.id"))
     project_id: Mapped[int] = mapped_column(ForeignKey("projects.id"))
-    user_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     request_id: Mapped[str] = mapped_column(String(36), unique=True)
     timestamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
@@ -28,6 +28,7 @@ class UsageLog(SQLAlchemyBase):
 
     model: Mapped[Optional[str]] = mapped_column(String(128))
     temperature: Mapped[Optional[float]] = mapped_column(Float)
+    top_p: Mapped[Optional[float]] = mapped_column(Float)
     top_k: Mapped[Optional[int]] = mapped_column(Integer)
     finish_reason: Mapped[Optional[str]] = mapped_column(String(64))
 

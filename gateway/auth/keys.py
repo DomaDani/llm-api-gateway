@@ -37,6 +37,8 @@ async def validate_api_key(auth: HTTPAuthorizationCredentials = Security(securit
 
     return KeyInfo(
         id=key_data["id"],
+        project_id=key_data["project_id"],
+        user_id=key_data["user_id"],
         limit_value=limit_data["limit_value"],
         spent_value=limit_data["spent_value"]
     )

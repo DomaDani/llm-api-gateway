@@ -4,6 +4,8 @@ fake_db = {
     "API_KEYS": {
         "TTcj1lxYOY9d": {
             "id": 1,
+            "project_id": 1,
+            "user_id": 1,
             "fingerprint": "TTcj1lxYOY9d",
             "key_hash": hash_key("TTcj1lxYOY9dB25bVh6IKfOrwW8ERIWHXJKqxYYwxHM-_LHTf3isqFhitJxpVGiZaLf2GVwiKsQZLhnR-xYJ2Q"),
             "is_active": True
