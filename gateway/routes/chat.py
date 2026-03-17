@@ -29,8 +29,8 @@ async def forward_request(request: Request, validated_request: ValidatedRequest 
         chat_completion = await upstream_client.create_chat_completion(payload)
         status_code = 200
     except Exception as e:
-        raise HTTPException(status_code=502, detail=f"LLM error: {str(e)}")
         status_code = 502
+        raise HTTPException(status_code=502, detail=f"LLM error: {str(e)}")
     finally:
         upstream_latency = time.perf_counter() - upstream_start
         total_time = time.perf_counter() - request.state.start_time
@@ -45,7 +45,7 @@ async def forward_request(request: Request, validated_request: ValidatedRequest 
             user_id=validated_request.user_id,
             request_id=getattr(chat_completion, "id", None),
             timestamp=datetime.now(timezone.utc),
-            request_type=validated_request.body.request_type,
+            request_type=getattr(chat_completion, "object", None),
             estimated_tokens=validated_request.estimated_tokens,
             prompt_tokens=usage.prompt_tokens if usage else None,
             completion_tokens=usage.completion_tokens if usage else None,
