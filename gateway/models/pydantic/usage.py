@@ -6,7 +6,7 @@ class UsageLogEntry(BaseModel):
     key_id : int
     project_id : int
     user_id : int
-    request_id : str
+    request_id : Optional[str]
     timestamp : datetime
 
     request_type : Optional[str]
