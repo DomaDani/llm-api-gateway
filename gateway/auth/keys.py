@@ -3,7 +3,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from gateway.utils import verify_key
 from gateway.db import db_key_check, mock_db_limit_check
-from gateway.models import KeyInfo
+from shared.models import APIKey
 
 from shared.config import EXPECTED_KEY_LENGTH
 from shared.models import Status
@@ -12,7 +12,7 @@ from shared.models import Status
 
 security = HTTPBearer()
 
-async def validate_api_key(auth: HTTPAuthorizationCredentials = Security(security)) -> KeyInfo:
+async def validate_api_key(auth: HTTPAuthorizationCredentials = Security(security)) -> APIKey:
     api_key = auth.credentials
 
     if not api_key:
@@ -34,12 +34,4 @@ async def validate_api_key(auth: HTTPAuthorizationCredentials = Security(securit
     if not is_valid:
         raise HTTPException(status_code=401, detail="Invalid API key.")
 
-    limit_data = mock_db_limit_check(key_data.id)
-
-    return KeyInfo(
-        id=key_data.id,
-        project_id=key_data.project_id,
-        user_id=key_data.user_id,
-        limit_value=limit_data["limit_value"],
-        spent_value=limit_data["spent_value"]
-    )
+    return key_data

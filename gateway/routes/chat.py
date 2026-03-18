@@ -40,9 +40,9 @@ async def forward_request(request: Request, validated_request: ValidatedRequest 
         choices = getattr(chat_completion, "choices", None)
 
         metadata = UsageLogEntry(
-            key_id=validated_request.api_key.id,
-            project_id=validated_request.api_key.project_id,
-            user_id=validated_request.api_key.user_id,
+            key_id=validated_request.key_id,
+            project_id=validated_request.project_id,
+            user_id=validated_request.user_id,
             request_id=getattr(chat_completion, "id", None),
             timestamp=datetime.now(timezone.utc),
             request_type=getattr(chat_completion, "object", None),

@@ -1,24 +1,21 @@
 import asyncio
+from sqlalchemy import select
 
-from gateway.db import mock_limit_change, mock_db_limit_check
-from shared.models.sqlalchemy.usage_log import UsageLog
+from gateway.db import db_limit_change
+from shared.models.sqlalchemy import UsageLog, ApiKey
 from gateway.models.pydantic import UsageLogEntry
 from shared.db import get_transactional_session
 
-async def mock_async_logger(metadata: dict):
-    mock_limit_change(metadata["key_id"], metadata["total_tokens"]-metadata["estimated_tokens"])
-    print(f"[LOGGER] New quota values: {mock_db_limit_check(metadata['key_id'])}")
-
-    # Simulate async logging delay
-    await asyncio.sleep(0.3)
-
-    print(f"[LOGGER] Saved metadata: {metadata}")
-
 async def usage_logger(entry: UsageLogEntry):
     async with get_transactional_session() as session:
-        # For now, this is still a mock function.
+
+        result = await session.execute(select(ApiKey).where(ApiKey.id == entry.api_key.id).limit(1))
+        api_key = result.scalar_one_or_none()
+        if not api_key:
+            raise ValueError(f"API key with ID {entry.api_key.id} not found in database.")
+
         total_tokens = entry.total_tokens or 0
-        mock_limit_change(entry.key_id, total_tokens-entry.estimated_tokens)
+        db_limit_change(api_key, total_tokens-entry.estimated_tokens, session=session)
 
         entry_dict = entry.model_dump()
 
