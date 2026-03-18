@@ -1,0 +1,79 @@
+from sqlalchemy import select, func, or_, and_
+from typing import Union
+
+from shared.models import APIKey, Quota, Status
+from shared.db import get_transactional_session
+
+MAX_VALUE = 1 << 60
+
+async def db_limit_check_and_allocation(api_key: APIKey, estimate: int) -> bool:
+    remaining_expr = (func.coalesce(Quota.limit_value, MAX_VALUE) - Quota.allocated).label("remaining")
+
+    async with get_transactional_session() as session:
+        result = await session.execute(
+            select(Quota)
+            .where(_quota_filter(api_key))
+            .order_by(remaining_expr, Quota.id)
+            .limit(1)
+            .with_for_update()
+        )
+
+        quota = result.scalars().one_or_none()
+
+        if not quota:
+            return True # There is no active quota for the key.
+        
+        new_allocated = quota.allocated + estimate
+
+        if quota.limit_value is None:
+            return True
+        elif new_allocated > quota.limit_value:
+            return False
+        else:
+            await db_limit_change(api_key, estimate, session=session)
+            return True
+
+async def db_limit_change(api_key: APIKey, change_by: int, session = None):
+    # Check if a session was provided, if not, create a new transactional session
+    if session is None:
+        async with get_transactional_session() as session:
+            await db_limit_change(api_key, change_by, session=session)
+            return
+
+    quotas = await db_get_quotas_by_key(api_key, session=session)
+
+    for quota in quotas:
+        if quota.limit_value is not None:
+            quota.allocated = min(max(quota.allocated + change_by, 0), quota.limit_value)
+
+async def db_get_quotas_by_key(api_key: APIKey, session = None) -> list[Quota]:
+    # Check if a session was provided, if not, create a new transactional session
+    if session is None:
+        # Session is transactional to use locks.
+        async with get_transactional_session() as session:
+            return await db_get_quotas_by_key(api_key, session=session)
+    
+    result = await session.execute(
+        select(Quota)
+        .where(_quota_filter(api_key))
+        .order_by(Quota.id)
+        .with_for_update()
+    )
+    quotas = result.scalars().all()
+
+    return quotas
+
+def _quota_filter(api_key: APIKey):
+    return and_(
+        or_(
+            Quota.key_id == api_key.id,
+            Quota.project_id == api_key.project_id,
+            Quota.user_id == api_key.user_id,
+            and_(
+                Quota.key_id.is_(None),
+                Quota.project_id.is_(None),
+                Quota.user_id.is_(None)
+            )
+        ),
+        Quota.status == Status.ACTIVE
+    )
