@@ -1,6 +1,8 @@
-from .openai import OpenAIRequest
 from pydantic import BaseModel
 from typing import Optional
+
+from gateway.models import OpenAIRequest
+from shared.models.sqlalchemy import APIKey
 
 # Pydantic classes for key validation
 
@@ -12,10 +14,7 @@ class KeyInfo(BaseModel):
     spent_value: int
 
 class ValidatedRequest(BaseModel):
-    key_id: int
-    project_id: int
-    user_id: int
-
+    api_key: APIKey
     body: OpenAIRequest
     estimated_tokens: int
     internal_cost: Optional[float]
