@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from .base import Base as SQLAlchemyBase
 from .project_permission import ProjectPermission
 from .api_key import APIKey
+from .quota import Quota
 
 class User(SQLAlchemyBase):
     __tablename__ = "users"
@@ -21,4 +22,5 @@ class User(SQLAlchemyBase):
 
     permissions : Mapped[list["ProjectPermission"]] = relationship("ProjectPermission", back_populates="user")
     api_keys : Mapped[list["APIKey"]] = relationship("APIKey", back_populates="user")
+    quotas : Mapped[list["Quota"]] = relationship("Quota", back_populates="user")
 
