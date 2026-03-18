@@ -16,7 +16,7 @@ engine = create_async_engine(SQLALCHEMY_DATABASE_URL, connect_args=_connect_args
 
 SessionLocal = async_sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
 
-
+@asynccontextmanager
 async def get_session() -> AsyncGenerator[AsyncSession, None]:
     async with SessionLocal() as session:
         yield session
