@@ -1,14 +1,16 @@
-from .openai import OpenAIRequest
 from pydantic import BaseModel
+from typing import Optional
+from datetime import datetime
+
+from gateway.models.pydantic import OpenAIRequest
+from shared.models import Status
 
 # Pydantic classes for key validation
 
-class KeyInfo(BaseModel):
-    id: int
-    limit_value: int
-    spent_value: int
-
 class ValidatedRequest(BaseModel):
+    key_id: int
+    project_id: int
+    user_id: int
     body: OpenAIRequest
     estimated_tokens: int
-    key_id: int
+    internal_cost: Optional[float]

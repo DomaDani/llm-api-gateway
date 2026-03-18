@@ -1,3 +1,3 @@
-from .pydantic import OpenAIMessage, OpenAIRequest, KeyInfo, ValidatedRequest
+from .pydantic import OpenAIMessage, OpenAIRequest, ValidatedRequest, UsageLogEntry
 
-__all__ = ["OpenAIMessage", "OpenAIRequest", "KeyInfo", "ValidatedRequest"]
+__all__ = ["OpenAIMessage", "OpenAIRequest", "ValidatedRequest", "UsageLogEntry"]
