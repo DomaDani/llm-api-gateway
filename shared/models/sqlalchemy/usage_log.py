@@ -26,7 +26,7 @@ class UsageLog(SQLAlchemyBase):
 
     internal_cost: Mapped[Optional[float]] = mapped_column(Numeric(12, 6))
 
-    model: Mapped[Optional[str]] = mapped_column(String(128))
+    model: Mapped[Optional[str]] = mapped_column(String(255))
     temperature: Mapped[Optional[float]] = mapped_column(Float)
     top_p: Mapped[Optional[float]] = mapped_column(Float)
     top_k: Mapped[Optional[int]] = mapped_column(Integer)
