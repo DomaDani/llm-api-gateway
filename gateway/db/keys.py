@@ -8,7 +8,6 @@ async def db_key_check(api_key: str) -> APIKey:
         api_fingerprint = api_key[:12]
         result = await session.execute(select(APIKey).where(APIKey.fingerprint == api_fingerprint))
         key_record = result.scalars().one_or_none()
-        print(type(key_record))
         if not key_record:
             raise ValueError("Invalid API Key")
         return key_record
