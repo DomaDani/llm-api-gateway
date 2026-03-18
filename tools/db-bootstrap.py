@@ -12,7 +12,7 @@ from shared.models import SQLAlchemyBase
 
 
 async def main() -> None:
-    async with engine.connect() as conn:
+    async with engine.begin() as conn:
         tables = await conn.run_sync(lambda sync_conn: inspect(sync_conn).get_table_names())
         if tables:
             answer = input(f"Database contains {len(tables)} tables, drop all and recreate? Type 'yes' to continue: ").strip().lower()
