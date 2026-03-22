@@ -1,0 +1,40 @@
+services:
+  db:
+    image: postgres:15
+    env_file: .env
+    volumes:
+      - ./postgreSQL/data:/var/lib/postgresql/data
+    
+  init-db:
+    build:
+      context: ./
+      dockerfile: postgreSQL/Dockerfile
+    environment:
+      RESET_DB: "false"
+      CREATE_MOCK_DATA: "false"
+    env_file: .env
+    depends_on:
+      - db
+    command: >
+      sh -c "until pg_isready -h db -U $POSTGRES_USER; do sleep 1; done;
+              if [ \"$$RESET_DB\" = 'true' ]; then
+                python tools/db-bootstrap.py --reset;
+              else
+                python tools/db-bootstrap.py;
+              fi;
+              
+              if [ \"$$CREATE_MOCK_DATA\" = 'true' ]; then
+                python tools/create_mock_data.py
+              fi;
+              python tools/check_tables.py"
+    restart: "no"
+
+  gateway:
+    build:
+      context: ./
+      dockerfile: gateway/Dockerfile
+    env_file: .env
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"

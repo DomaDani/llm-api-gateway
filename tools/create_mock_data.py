@@ -10,7 +10,7 @@ if __package__ is None:
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from shared.models import *
-from gateway.utils import hash_key
+from shared.utils import hash_key
 
 from shared.db import get_transactional_session
 

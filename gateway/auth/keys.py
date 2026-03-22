@@ -1,7 +1,7 @@
 from fastapi import HTTPException, Security
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from gateway.utils import verify_key
+from shared.utils import verify_key
 from gateway.db import db_key_check
 from shared.models import APIKey
 

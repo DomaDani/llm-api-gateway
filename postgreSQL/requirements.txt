@@ -1,0 +1,4 @@
+sqlalchemy>=1.4
+argon2-cffi
+dotenv
+asyncpg
