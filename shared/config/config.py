@@ -17,4 +17,4 @@ DEFAULT_MAX_COMPLETION_TOKENS = 4096
 
 #####
 
-SQLALCHEMY_DATABASE_URL = os.getenv("SQLALCHEMY_DATABASE_URL", "sqlite:///./test.db")
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./test.db")
