@@ -7,7 +7,7 @@ stages:
 
 build-images:
   stage: build
-  image: grc.io/kaniko-project/executor:latest
+  image: gcr.io/kaniko-project/executor:latest
   script:
     - mkdir -p /kaniko/.docker
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n $CI_REGISTRY_USER:$CI_REGISTRY_PASSWORD | base64)\"}}}" > /kaniko/.docker/config.json
