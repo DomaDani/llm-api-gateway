@@ -16,4 +16,4 @@ compose:
           CREATE_MOCK_DATA: "true"
     YAML
 
-    docker compose -f docker-compose.yml -f ci.override.yml up -d --build
+    docker-compose -f docker-compose.yml -f ci.override.yml up -d --build
