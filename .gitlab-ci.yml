@@ -2,6 +2,7 @@ stages:
   - compose
 
 compose:
+  stage: compose
   image:
     name: docker/compose:latest
   services:
