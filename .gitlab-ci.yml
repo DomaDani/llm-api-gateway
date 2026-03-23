@@ -9,9 +9,9 @@ variables:
 compose:
   stage: compose
   image:
-    name: docker/compose:latest
+    name: docker:29.3.0
   services:
-    - docker:19.03.12-dind
+    - docker:29.3.0-dind
   script: |
     cat > ci.override.yml <<'YAML'
     services:
