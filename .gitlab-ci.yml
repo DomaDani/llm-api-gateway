@@ -14,29 +14,24 @@ build-images:
     KANIKO_VERSION: v1.24.0
     KANIKO_DIGEST: sha256:4e7a52dd1f14872430652bb3b027405b8dfd17c4538751c620ac005741ef9698
   script:
-    - apk add --no-cache bash curl tar
+    - apk add --no-cache bash curl tar ca-certificates coreutils
+
+    - mkdir -p /kaniko /kaniko/.docker /workspace
+
+    - KANIKO_DIGEST_SHA="${KANIKO_DIGEST#sha256:}"
+    - curl -fsSL -o /kaniko/executor "https://github.com/GoogleContainerTools/kaniko/releases/download/${KANIKO_VERSION}/executor"
+
+    - echo "${KANIKO_DIGEST_SHA}  /kaniko/executor" > /kaniko/executor.sha256
+    - if ! sha256sum -c /kaniko/executor.sha256; then echo "kaniko checksum mismatch"; exit 1; fi
     
-    - mkdir -p /kaniko/.docker
-    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n $CI_REGISTRY_USER:$CI_REGISTRY_PASSWORD | base64)\"}}}" > /kaniko/.docker/config.json
+    - chmod +x /kaniko/executor
 
-    - docker run --rm \
-      -v $CI_PROJECT_DIR:/workspace \
-      -v /kaniko/.docker:/kaniko/.docker \
-      gcr.io/kaniko-project/executor@$KANIKO_DIGEST \
-      --context /workspace \
-      --dockerfile /workspace/gateway/Dockerfile \
-      --destination $CI_REGISTRY_IMAGE:gateway-$IMAGE_TAG \
-      --cache=true
+    - printf '{"auths":{"%s":{"auth":"%s"}}}' "$CI_REGISTRY" "$(printf '%s' "gitlab-ci-token:${CI_JOB_TOKEN}" | base64)" > /kaniko/.docker/config.json
 
-    - docker run --rm \
-      -v $CI_PROJECT_DIR:/workspace \
-      -v /kaniko/.docker:/kaniko/.docker \
-      gcr.io/kaniko-project/executor@$KANIKO_DIGEST \
-      --context /workspace \
-      --dockerfile /workspace/postgreSQL/Dockerfile \
-      --destination $CI_REGISTRY_IMAGE:init-db-$IMAGE_TAG \
-      --cache=true
+    - /kaniko/executor --context=dir:///workspace --dockerfile=/workspace/gateway/Dockerfile --destination=$CI_REGISTRY_IMAGE:gateway-$IMAGE_TAG --cache=true
+    - /kaniko/executor --context=dir:///workspace --dockerfile=/workspace/postgreSQL/Dockerfile --destination=$CI_REGISTRY_IMAGE:init-db-$IMAGE_TAG --cache=true
 
+    - shred -u /kaniko/.docker/config.json || rm -f /kaniko/.docker/config.json
   only:
     - branches
 
