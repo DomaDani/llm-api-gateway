@@ -1,0 +1,60 @@
+image: docker/compose:2.21.1
+
+services:
+  - docker:dind
+
+variables:
+  DOCKER_HOST: "tcp://docker:2375"
+  DOCKER_TLS_CERTDIR: ""
+  COMPOSE_HTTP_TIMEOUT: "1200"
+  DOCKER_CLIENT_TIMEOUT: "1200"
+
+stages:
+  - startup
+
+startup:
+  stage: startup
+  script: |
+    cat > ci.override.yml <<'YAML'
+    services:
+      init-db:
+        environment:
+          RESET_DB: "true"
+          CREATE_MOCK_DATA: "true"
+    YAML
+
+    docker compose -f docker-compose.yml -f ci.override.yml up -d --build
+
+    INIT_ID=$(docker compose -f docker-compose.yml -f ci.override.yml ps -q init-db) || true
+    if [ -n "$INIT_ID" ]; then
+      timeout=300; elapsed=0
+      while [ "$(docker inspect -f '{{.State.Running}}' "$INIT_ID")" = "true" ] && [ $elapsed -lt $timeout ]; do
+        sleep 1; elapsed=$((elapsed+1))
+      done
+      EXIT_CODE=$(docker inspect -f '{{.State.ExitCode}}' "$INIT_ID")
+      if [ "$EXIT_CODE" -ne 0 ]; then
+        docker compose -f docker-compose.yml -f ci.override.yml logs init-db --tail=300
+        docker compose -f docker-compose.yml -f ci.override.yml down -v
+        rm -f ci.override.yml
+        exit $EXIT_CODE
+      fi
+    fi
+
+    elapsed=0
+    until curl -sSf http://localhost:8000/health || [ $elapsed -ge 120 ]; do
+      sleep 1
+      elapsed=$((elapsed+2))
+    done
+    if ! curl -sSf http://localhost:8000/health; then
+      docker compose -f docker-compose.yml -f ci.override.yml logs gateway --tail=300
+      docker compose -f docker-compose.yml -f ci.override.yml down -v
+      rm -f ci.override.yml
+      exit 1
+    fi
+
+    docker compose -f docker-compose.yml -f ci.override.yml ps
+    docker compose -f docker-compose.yml -f ci.override.yml logs --tail=200
+    docker compose -f docker-compose.yml -f ci.override.yml down -v
+    rm -f ci.override.yml
+  only:
+    - branches
