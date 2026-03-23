@@ -1,6 +1,11 @@
 stages:
   - compose
 
+variables:
+  POSTGRES_USER: $POSTGRES_USER
+  POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+  DATABASE_URL: postgresql+asyncpg://$POSTGRES_USER:$POSTGRES_PASSWORD@db:5432/postgres
+
 compose:
   stage: compose
   image:
@@ -17,3 +22,4 @@ compose:
     YAML
 
     docker-compose -f docker-compose.yml -f ci.override.yml up -d --build
+    docker-compose -f docker-compose.yml -f ci.override.yml down -v
