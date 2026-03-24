@@ -4,6 +4,7 @@ stages:
 
 variables:
   DATABASE_URL: postgresql+asyncpg://$POSTGRES_USER:$POSTGRES_PASSWORD@db:5432/postgres
+  IMAGE_TAG: $CI_COMMIT_SHORT_SHA
 
 build:
   stage: build
@@ -43,23 +44,64 @@ compose:
     name: docker:29.3.0
   services:
     - docker:29.3.0-dind
-  script: |
-    cat > .env <<ENV
-    POSTGRES_USER=$POSTGRES_USER
-    POSTGRES_PASSWORD=$POSTGRES_PASSWORD
-    DATABASE_URL=$DATABASE_URL
+  script:
+    - |
+      cat > .env <<ENV
+      POSTGRES_USER=$POSTGRES_USER
+      POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      DATABASE_URL=$DATABASE_URL
+      
+      TARGET_URL=$TARGET_URL
+      TARGET_KEY=$TARGET_KEY
+      ENV
+
+    - | 
+      cat > ci.override.yml <<'YAML'
+      services:
+        init-db:
+          environment:
+            RESET_DB: "true"
+            CREATE_MOCK_DATA: "true"
+      YAML
+
+    - docker login $CI_REGISTRY -u CI_REGISTRY_USER -p CI_REGISTRY_PASSWORD
+    - echo "GATEWAY_IMAGE=$CI_REGISTRY_IMAGE:gateway-$IMAGE_TAG" >> .env
+    - echo "INIT_DB_IMAGE=$CI_REGISTRY_IMAGE:init-db-$IMAGE_TAG" >> .env
+
+    - docker-compose pull || true
+    - docker compose -f docker-compose.yml -f ci.override.yml up -d
     
-    TARGET_URL=$TARGET_URL
-    TARGET_KEY=$TARGET_KEY
-    ENV
+    - |
+      INIT_ID=$(docker compose -f docker-compose.yml -f ci.override.yml ps -q init-db) || true
+      if [ -n "$INIT_ID" ]; then
+        timeout=300; elapsed=0
+        while [ "$(docker inspect -f '{{.State.Running}}' "$INIT_ID")" = "true" ] && [ $elapsed -lt $timeout ]; do
+          sleep 1; elapsed=$((elapsed+1))
+        done
+        EXIT_CODE=$(docker inspect -f '{{.State.ExitCode}}' "$INIT_ID")
+        if [ "$EXIT_CODE" -ne 0 ]; then
+          docker compose -f docker-compose.yml -f ci.override.yml logs init-db --tail=300
+          docker compose -f docker-compose.yml -f ci.override.yml down -v
+          rm -f ci.override.yml
+          exit $EXIT_CODE
+        fi
+      fi
 
-    cat > ci.override.yml <<'YAML'
-    services:
-      init-db:
-        environment:
-          RESET_DB: "true"
-          CREATE_MOCK_DATA: "true"
-    YAML
+    - |
+      elapsed=0
+      until curl -sSf http://localhost:8000/health || [ $elapsed -ge 120 ]; do
+        sleep 1
+        elapsed=$((elapsed+2))
+      done
+      if ! curl -sSf http://localhost:8000/health; then
+        docker compose -f docker-compose.yml -f ci.override.yml logs gateway --tail=300
+        docker compose -f docker-compose.yml -f ci.override.yml down -v
+        rm -f ci.override.yml
+        exit 1
+      fi
 
-    docker-compose -f docker-compose.yml -f ci.override.yml up -d --build
-    docker-compose -f docker-compose.yml -f ci.override.yml down -v
+    - docker compose -f docker-compose.yml -f ci.override.yml ps
+    - docker compose -f docker-compose.yml -f ci.override.yml logs --tail=200
+    - docker compose -f docker-compose.yml -f ci.override.yml down -v
+    - rm -f ci.override.yml
+    - rm -f .env
