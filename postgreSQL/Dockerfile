@@ -8,6 +8,8 @@ RUN apt-get update \
 
 RUN pip install --no-cache-dir -r requirements.txt
 
+RUN chmod -R o+rX /usr/local/lib/python3.14/site-packages
+
 COPY shared/ ./shared
 COPY tools/ ./tools
 
