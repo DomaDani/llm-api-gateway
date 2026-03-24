@@ -28,14 +28,14 @@ build:
       --context $CI_PROJECT_DIR \
       --dockerfile gateway/Dockerfile \
       --destination $CI_REGISTRY_IMAGE:gateway-$IMAGE_TAG \
-      --cache=true
+      --cache=false
 
     - |
       /kaniko/executor \
       --context $CI_PROJECT_DIR \
       --dockerfile postgreSQL/Dockerfile \
       --destination $CI_REGISTRY_IMAGE:init-db-$IMAGE_TAG \
-      --cache=true
+      --cache=false
 
     - |
       echo "GATEWAY_IMAGE=$CI_REGISTRY_IMAGE:gateway-$IMAGE_TAG" > images.env
