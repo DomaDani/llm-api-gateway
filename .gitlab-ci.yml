@@ -24,15 +24,15 @@ build:
       EOF
     - |
       /kaniko/executor \
-      --context /workspace \
-      --dockerfile /workspace/gateway/Dockerfile \
+      --context $CI_PROJECT_DIR \
+      --dockerfile gateway/Dockerfile \
       --destination $CI_REGISTRY_IMAGE:gateway-$IMAGE_TAG \
       --cache=true
 
     - |
       /kaniko/executor \
-      --context /workspace \
-      --dockerfile /workspace/postgreSQL/Dockerfile \
+      --context $CI_PROJECT_DIR \
+      --dockerfile postgreSQL/Dockerfile \
       --destination $CI_REGISTRY_IMAGE:init-db-$IMAGE_TAG \
       --cache=true
 
