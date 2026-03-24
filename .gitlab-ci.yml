@@ -18,7 +18,7 @@ build:
       {
         "auths": {
           "$CI_REGISTRY": {
-            "auth": "$(echo -n gitlab-ci-token:$CI_JOB_TOKEN | base64 | tr -d '\n')"
+            "auth": "$(echo -n $CI_REGISTRY_USER:$CI_JOB_TOKEN | base64 | tr -d '\n')"
           }
         }
       }
@@ -64,7 +64,7 @@ compose:
             CREATE_MOCK_DATA: "true"
       YAML
 
-    - printf '%s' "$CI_JOB_TOKEN" | docker login "$CI_REGISTRY" -u gitlab-ci-token --password-stdin
+    - printf '%s' "$CI_JOB_TOKEN" | docker login "$CI_REGISTRY" -u $CI_REGISTRY_USER --password-stdin
     - echo "GATEWAY_IMAGE=$CI_REGISTRY_IMAGE:gateway-$IMAGE_TAG" >> .env
     - echo "INIT_DB_IMAGE=$CI_REGISTRY_IMAGE:init-db-$IMAGE_TAG" >> .env
 
