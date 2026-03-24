@@ -44,6 +44,7 @@ compose:
     name: docker:29.3.0
   services:
     - docker:29.3.0-dind
+  privileged: true
   script:
     - |
       cat > .env <<ENV
