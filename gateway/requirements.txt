@@ -2,6 +2,6 @@ fastapi
 uvicorn
 openai
 tiktoken
-dotenv
+python-dotenv
 sqlalchemy>=1.4
 asyncpg
