@@ -37,6 +37,15 @@ build:
       --destination $CI_REGISTRY_IMAGE:init-db-$IMAGE_TAG \
       --cache=true
 
+    - |
+      echo "GATEWAY_IMAGE=$CI_REGISTRY_IMAGE:gateway-$IMAGE_TAG" > images.env
+      echo "INIT_DB_IMAGE=$CI_REGISTRY_IMAGE:init-db-$IMAGE_TAG" >> images.env
+
+  artifacts:
+    paths:
+      - images.env
+    expire_in: 1h
+
 
 compose:
   stage: compose
@@ -46,6 +55,8 @@ compose:
     - docker:24.0.9-dind
   tags:
     - local
+  dependencies:
+    - build
   variables:
     DOCKER_TLS_CERTDIR: ""
     DOCKER_HOST: tcp://docker:2375
@@ -60,7 +71,7 @@ compose:
       TARGET_KEY=$TARGET_KEY
       ENV
 
-    - | 
+    - |
       cat > ci.override.yml <<'YAML'
       services:
         init-db:
@@ -71,18 +82,11 @@ compose:
 
     - apk add --no-cache curl
 
-    - ls -l /var/run/docker.sock || true
-    - docker info || true
-    - env | grep -i DOCKER || true
-    - ps aux | grep dockerd || true
-    - curl -v --max-time 2 http://docker:2375 || true
-
     - printf '%s' "$CI_JOB_PASSWORD" | docker login "$CI_REGISTRY" -u $CI_JOB_USER --password-stdin
-    - echo "GATEWAY_IMAGE=$CI_REGISTRY_IMAGE:gateway-$IMAGE_TAG" >> .env
-    - echo "INIT_DB_IMAGE=$CI_REGISTRY_IMAGE:init-db-$IMAGE_TAG" >> .env
+    - if [ -f images.env ]; then cat images.env >> .env; fi
 
     - docker-compose pull || true
-    - docker-compose -f docker-compose.yml -f ci.override.yml up -d
+    - docker-compose -f docker-compose.yml -f ci.override.yml up -d --no-build
     
     - |
       INIT_ID=$(docker-compose -f docker-compose.yml -f ci.override.yml ps -q init-db) || true
