@@ -6,6 +6,7 @@ services:
       - ./postgreSQL/data:/var/lib/postgresql/data
     
   init-db:
+    image: ${INIT_DB_IMAGE:-llm-api-gateway-init-db:latest}
     build:
       context: ./
       dockerfile: postgreSQL/Dockerfile
@@ -30,10 +31,16 @@ services:
     restart: "no"
 
   gateway:
+    image: ${GATEWAY_IMAGE:-llm-api-gateway:latest}
     build:
       context: ./
       dockerfile: gateway/Dockerfile
     env_file: .env
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      interval: 60s
+      timeout: 3s
+      retries: 10
     depends_on:
       - db
     ports:
