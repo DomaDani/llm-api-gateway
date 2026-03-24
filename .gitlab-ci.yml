@@ -64,6 +64,12 @@ compose:
             CREATE_MOCK_DATA: "true"
       YAML
 
+    - ls -l /var/run/docker.sock || true
+    - docker info || true
+    - env | grep -i DOCKER || true
+    - ps aux | grep dockerd || true
+    - curl -v --max-time 2 http://docker:2375 || true
+
     - printf '%s' "$CI_JOB_PASSWORD" | docker login "$CI_REGISTRY" -u $CI_JOB_USER --password-stdin
     - echo "GATEWAY_IMAGE=$CI_REGISTRY_IMAGE:gateway-$IMAGE_TAG" >> .env
     - echo "INIT_DB_IMAGE=$CI_REGISTRY_IMAGE:init-db-$IMAGE_TAG" >> .env
