@@ -46,6 +46,11 @@ compose:
     - docker:29.3.0-dind
   tags:
     - local
+  variables:
+    # Instruct docker:dind to not use TLS (so it listens on tcp://docker:2375)
+    DOCKER_TLS_CERTDIR: ""
+    # docker client in the job will talk to the dind service on this host:port
+    DOCKER_HOST: tcp://docker:2375
   script:
     - |
       cat > .env <<ENV
