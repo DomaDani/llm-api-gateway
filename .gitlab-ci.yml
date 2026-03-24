@@ -41,9 +41,9 @@ build:
 compose:
   stage: compose
   image:
-    name: docker:28.2.0
+    name: docker:29.3.0
   services:
-    - docker:28.2.0-dind
+    - docker:29.3.0-dind
   tags:
     - local
   variables:
