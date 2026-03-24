@@ -8,11 +8,20 @@ variables:
 build:
   stage: build
   image:
-    name: gcr.io/kaniko-project/executor:v1.24.0
+    name: gcr.io/kaniko-project/executor:v1.24.0-debug
     entrypoint: ["/busybox/sh", "-c"]
   script:
     - mkdir -p /kaniko/.docker
-    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n $CI_REGISTRY_USER:$CI_REGISTRY_PASSWORD | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+    - |
+      cat > /kaniko/.docker/config.json <<EOF
+      {
+        "auths": {
+          "$CI_REGISTRY": {
+            "auth": "$(echo -n $CI_REGISTRY_USER:$CI_REGISTRY_PASSWORD | base64 | tr -d '\n')"
+          }
+        }
+      }
+      EOF
     - /kaniko/executor \
       --context /workspace \
       --dockerfile /workspace/gateway/Dockerfile \
