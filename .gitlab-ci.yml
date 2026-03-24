@@ -69,10 +69,10 @@ compose:
     - echo "INIT_DB_IMAGE=$CI_REGISTRY_IMAGE:init-db-$IMAGE_TAG" >> .env
 
     - docker-compose pull || true
-    - docker compose -f docker-compose.yml -f ci.override.yml up -d
+    - docker-compose -f docker-compose.yml -f ci.override.yml up -d
     
     - |
-      INIT_ID=$(docker compose -f docker-compose.yml -f ci.override.yml ps -q init-db) || true
+      INIT_ID=$(docker-compose -f docker-compose.yml -f ci.override.yml ps -q init-db) || true
       if [ -n "$INIT_ID" ]; then
         timeout=300; elapsed=0
         while [ "$(docker inspect -f '{{.State.Running}}' "$INIT_ID")" = "true" ] && [ $elapsed -lt $timeout ]; do
@@ -80,8 +80,8 @@ compose:
         done
         EXIT_CODE=$(docker inspect -f '{{.State.ExitCode}}' "$INIT_ID")
         if [ "$EXIT_CODE" -ne 0 ]; then
-          docker compose -f docker-compose.yml -f ci.override.yml logs init-db --tail=300
-          docker compose -f docker-compose.yml -f ci.override.yml down -v
+          docker-compose -f docker-compose.yml -f ci.override.yml logs init-db --tail=300
+          docker-compose -f docker-compose.yml -f ci.override.yml down -v
           rm -f ci.override.yml
           exit $EXIT_CODE
         fi
@@ -94,14 +94,14 @@ compose:
         elapsed=$((elapsed+2))
       done
       if ! curl -sSf http://localhost:8000/health; then
-        docker compose -f docker-compose.yml -f ci.override.yml logs gateway --tail=300
-        docker compose -f docker-compose.yml -f ci.override.yml down -v
+        docker-compose -f docker-compose.yml -f ci.override.yml logs gateway --tail=300
+        docker-compose -f docker-compose.yml -f ci.override.yml down -v
         rm -f ci.override.yml
         exit 1
       fi
 
-    - docker compose -f docker-compose.yml -f ci.override.yml ps
-    - docker compose -f docker-compose.yml -f ci.override.yml logs --tail=200
-    - docker compose -f docker-compose.yml -f ci.override.yml down -v
+    - docker-compose -f docker-compose.yml -f ci.override.yml ps
+    - docker-compose -f docker-compose.yml -f ci.override.yml logs --tail=200
+    - docker-compose -f docker-compose.yml -f ci.override.yml down -v
     - rm -f ci.override.yml
     - rm -f .env
