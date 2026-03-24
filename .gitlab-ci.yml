@@ -85,7 +85,7 @@ compose:
     - printf '%s' "$CI_JOB_PASSWORD" | docker login "$CI_REGISTRY" -u $CI_JOB_USER --password-stdin
     - if [ -f images.env ]; then cat images.env >> .env; fi
 
-    - docker-compose pull || true
+    - docker-compose pull
     - docker-compose -f docker-compose.yml -f ci.override.yml up -d --no-build
     
     - |
