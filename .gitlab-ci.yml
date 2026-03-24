@@ -69,6 +69,8 @@ compose:
             CREATE_MOCK_DATA: "true"
       YAML
 
+    - apk add --no-cache curl
+
     - ls -l /var/run/docker.sock || true
     - docker info || true
     - env | grep -i DOCKER || true
