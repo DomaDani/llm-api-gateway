@@ -38,10 +38,6 @@ build:
       --cache=true
 
     - |
-      docker run --rm $CI_REGISTRY_IMAGE:init-db-$IMAGE_TAG \
-      python -c "import importlib, sys; importlib.import_module('sqlalchemy'); importlib.import_module('dotenv')"
-
-    - |
       echo "GATEWAY_IMAGE=$CI_REGISTRY_IMAGE:gateway-$IMAGE_TAG" > images.env
       echo "INIT_DB_IMAGE=$CI_REGISTRY_IMAGE:init-db-$IMAGE_TAG" >> images.env
 
