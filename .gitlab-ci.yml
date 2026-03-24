@@ -41,9 +41,9 @@ build:
 compose:
   stage: compose
   image:
-    name: docker:29.3.0
+    name: docker:24.0.9
   services:
-    - docker:29.3.0-dind
+    - docker:24.0.9-dind
   tags:
     - local
   variables:
@@ -100,11 +100,11 @@ compose:
 
     - |
       elapsed=0
-      until curl -sSf http://localhost:8000/health || [ $elapsed -ge 120 ]; do
+      until curl -sSf http://docker:8000/health || [ $elapsed -ge 120 ]; do
         sleep 1
         elapsed=$((elapsed+2))
       done
-      if ! curl -sSf http://localhost:8000/health; then
+      if ! curl -sSf http://docker:8000/health; then
         docker-compose -f docker-compose.yml -f ci.override.yml logs gateway --tail=300
         docker-compose -f docker-compose.yml -f ci.override.yml down -v
         rm -f ci.override.yml
