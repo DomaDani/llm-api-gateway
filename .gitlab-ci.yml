@@ -8,7 +8,7 @@ variables:
 build:
   stage: build
   image:
-    name: grc.io/kaniko-project/executor:v1.24.0
+    name: gcr.io/kaniko-project/executor:v1.24.0
     entrypoint: ["/busybox/sh", "-c"]
   script:
     - mkdir -p /kaniko/.docker
