@@ -1,8 +1,41 @@
 stages:
+  - build
   - compose
 
 variables:
   DATABASE_URL: postgresql+asyncpg://$POSTGRES_USER:$POSTGRES_PASSWORD@db:5432/postgres
+
+build:
+  stage: build
+  image:
+    name: alpine:3.21
+  services:
+    - docker:29.3.0-dind
+  variables:
+    KANIKO_VERSION: v1.24.0
+    KANIKO_DIGEST: sha256:4e7a52dd1f14872430652bb3b027405b8dfd17c4538751c620ac005741ef9698
+  script:
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n $CI_REGISTRY_USER:$CI_REGISTRY_PASSWORD | base64)\"}}}" > /kaniko/.docker/config.json
+
+    - docker run --rm \
+      -v $CI_PROJECT_DIR:/workspace \
+      -v /kaniko/.docker:/kaniko/.docker \
+      gcr.io/kaniko-project/executor@$KANIKO_DIGEST \
+      --context /workspace \
+      --dockerfile /workspace/gateway/Dockerfile \
+      --destination $CI_REGISTRY_IMAGE:gateway-$IMAGE_TAG \
+      --cache=true
+
+    - docker run --rm \
+      -v $CI_PROJECT_DIR:/workspace \
+      -v /kaniko/.docker:/kaniko/.docker \
+      gcr.io/kaniko-project/executor@$KANIKO_DIGEST \
+      --context /workspace \
+      --dockerfile /workspace/postgreSQL/Dockerfile \
+      --destination $CI_REGISTRY_IMAGE:init-db-$IMAGE_TAG \
+      --cache=true
+
 
 compose:
   stage: compose
