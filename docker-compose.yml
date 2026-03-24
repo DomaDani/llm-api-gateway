@@ -6,6 +6,7 @@ services:
       - ./postgreSQL/data:/var/lib/postgresql/data
     
   init-db:
+    image: ${INIT_DB_IMAGE:-llm-api-gateway-init-db:latest}
     build:
       context: ./
       dockerfile: postgreSQL/Dockerfile
@@ -30,6 +31,7 @@ services:
     restart: "no"
 
   gateway:
+    image: ${GATEWAY_IMAGE:-llm-api-gateway:latest}
     build:
       context: ./
       dockerfile: gateway/Dockerfile
