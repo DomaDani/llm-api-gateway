@@ -44,6 +44,8 @@ compose:
     name: docker:29.3.0
   services:
     - docker:29.3.0-dind
+  tags:
+    - local
   script:
     - |
       cat > .env <<ENV
