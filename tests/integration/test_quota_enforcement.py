@@ -16,6 +16,8 @@ def test_quota_enforcement(base_url: str, limited_api_key: str):
     )
 
     assert chat_completion.status_code == 429
+    response = chat_completion.model_dump()
+    assert response["detail"] == "Quota exceeded."
 
     chat_completion = client.chat.completions.create(**request_data)
     assert chat_completion.status_code == 200
@@ -25,3 +27,5 @@ def test_quota_enforcement(base_url: str, limited_api_key: str):
 
     chat_completion = client.chat.completions.create(**request_data)
     assert chat_completion.status_code == 429
+    response = chat_completion.model_dump()
+    assert response["detail"] == "Quota exceeded."
