@@ -1,0 +1,7 @@
+pytest
+pytest-asyncio
+openai
+sqlalchemy>=1.4
+asyncpg
+fastapi
+uvicorn
