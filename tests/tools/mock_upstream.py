@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 import argparse
-import json
 import logging
 from pathlib import Path
 from typing import Dict, Any
@@ -11,6 +10,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 import uvicorn
 from contextlib import asynccontextmanager
+from .load_mappings import load_mappings_from_dir
 
 log = logging.getLogger("mock_upstream")
 
@@ -18,7 +18,7 @@ _mappings = {}
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    log.info("Mock upstream starting; %d mappings available", len(_mappings))
+    log.info(f"Mock upstream starting; {len(_mappings)} mappings available")
     yield
     log.info("Mock upstream shutting down")
 
@@ -26,24 +26,9 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="Mock Upstream", docs_url=None, redoc_url=None, lifespan=lifespan)
 
 
-def load_mappings_from_dir(directory: Path) -> None:
-    if not directory.exists():
-        log.warning("Mappings directory %s does not exist", directory)
-        return
-    for p in sorted(directory.iterdir()):
-        if p.is_file() and p.suffix.lower() == ".json":
-            try:
-                with p.open("r", encoding="utf-8") as fh:
-                    data = json.load(fh)
-                _mappings[p.stem] = data
-                log.info("Loaded mapping %s from %s", p.stem, p)
-            except Exception as e:
-                log.exception("Failed loading mapping from %s: %s", p, e)
-
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    log.info("Mock upstream starting; %d mappings available", len(_mappings))
+    log.info(f"Mock upstream starting; {len(_mappings)} mappings available")
     yield
     log.info("Mock upstream shutting down")
 
@@ -78,7 +63,7 @@ def main(argv=None):
     logging.basicConfig(level=logging.INFO)
 
     mappings_dir = Path(args.mappings)
-    load_mappings_from_dir(mappings_dir)
+    _mappings.update(load_mappings_from_dir(mappings_dir))
 
     uvicorn.run(app, host=args.host, port=args.port, log_level="info", reload=args.reload)
 
