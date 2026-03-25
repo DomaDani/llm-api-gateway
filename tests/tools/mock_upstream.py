@@ -8,13 +8,13 @@ from pathlib import Path
 from typing import Dict, Any
 
 from fastapi import FastAPI, Request
-from openai import ChatCompletion
+from fastapi.responses import JSONResponse
 import uvicorn
 from contextlib import asynccontextmanager
 
 log = logging.getLogger("mock_upstream")
 
-_mappings: Dict[str, Dict[str, Any]] = {}
+_mappings = {}
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -48,15 +48,23 @@ async def lifespan(app: FastAPI):
     log.info("Mock upstream shutting down")
 
 
-def _choose_mapping(request: Request) -> Dict[str, Any]:
+async def _choose_mapping(request: Request) -> Dict[str, Any]:
+    incoming = await request.json()
+
+    for _, data in _mappings.items():
+        if "request" in data:
+            if data["request"] == incoming:
+                if "completion" in data:
+                    return data["completion"]
+                break
+
     return _mappings.get("mock_completion1")
 
 
 @app.post("/v1/chat/completions")
 async def chat_completions(request: Request):
-    mapping = _choose_mapping(request)
-    completion = ChatCompletion.construct(**mapping)
-    return completion
+    mapping = await _choose_mapping(request)
+    return JSONResponse(content=mapping, status_code=200)
 
 
 def main(argv=None):
