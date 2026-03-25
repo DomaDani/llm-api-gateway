@@ -39,17 +39,19 @@ async def _choose_mapping(request: Request) -> Dict[str, Any]:
     for _, data in _mappings.items():
         if "request" in data:
             if data["request"] == incoming:
-                if "completion" in data:
-                    return data["completion"]
+                if data.get("completion") is not None:
+                    return 200, data["completion"]
+                elif data.get("upstream_error") is not None:
+                    return data["upstream_error"]["status_code"], data["upstream_error"]["response"]
                 break
 
-    return _mappings.get("mock_completion1")
+    return 200, _mappings.get("mock_completion1")
 
 
 @app.post("/v1/chat/completions")
 async def chat_completions(request: Request):
-    mapping = await _choose_mapping(request)
-    return JSONResponse(content=mapping, status_code=200)
+    status_code, response = await _choose_mapping(request)    
+    return JSONResponse(content=response, status_code=status_code)
 
 
 def main(argv=None):
