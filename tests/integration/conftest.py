@@ -17,3 +17,7 @@ def unlimited_api_key() -> str:
 @pytest.fixture(scope="session")
 def limited_api_key() -> str:
     return os.environ.get("LIMITED_API_KEY", "WQC-GPp6L8glbHgIqAmyTQjwwr6mOV3Ar3uuWG33x0j_HzGsD-7DxujaCl-EzkTkQwZBWSekQwvtnw-WNUKnDQ")
+
+@pytest.fixture(scope="session")
+def expired_api_key() -> str:
+    return os.environ.get("EXPIRED_API_KEY", "ExpiredKey123bHgIqAmyTQjwwr6mOV3Ar3uuWG33x0j_HzGsD-7DxujaCl-EzkTkQwZBWSekQwvtnw-WNUKnDQ")

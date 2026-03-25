@@ -8,6 +8,8 @@ def test_quota_enforcement(base_url: str, limited_api_key: str):
 
     client = OpenAI(api_key=limited_api_key, base_url=base_url)
 
+
+    # Test with a request that immediately exceeds the quota
     chat_completion = client.chat.completions.create(
         model=request_data["model"],
         messages=request_data["messages"],
@@ -19,12 +21,14 @@ def test_quota_enforcement(base_url: str, limited_api_key: str):
     response = chat_completion.model_dump()
     assert response["detail"] == "Quota exceeded."
 
+    # Test with a request that is within the quota
     chat_completion = client.chat.completions.create(**request_data)
     assert chat_completion.status_code == 200
 
     response = chat_completion.model_dump()
     assert response == expected_response
 
+    # Test with another request that now exceeds the quota
     chat_completion = client.chat.completions.create(**request_data)
     assert chat_completion.status_code == 429
     response = chat_completion.model_dump()

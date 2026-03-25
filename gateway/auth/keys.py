@@ -23,7 +23,7 @@ async def validate_api_key(auth: HTTPAuthorizationCredentials = Security(securit
     try:
         key_data = await db_key_check(api_key)
     except ValueError:
-        raise HTTPException(status_code=401, detail="API key fingerprint not in allowed keys.")
+        raise HTTPException(status_code=401, detail="API key fingerprint invalid or not in allowed keys.")
     
     if key_data.status != Status.ACTIVE:
         raise HTTPException(status_code=403, detail="The API key is not active.")

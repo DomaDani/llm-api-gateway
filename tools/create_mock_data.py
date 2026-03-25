@@ -93,7 +93,17 @@ async def create_mock_data():
             status=Status.ACTIVE
         )
 
-        session.add_all([api_key1, api_key2])
+        api_key3 = APIKey(
+            project=project,
+            user=user2,
+            name="Expired API key",
+            fingerprint="ExpiredKey123",
+            key_hash=hash_key("ExpiredKey123bHgIqAmyTQjwwr6mOV3Ar3uuWG33x0j_HzGsD-7DxujaCl-EzkTkQwZBWSekQwvtnw-WNUKnDQ"),
+            create_date=datetime.now(timezone.utc),
+            status=Status.EXPIRED
+        )
+
+        session.add_all([api_key1, api_key2, api_key3])
 
         limit = Limit(
             name="Token Limit",
