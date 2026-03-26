@@ -209,7 +209,7 @@ integration:
 
     - wait $PIP_PID
 
-    - python -m pytest tests/integration
+    - python -m pytest -vv tests/integration
 
     - docker-compose -f docker-compose.yml -f tests/docker-compose.test.yml ps
     - docker-compose -f docker-compose.yml -f tests/docker-compose.test.yml logs --tail=200
