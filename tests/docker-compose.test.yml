@@ -1,0 +1,18 @@
+version: "3.8"
+services:
+  init-db:
+    environment:
+      RESET_DB: "true"
+      CREATE_MOCK_DATA: "true"
+  gateway:
+    healthcheck:
+      interval: 10s
+      timeout: 3s
+      retries: 6
+  mock_upstream:
+    image: ${MOCK_UPSTREAM_IMAGE:-llm-api-mock-upstream:latest}
+    build:
+      context: ./
+      dockerfile: tests/tools/Dockerfile
+    ports:
+      - "8081:8081"
