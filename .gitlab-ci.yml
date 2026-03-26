@@ -21,8 +21,6 @@ build:
   image:
     name: gcr.io/kaniko-project/executor:v1.24.0-debug
     entrypoint: ["/busybox/sh", "-c"]
-  tags:
-    - local
   script:
     - mkdir -p /kaniko/.docker
     - |
