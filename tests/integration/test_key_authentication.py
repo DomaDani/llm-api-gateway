@@ -10,7 +10,7 @@ def test_key_authentication(completions_url: str, expired_api_key: str, completi
     clinet = OpenAI(api_key="TooShortKey", base_url=completions_url, max_retries=0)
     chat_completion = clinet.chat.completions.create(**request_data)
 
-    assert chat_completion.status_code == 400
+    assert chat_completion.status == 400
     response = chat_completion.model_dump()
     assert response["detail"] == "Invalid API Key length."
 
@@ -18,7 +18,7 @@ def test_key_authentication(completions_url: str, expired_api_key: str, completi
     client = OpenAI(api_key="TooLongKeyTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT", base_url=completions_url, max_retries=0)
     chat_completion = client.chat.completions.create(**request_data)
 
-    assert chat_completion.status_code == 400
+    assert chat_completion.status == 400
     response = chat_completion.model_dump()
     assert response["detail"] == "Invalid API Key length."
 
@@ -26,14 +26,14 @@ def test_key_authentication(completions_url: str, expired_api_key: str, completi
     client = OpenAI(api_key="InvalidKeyTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT", base_url=completions_url, max_retries=0)
     chat_completion = client.chat.completions.create(**request_data)
 
-    assert chat_completion.status_code == 401
+    assert chat_completion.status == 401
     response = chat_completion.model_dump()
     assert response["detail"] == "API key fingerprint invalid or not in allowed keys."
 
     # Test with an API key that is valid but expired
     client = OpenAI(api_key=expired_api_key, base_url=completions_url, max_retries=0)
     chat_completion = client.chat.completions.create(**request_data)
-    assert chat_completion.status_code == 403
+    assert chat_completion.status == 403
 
     response = chat_completion.model_dump()
     assert response["detail"] == "The API key is not active."
@@ -42,6 +42,6 @@ def test_key_authentication(completions_url: str, expired_api_key: str, completi
     client = OpenAI(api_key="TTcj1lxYOY9dInvalidWithMatchingFingerprintTTTTTTTTTTTTTTTTTTTTTT", base_url=completions_url, max_retries=0)
     chat_completion = client.chat.completions.create(**request_data)
 
-    assert chat_completion.status_code == 401
+    assert chat_completion.status == 401
     response = chat_completion.model_dump()
     assert response["detail"] == "Invalid API key."

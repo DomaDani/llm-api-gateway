@@ -18,19 +18,19 @@ def test_quota_enforcement(completions_url: str, limited_api_key: str, completio
         max_tokens=5000
     )
 
-    assert chat_completion.status_code == 429
+    assert chat_completion.status == 429
     response = chat_completion.model_dump()
     assert response["detail"] == "Quota exceeded."
 
     # Test with a request that is within the quota
     chat_completion = client.chat.completions.create(**request_data)
-    assert chat_completion.status_code == 200
+    assert chat_completion.status == 200
 
     response = chat_completion.model_dump()
     assert response == expected_response
 
     # Test with another request that now exceeds the quota
     chat_completion = client.chat.completions.create(**request_data)
-    assert chat_completion.status_code == 429
+    assert chat_completion.status == 429
     response = chat_completion.model_dump()
     assert response["detail"] == "Quota exceeded."

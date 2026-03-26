@@ -10,7 +10,7 @@ def test_chat_end_to_end(completions_url: str, unlimited_api_key: str, completio
     client = OpenAI(api_key=unlimited_api_key, base_url=completions_url, max_retries=0)
 
     chat_completion = client.chat.completions.create(**request_data)
-    assert chat_completion.status_code == 200
+    assert chat_completion.status == 200
 
     response = chat_completion.model_dump()
     assert response == expected_response

@@ -37,25 +37,34 @@ async def _choose_mapping(request: Request) -> Dict[str, Any]:
     incoming = await request.json()
 
     for _, data in _mappings.items():
-        if "request" in data:
-            if data["request"] == incoming:
-                if data.get("completion") is not None:
-                    return 200, data["completion"]
-                elif data.get("upstream_error") is not None:
-                    return data["upstream_error"]["status_code"], data["upstream_error"]["response"]
-                break
+        if "request" in data and data["request"] == incoming:
+            if data.get("completion") is not None:
+                return 200, data["completion"]
 
-    return 200, _mappings.get("mock_completion1")
+            ue = data.get("upstream_error")
+            if ue is not None:
+                status = ue.get("status") or 500
+                response = ue.get("response") or {"detail": "upstream error"}
+                return int(status), response
+
+            break
+
+    # fallback to a known completion mapping if available
+    fallback = _mappings.get("mock_completion1", {})
+    if isinstance(fallback, dict) and fallback.get("completion") is not None:
+        return 200, fallback["completion"]
+
+    return 200, {"detail": "no mapping found"}
 
 
 @app.post("/v1/chat/completions")
 async def chat_completions(request: Request):
-    status_code, response = await _choose_mapping(request)    
-    return JSONResponse(content=response, status_code=status_code)
+    status, response = await _choose_mapping(request)    
+    return JSONResponse(content=response, status=status)
 
 @app.get("/health")
 async def health():
-    return JSONResponse(content={"status": "ok"}, status_code=200)
+    return JSONResponse(content={"status": "ok"}, status=200)
 
 
 def main(argv=None):
