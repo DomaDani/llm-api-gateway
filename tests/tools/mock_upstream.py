@@ -27,13 +27,6 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="Mock Upstream", docs_url=None, redoc_url=None, lifespan=lifespan)
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    log.info(f"Mock upstream starting; {len(_mappings)} mappings available")
-    yield
-    log.info("Mock upstream shutting down")
-
-
 async def _choose_mapping(request: Request) -> Dict[str, Any]:
     incoming = await request.json()
 
@@ -67,7 +60,7 @@ async def chat_completions(request: Request):
 
 @app.get("/health")
 async def health():
-    return JSONResponse(content={"status": "ok"}, status=200)
+    return JSONResponse(content={"status": "ok"}, status_code=200)
 
 
 def main(argv=None):
