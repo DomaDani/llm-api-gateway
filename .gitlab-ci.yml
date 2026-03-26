@@ -179,7 +179,7 @@ integration:
       ENV
 
     - apk add --no-cache python3 py3-pip curl
-    - python -m venv .venvv
+    - python -m venv .venv
     - . .venv/bin/activate
     - pip install -r tests/requirements.txt & PIP_PID=$!
 
