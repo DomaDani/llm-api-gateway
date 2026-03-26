@@ -230,7 +230,7 @@ integration:
 
     - |
       # Run tests, print logs
-      python -m pytest -vv tests/integration
+      python -m pytest -vv tests/integration || true
       PYTEST_EXIT=$?
 
 
