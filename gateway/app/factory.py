@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+import logging
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,6 +10,8 @@ from gateway.routes import chat_router, health_router
 from gateway.app.middleware import init_middleware
 
 from shared.config import TARGET_URL, TARGET_KEY
+
+logger = logging.getLogger("uvicorn.error")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -30,6 +33,8 @@ def create_app() -> FastAPI:
 
 	url = os.getenv("TARGET_URL") or TARGET_URL
 	key = os.getenv("TARGET_KEY") or TARGET_KEY
+
+	logger.info(f"Initializing UpstreamClient with URL: {url}")
 	app.state.upstream_client = UpstreamClient(url, key)
 
 	init_middleware(app)
