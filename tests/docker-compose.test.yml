@@ -14,5 +14,10 @@ services:
     build:
       context: ./
       dockerfile: tests/tools/Dockerfile
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8081/health ||exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
     ports:
       - "8081:8081"

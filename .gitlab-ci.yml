@@ -205,6 +205,25 @@ integration:
         docker-compose -f docker-compose.yml -f tests/docker-compose.test.yml logs gateway --tail=200
         exit 1
       fi
+
+
+    - |
+      # Wait for mock-upstream to be healthy
+      SERVICE=mock-upstream
+      ID=$(docker-compose -f docker-compose.yml -f tests/docker-compose.test.yml ps -q "$SERVICE") || true
+      if [ -z "$ID" ]; then echo "$SERVICE: no container"; exit 1; fi
+
+      timeout=120; elapsed=0
+      while [ "$(docker inspect -f '{{.State.Health.Status}}' "$ID" 2>/dev/null || echo unknown)" != "healthy" ] && [ $elapsed -lt $timeout ]; do
+        sleep 1
+        elapsed=$((elapsed+1))
+      done
+
+      if [ "$(docker inspect -f '{{.State.Health.Status}}' "$ID" 2>/dev/null || echo unknown)" != "healthy" ]; then
+        docker-compose -f docker-compose.yml -f tests/docker-compose.test.yml logs mock-upstream --tail=200
+        exit 1
+      fi
+
     - sleep 5
 
     - wait $PIP_PID
