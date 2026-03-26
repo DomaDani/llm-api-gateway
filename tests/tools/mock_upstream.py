@@ -53,6 +53,10 @@ async def chat_completions(request: Request):
     status_code, response = await _choose_mapping(request)    
     return JSONResponse(content=response, status_code=status_code)
 
+@app.get("/health")
+async def health():
+    return JSONResponse(content={"status": "ok"}, status_code=200)
+
 
 def main(argv=None):
     p = argparse.ArgumentParser()

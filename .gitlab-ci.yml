@@ -1,6 +1,6 @@
 stages:
-  - build
-  - compose
+  - docker
+  - tests
 
 workflow:
   rules:
@@ -17,13 +17,14 @@ variables:
   IMAGE_TAG: $CI_COMMIT_SHORT_SHA
 
 build:
-  stage: build
+  stage: docker
   image:
     name: gcr.io/kaniko-project/executor:v1.24.0-debug
     entrypoint: ["/busybox/sh", "-c"]
   script:
     - mkdir -p /kaniko/.docker
     - |
+      # Set up kaniko authentication
       cat > /kaniko/.docker/config.json <<EOF
       {
         "auths": {
@@ -34,6 +35,7 @@ build:
       }
       EOF
     - |
+      # Build & push gateway image
       /kaniko/executor \
       --context $CI_PROJECT_DIR \
       --dockerfile gateway/Dockerfile \
@@ -41,6 +43,7 @@ build:
       --cache=false
 
     - |
+      # Build & push init-db image
       /kaniko/executor \
       --context $CI_PROJECT_DIR \
       --dockerfile postgreSQL/Dockerfile \
@@ -48,6 +51,7 @@ build:
       --cache=false
 
     - |
+      # Write artifact
       echo "GATEWAY_IMAGE=$CI_REGISTRY_IMAGE:gateway-$IMAGE_TAG" > images.env
       echo "INIT_DB_IMAGE=$CI_REGISTRY_IMAGE:init-db-$IMAGE_TAG" >> images.env
 
@@ -58,7 +62,7 @@ build:
 
 
 compose:
-  stage: compose
+  stage: docker
   image:
     name: docker:24.0.9
   services:
@@ -72,6 +76,7 @@ compose:
     DOCKER_HOST: tcp://docker:2375
   script:
     - |
+      # Write .env file
       cat > .env <<ENV
       POSTGRES_USER=$POSTGRES_USER
       POSTGRES_PASSWORD=$POSTGRES_PASSWORD
@@ -82,6 +87,7 @@ compose:
       ENV
 
     - |
+      # Update ci.yml settings
       cat > ci.override.yml <<'YAML'
       services:
         init-db:
@@ -99,6 +105,7 @@ compose:
     - docker-compose -f docker-compose.yml -f ci.override.yml up -d --no-build
     
     - |
+      # Wait for init-db to bootsrap db, verify success
       INIT_ID=$(docker-compose -f docker-compose.yml -f ci.override.yml ps -q init-db) || true
       if [ -n "$INIT_ID" ]; then
         timeout=300; elapsed=0
@@ -114,7 +121,8 @@ compose:
         fi
       fi
 
-    - |
+    - | 
+      # Perform gateway health check
       elapsed=0
       until curl -sSf http://docker:8000/health || [ $elapsed -ge 120 ]; do
         sleep 1
@@ -130,5 +138,96 @@ compose:
     - docker-compose -f docker-compose.yml -f ci.override.yml ps
     - docker-compose -f docker-compose.yml -f ci.override.yml logs --tail=200
     - docker-compose -f docker-compose.yml -f ci.override.yml down -v
+    - rm -f ci.override.yml
+    - rm -f .env
+
+
+integration:
+  stage: tests
+  image:
+    name: docker:24.0.9
+  services:
+    - docker:24.0.9-dind
+  tags:
+    - local
+  variables:
+    DOCKER_TLS_CERTDIR: ""
+    DOCKER_HOST: tcp://docker:2375
+    TARGET_URL: http://127.0.0.1:8001/
+    TARGET_KEY: anykey
+  script:
+    - |
+      # Write .env file
+      cat > .env <<ENV
+      POSTGRES_USER=$POSTGRES_USER
+      POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      DATABASE_URL=$DATABASE_URL
+      
+      TARGET_URL=$TARGET_URL
+      TARGET_KEY=$TARGET_KEY
+      ENV
+
+    - |
+      # Update ci.yml settings
+      cat > ci.override.yml <<'YAML'
+      services:
+        init-db:
+          environment:
+            RESET_DB: "true"
+            CREATE_MOCK_DATA: "true"
+        gateway:
+          healthcheck:
+            interval: 10s
+            timeout: 3s
+            retries: 6
+      YAML
+
+    - apk add --no-cache python3 py3-pip curl
+    - pip install -r tests/requirements.txt & PIP_PID=$!
+
+    - printf '%s' "$CI_JOB_PASSWORD" | docker login "$CI_REGISTRY" -u $CI_JOB_USER --password-stdin
+    - if [ -f images.env ]; then cat images.env >> .env; fi
+
+    - docker-compose pull
+    - docker-compose -f docker-compose.yml -f ci.override.yml up -d --no-build
+
+    - |
+      # Wait for gateway to be healthy
+      SERVICE=gateway
+      ID=$(docker-compose -f docker-compose.yml -f ci.override.yml ps -q "$SERVICE") || true
+      if [ -z "$ID" ]; then echo "$SERVICE: no container"; exit 1; fi
+
+      timeout=120; elapsed=0
+      while [ "$(docker inspect -f '{{.State.Health.Status}}' "$ID" 2>/dev/null || echo unknown)" != "healthy" ] && [ $elapsed -lt $timeout ]; do
+        sleep 1
+        elapsed=$((elapsed+1))
+      done
+
+      if [ "$(docker inspect -f '{{.State.Health.Status}}' "$ID" 2>/dev/null || echo unknown)" != "healthy" ]; then
+        docker-compose -f docker-compose.yml -f ci.override.yml logs gateway --tail=200
+        exit 1
+      fi
+    - sleep 5
+
+    - wait $PIP_PID
+
+    - python tests/tools/mock_upstream.py & MOCK_PID=$!
+    
+    - |
+      # Wait for mock upstream
+      timeout=10; elapsed=0
+      until curl -sSf http://127.0.0.1:8001/health >/dev/null 2>&1 || [ $elapsed -ge $timeout ]; do
+      sleep 1; elapsed=$((elapsed+1))
+      done
+      if ! curl -sSf http://127.0.0.1:8001/health >/dev/null 2>&1; then
+      echo "mock_upstream failed to start"; kill $MOCK_PID || true; exit 1
+      fi
+
+    - pytest tests/integration -q
+
+    - docker-compose -f docker-compose.yml -f ci.override.yml ps
+    - docker-compose -f docker-compose.yml -f ci.override.yml logs --tail=200
+    - docker-compose -f docker-compose.yml -f ci.override.yml down -v
+    - kill MOCK_PID || true
     - rm -f ci.override.yml
     - rm -f .env
