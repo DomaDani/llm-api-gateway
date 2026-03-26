@@ -215,5 +215,4 @@ integration:
     - docker-compose -f docker-compose.yml -f tests/docker-compose.test.yml logs --tail=200
     - docker-compose -f docker-compose.yml -f tests/docker-compose.test.yml down -v
     - kill MOCK_PID || true
-    - rm -f ci.override.yml
     - rm -f .env
