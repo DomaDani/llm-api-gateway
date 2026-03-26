@@ -8,6 +8,9 @@ services:
       interval: 10s
       timeout: 3s
       retries: 6
+    environment:
+      - TARGET_URL=${TARGET_URL}
+      - TARGET_KEY=${TARGET_KEY}
   mock-upstream:
     image: ${MOCK_UPSTREAM_IMAGE:-llm-api-mock-upstream:latest}
     build:
