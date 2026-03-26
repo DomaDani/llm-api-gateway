@@ -10,7 +10,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 import uvicorn
 from contextlib import asynccontextmanager
-from .load_mappings import load_mappings_from_dir
+from tests.tools import load_mappings_from_dir
 
 log = logging.getLogger("mock_upstream")
 
@@ -62,7 +62,7 @@ def main(argv=None):
     p = argparse.ArgumentParser()
     p.add_argument("--port", type=int, default=8081)
     p.add_argument("--host", default="0.0.0.0")
-    p.add_argument("--mappings", default="tests/fixtures/llm_responses/completions")
+    p.add_argument("--mappings", default="tests/fixtures/completions")
     p.add_argument("--reload", action="store_true", default=False)
     args = p.parse_args(argv)
 

@@ -1,12 +1,13 @@
-from tools.load_mappings import load_mappings_from_dir
+from tests.tools.load_mappings import load_mappings_from_dir
 from openai import OpenAI
+from pathlib import Path
 
-def test_quota_enforcement(base_url: str, limited_api_key: str):
-    mappings = load_mappings_from_dir("tests/fixtures/llm_responses/completions", "mock_completion1")
+def test_quota_enforcement(completion_url: str, limited_api_key: str, completions_dir: Path):
+    mappings = load_mappings_from_dir(completions_dir, "mock_completion1")
     request_data = mappings.get("mock_completion1", {}).get("request")
     expected_response = mappings.get("mock_completion1", {}).get("completion")
 
-    client = OpenAI(api_key=limited_api_key, base_url=base_url)
+    client = OpenAI(api_key=limited_api_key, base_url=completion_url)
 
 
     # Test with a request that immediately exceeds the quota

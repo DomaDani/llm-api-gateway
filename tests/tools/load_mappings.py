@@ -1,8 +1,15 @@
 from pathlib import Path
 import json
 
-def load_mappings_from_dir(directory: Path, file: str = None) -> dict:
+def load_mappings_from_dir(directory: str|Path, file: str = None) -> dict:
     mappings = {}
+    if isinstance(directory, str):
+        directory = Path(directory)
+
+    if not directory.is_absolute():
+        directory = (Path.cwd() / directory).resolve()
+
+
     if not directory.exists():
         return
     if file:

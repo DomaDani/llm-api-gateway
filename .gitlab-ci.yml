@@ -156,6 +156,7 @@ integration:
     DOCKER_HOST: tcp://docker:2375
     TARGET_URL: http://127.0.0.1:8001/
     TARGET_KEY: anykey
+    BASE_URL: http://docker:8000/v1
   script:
     - |
       # Write .env file
@@ -184,7 +185,7 @@ integration:
       YAML
 
     - apk add --no-cache python3 py3-pip curl
-    - python3 -m venv .venv
+    - python -m venv .venv
     - . .venv/bin/activate
     - pip install -r tests/requirements.txt & PIP_PID=$!
 
@@ -214,7 +215,7 @@ integration:
 
     - wait $PIP_PID
 
-    - python tests/tools/mock_upstream.py & MOCK_PID=$!
+    - python -m tests.tools.mock_upstream.py & MOCK_PID=$!
     
     - |
       # Wait for mock upstream
@@ -226,7 +227,7 @@ integration:
       echo "mock_upstream failed to start"; kill $MOCK_PID || true; exit 1
       fi
 
-    - pytest tests/integration -q
+    - python -m pytest tests/integration
 
     - docker-compose -f docker-compose.yml -f ci.override.yml ps
     - docker-compose -f docker-compose.yml -f ci.override.yml logs --tail=200

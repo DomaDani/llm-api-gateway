@@ -1,7 +1,7 @@
 import requests
 import time
 
-def _wait_for_health(url: str, timeout: int = 120, interval: float = 1.0) -> requests.Response:
+def _wait_for_health(url: str, timeout: int = 30, interval: float = 1.0) -> requests.Response:
 	end = time.time() + timeout
 	while time.time() < end:
 		try:
