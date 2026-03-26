@@ -40,7 +40,7 @@ build:
       --context $CI_PROJECT_DIR \
       --dockerfile gateway/Dockerfile \
       --destination $CI_REGISTRY_IMAGE:gateway-$IMAGE_TAG \
-      --cache=false
+      --cache=true
 
     - |
       # Build & push init-db image
@@ -48,12 +48,21 @@ build:
       --context $CI_PROJECT_DIR \
       --dockerfile postgreSQL/Dockerfile \
       --destination $CI_REGISTRY_IMAGE:init-db-$IMAGE_TAG \
-      --cache=false
+      --cache=true
+
+    - |
+      # Build & push mock-upstream image
+      /kaniko/executor \
+      --context $CI_PROJECT_DIR \
+      --dockerfile tests/tools/Dockerfile \
+      --destination $CI_REGISTRY_IMAGE:mock-upstream-$IMAGE_TAG \
+      --cache=true
 
     - |
       # Write artifact
       echo "GATEWAY_IMAGE=$CI_REGISTRY_IMAGE:gateway-$IMAGE_TAG" > images.env
       echo "INIT_DB_IMAGE=$CI_REGISTRY_IMAGE:init-db-$IMAGE_TAG" >> images.env
+      echo "MOCK_UPSTREAM_IMAGE=$CI_REGISTRY_IMAGE:mock-upstream-$IMAGE_TAG" >> images.env
 
   artifacts:
     paths:
@@ -154,7 +163,7 @@ integration:
   variables:
     DOCKER_TLS_CERTDIR: ""
     DOCKER_HOST: tcp://docker:2375
-    TARGET_URL: http://docker:8081/v1
+    TARGET_URL: http://mock_upstream:8081/v1
     TARGET_KEY: anykey
     BASE_URL: http://docker:8000/v1
   script:
@@ -199,18 +208,6 @@ integration:
     - sleep 5
 
     - wait $PIP_PID
-
-    - python -m tests.tools.mock_upstream.py & MOCK_PID=$!
-    
-    - |
-      # Wait for mock upstream
-      timeout=10; elapsed=0
-      until curl -sSf http://127.0.0.1:8001/health >/dev/null 2>&1 || [ $elapsed -ge $timeout ]; do
-      sleep 1; elapsed=$((elapsed+1))
-      done
-      if ! curl -sSf http://127.0.0.1:8001/health >/dev/null 2>&1; then
-      echo "mock_upstream failed to start"; kill $MOCK_PID || true; exit 1
-      fi
 
     - python -m pytest tests/integration
 

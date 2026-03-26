@@ -1,6 +1,6 @@
 {
     "upstream_error": {
-        "status": 502,
+        "status_code": 502,
         "response": {
             "detail": "LLM error: Error code: 404 - {'error': {'message': 'The model `invalid` does not exist.', 'type': 'NotFoundError', 'param': 'model', 'code': 404}}"
         }
