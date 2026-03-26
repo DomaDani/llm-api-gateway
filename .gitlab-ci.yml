@@ -136,7 +136,7 @@ compose:
       elapsed=0
       until curl -sSf http://docker:8000/health || [ $elapsed -ge 120 ]; do
         sleep 1
-        elapsed=$((elapsed+2))
+        elapsed=$((elapsed+1))
       done
       if ! curl -sSf http://docker:8000/health; then
         docker-compose -f docker-compose.yml -f ci.override.yml logs gateway --tail=300
