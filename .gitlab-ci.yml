@@ -69,8 +69,9 @@ compose:
     - docker:24.0.9-dind
   tags:
     - local
-  dependencies:
-    - build
+  needs:
+    - job: build
+      artifacts: true
   variables:
     DOCKER_TLS_CERTDIR: ""
     DOCKER_HOST: tcp://docker:2375
