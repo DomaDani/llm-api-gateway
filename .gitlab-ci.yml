@@ -165,7 +165,7 @@ integration:
     DOCKER_HOST: tcp://docker:2375
     TARGET_URL: http://mock_upstream:8081/v1
     TARGET_KEY: anykey
-    BASE_URL: http://docker:8000/v1
+    BASE_URL: http://docker:8000
   script:
     - |
       # Write .env file
