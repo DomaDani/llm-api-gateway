@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+import os
 from gateway.clients import UpstreamClient
 from gateway.routes import chat_router, health_router
 from gateway.app.middleware import init_middleware
@@ -27,7 +28,9 @@ def create_app() -> FastAPI:
 		allow_headers=["*"],
 	)
 
-	app.state.upstream_client = UpstreamClient(TARGET_URL, TARGET_KEY)
+	url = os.getenv("TARGET_URL") or TARGET_URL
+	key = os.getenv("TARGET_KEY") or TARGET_KEY
+	app.state.upstream_client = UpstreamClient(url, key)
 
 	init_middleware(app)
 
