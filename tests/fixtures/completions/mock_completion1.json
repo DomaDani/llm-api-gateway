@@ -8,7 +8,8 @@
         "content": "Please write a one paragraph story about geckoes and trolleybuses! Include the city name \"Tesherv'aals\"!"
       }
     ],
-    "temperature": 1.3
+    "temperature": 1.3,
+    "max_completion_tokens": 750
   },
   "completion": {
     "id": "chatcmpl-979cd463d8ef7b71",

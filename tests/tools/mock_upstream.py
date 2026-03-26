@@ -60,7 +60,7 @@ async def _choose_mapping(request: Request) -> Dict[str, Any]:
 @app.post("/v1/chat/completions")
 async def chat_completions(request: Request):
     status, response = await _choose_mapping(request)    
-    return JSONResponse(content=response, status=status)
+    return JSONResponse(content=response, status_code=status)
 
 @app.get("/health")
 async def health():

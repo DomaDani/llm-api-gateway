@@ -97,7 +97,7 @@ async def create_mock_data():
             project=project,
             user=user2,
             name="Expired API key",
-            fingerprint="ExpiredKey123",
+            fingerprint="ExpiredKey12",
             key_hash=hash_key("ExpiredKey123bHgIqAmyTQjwwr6mOV3Ar3uuWG33x0j_HzGsD-7DxujaCl-EzkTkQwZBWSekQwvtnw-WNUKnDQ"),
             create_date=datetime.now(timezone.utc),
             status=Status.EXPIRED

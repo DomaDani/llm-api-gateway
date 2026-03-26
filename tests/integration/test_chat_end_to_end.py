@@ -1,5 +1,5 @@
 from tests.tools.load_mappings import load_mappings_from_dir
-from openai import OpenAI
+import requests
 from pathlib import Path
 
 def test_chat_end_to_end(completions_url: str, unlimited_api_key: str, completions_dir: Path):
@@ -7,11 +7,11 @@ def test_chat_end_to_end(completions_url: str, unlimited_api_key: str, completio
     request_data = mappings.get("mock_completion1", {}).get("request")
     expected_response = mappings.get("mock_completion1", {}).get("completion")
 
-    client = OpenAI(api_key=unlimited_api_key, base_url=completions_url, max_retries=0)
+    url = f"{completions_url}/chat/completions"
+    headers = {"Authorization": f"Bearer {unlimited_api_key}"}
+    resp = requests.post(url, headers=headers, json=request_data)
+    assert resp.status_code == 200
 
-    chat_completion = client.chat.completions.create(**request_data)
-    assert chat_completion.status == 200
-
-    response = chat_completion.model_dump()
+    response = resp.json()
     assert response == expected_response
 

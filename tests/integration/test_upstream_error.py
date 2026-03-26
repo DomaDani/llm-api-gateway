@@ -1,5 +1,5 @@
 from tests.tools.load_mappings import load_mappings_from_dir
-from openai import OpenAI
+import requests
 from pathlib import Path
 
 def test_upstream_error(completions_url: str, unlimited_api_key: str, completions_dir: Path):
@@ -8,10 +8,11 @@ def test_upstream_error(completions_url: str, unlimited_api_key: str, completion
     expected_response = mappings.get("mock_completion2", {}).get("upstream_error", {}).get("response")
     expected_status = mappings.get("mock_completion2", {}).get("upstream_error", {}).get("status", 200)
 
-    client = OpenAI(api_key=unlimited_api_key, base_url=completions_url, max_retries=0)
-    
-    chat_completion = client.chat.completions.create(**request_data)
-    assert chat_completion.status == expected_status
+    url = f"{completions_url}/chat/completions"
+    headers = {"Authorization": f"Bearer {unlimited_api_key}"}
 
-    response = chat_completion.model_dump()
+    resp = requests.post(url, headers=headers, json=request_data)
+    assert resp.status_code == expected_status
+
+    response = resp.json()
     assert response == expected_response
