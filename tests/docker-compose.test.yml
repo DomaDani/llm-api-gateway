@@ -9,8 +9,8 @@ services:
       timeout: 3s
       retries: 6
     environment:
-      - TARGET_URL=${TARGET_URL}
-      - TARGET_KEY=${TARGET_KEY}
+      TARGET_URL: http://mock-upstream:8081/v1
+      TARGET_KEY: anykey
   mock-upstream:
     image: ${MOCK_UPSTREAM_IMAGE:-llm-api-mock-upstream:latest}
     build:
