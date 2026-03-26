@@ -229,9 +229,9 @@ integration:
     - wait $PIP_PID
 
     - |
-      # Run tests, print logs
-      python -m pytest -vv tests/integration || true
-      PYTEST_EXIT=$?
+      # Run tests, capture exit code
+      PYTEST_EXIT=0
+      python -m pytest -vv tests/integration || PYTEST_EXIT=$?
 
 
     - docker-compose -f docker-compose.yml -f tests/docker-compose.test.yml logs gateway --tail=200 || true
