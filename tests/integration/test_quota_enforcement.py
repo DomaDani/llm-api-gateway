@@ -7,7 +7,7 @@ def test_quota_enforcement(completions_url: str, limited_api_key: str, completio
     request_data = mappings.get("mock_completion1", {}).get("request")
     expected_response = mappings.get("mock_completion1", {}).get("completion")
 
-    client = OpenAI(api_key=limited_api_key, base_url=completions_url)
+    client = OpenAI(api_key=limited_api_key, base_url=completions_url, max_retries=0)
 
 
     # Test with a request that immediately exceeds the quota

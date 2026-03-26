@@ -8,7 +8,7 @@ def test_upstream_error(completions_url: str, unlimited_api_key: str, completion
     expected_response = mappings.get("mock_completion2", {}).get("upstream_error", {}).get("response")
     expected_status_code = mappings.get("mock_completion2", {}).get("upstream_error", {}).get("status_code", 200)
 
-    client = OpenAI(api_key=unlimited_api_key, base_url=completions_url)
+    client = OpenAI(api_key=unlimited_api_key, base_url=completions_url, max_retries=0)
     
     chat_completion = client.chat.completions.create(**request_data)
     assert chat_completion.status_code == expected_status_code
