@@ -9,7 +9,7 @@ services:
       interval: 10s
       timeout: 3s
       retries: 6
-  mock_upstream:
+  mock-upstream:
     image: ${MOCK_UPSTREAM_IMAGE:-llm-api-mock-upstream:latest}
     build:
       context: ./
