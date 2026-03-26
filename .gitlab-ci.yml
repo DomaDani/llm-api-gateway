@@ -228,10 +228,18 @@ integration:
 
     - wait $PIP_PID
 
-    - python -m pytest -vv tests/integration
+    - |
+      # Run tests, print logs
+      python -m pytest -vv tests/integration
+      PYTEST_EXIT=$?
 
-    - docker-compose -f docker-compose.yml -f tests/docker-compose.test.yml ps
-    - docker-compose -f docker-compose.yml -f tests/docker-compose.test.yml logs --tail=200
-    - docker-compose -f docker-compose.yml -f tests/docker-compose.test.yml down -v
+
+    - docker-compose -f docker-compose.yml -f tests/docker-compose.test.yml logs gateway --tail=200 || true
+    - docker-compose -f docker-compose.yml -f tests/docker-compose.test.yml logs mock-upstream --tail=200 || true
+
+    - docker-compose -f docker-compose.yml -f tests/docker-compose.test.yml ps || true
+    - docker-compose -f docker-compose.yml -f tests/docker-compose.test.yml down -v || true
     - kill MOCK_PID || true
     - rm -f .env
+
+    - exit $PYTEST_EXIT
