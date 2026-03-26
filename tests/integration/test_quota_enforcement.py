@@ -1,6 +1,7 @@
 from tests.tools.load_mappings import load_mappings_from_dir
 import requests
 from pathlib import Path
+import time
 
 def test_quota_enforcement(completions_url: str, limited_api_key: str, completions_dir: Path):
     mappings = load_mappings_from_dir(completions_dir, "mock_completion1")
@@ -22,13 +23,16 @@ def test_quota_enforcement(completions_url: str, limited_api_key: str, completio
     assert resp.status_code == 429
     response = resp.json()
     assert response["detail"] == "Quota exceeded."
+    time.sleep(0.5)
 
     # Test with a request that is within the quota
     resp = requests.post(url, headers=headers, json=request_data)
     assert resp.status_code == 200
 
     response = resp.json()
+    response["id"] = expected_response["id"]
     assert response == expected_response
+    time.sleep(0.5)
 
     # Test with another request that now exceeds the quota
     resp = requests.post(url, headers=headers, json=request_data)

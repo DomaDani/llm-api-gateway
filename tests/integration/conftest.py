@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+import time
 
 import pytest
 
@@ -34,3 +35,7 @@ def fixtures_dir() -> Path:
 @pytest.fixture(scope="session")
 def completions_dir(fixtures_dir: Path) -> Path:
     return fixtures_dir  / "completions"
+
+@pytest.fixture(autouse=True, scope="session")
+def sleep_between_tests():
+    time.sleep(1)

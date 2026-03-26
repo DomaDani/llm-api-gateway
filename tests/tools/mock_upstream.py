@@ -5,6 +5,7 @@ import argparse
 import logging
 from pathlib import Path
 from typing import Dict, Any
+from random import randint
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
@@ -59,7 +60,9 @@ async def _choose_mapping(request: Request) -> Dict[str, Any]:
 
 @app.post("/v1/chat/completions")
 async def chat_completions(request: Request):
-    status, response = await _choose_mapping(request)    
+    status, response = await _choose_mapping(request)
+    if status == 200:
+        response["id"] += str(randint(1000, 999999))
     return JSONResponse(content=response, status_code=status)
 
 @app.get("/health")

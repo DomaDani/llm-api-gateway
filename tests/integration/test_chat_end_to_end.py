@@ -13,5 +13,6 @@ def test_chat_end_to_end(completions_url: str, unlimited_api_key: str, completio
     assert resp.status_code == 200
 
     response = resp.json()
+    response["id"] = expected_response["id"]
     assert response == expected_response
 
