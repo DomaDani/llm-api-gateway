@@ -4,3 +4,4 @@ class Status(Enum):
     ACTIVE = "active"
     BLOCKED = "blocked"
     ARCHIVED = "archived"
+    EXPIRED = "expired"

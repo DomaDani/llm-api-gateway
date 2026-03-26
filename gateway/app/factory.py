@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+import logging
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,6 +10,8 @@ from gateway.app.middleware import init_middleware
 
 from shared.config import TARGET_URL, TARGET_KEY
 
+logger = logging.getLogger("uvicorn.error")
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
 	await app.state.upstream_client.startup()
@@ -18,7 +21,6 @@ async def lifespan(app: FastAPI):
 def create_app() -> FastAPI:
 	app = FastAPI(title="LLM API Gateway", lifespan=lifespan)
 
-	# Local CORS policy
 	app.add_middleware(
 		CORSMiddleware,
 		allow_origins=["*"],
@@ -27,10 +29,10 @@ def create_app() -> FastAPI:
 		allow_headers=["*"],
 	)
 
+	logger.info("TARGET_URL=%s", TARGET_URL)
 	app.state.upstream_client = UpstreamClient(TARGET_URL, TARGET_KEY)
 
 	init_middleware(app)
-
 	app.include_router(chat_router)
 	app.include_router(health_router)
 
