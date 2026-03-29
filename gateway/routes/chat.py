@@ -8,7 +8,7 @@ from gateway.models import ValidatedRequest
 from gateway.limits.quota import check_limits_costs
 from gateway.logging import usage_logger
 from gateway.clients import UpstreamClient
-from gateway.models.pydantic.usage import UsageLogEntry
+from gateway.models.dto_models.usage import UsageLogEntry
 
 
 router  = APIRouter(prefix="/v1/chat", tags=["chat"])
