@@ -3,8 +3,8 @@ from sqlalchemy import select
 import logging
 
 from gateway.db import db_limit_change
-from shared.models.sqlalchemy import UsageLog, APIKey
-from gateway.models.pydantic import UsageLogEntry
+from shared.models.orm_models import UsageLog, APIKey
+from gateway.models.dto_models import UsageLogEntry
 from shared.db import get_transactional_session
 
 logger = logging.getLogger("gateway.logging.metadata")
