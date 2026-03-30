@@ -64,7 +64,8 @@ async def db_get_quotas_by_key(api_key: APIKey, session = None) -> Tuple[list[Qu
         .order_by(Limit.id)
     )
 
-    request_limit_id = result.scalars().one().id
+    request_limit = result.scalars().one_or_none()
+    request_limit_id = request_limit.id if request_limit else None
 
     result = await session.execute(
         select(Limit)
@@ -72,7 +73,8 @@ async def db_get_quotas_by_key(api_key: APIKey, session = None) -> Tuple[list[Qu
         .order_by(Limit.id)
     )
 
-    token_limit_id = result.scalars().one().id
+    token_limit = result.scalars().one_or_none()
+    token_limit_id = token_limit.id if token_limit else None
 
     result = await session.execute(
         select(Quota)
@@ -82,8 +84,8 @@ async def db_get_quotas_by_key(api_key: APIKey, session = None) -> Tuple[list[Qu
     )
     quotas = result.scalars().all()
 
-    request_quotas = [q for q in quotas if q.limit_id == request_limit_id]
-    token_quotas = [q for q in quotas if q.limit_id == token_limit_id]
+    request_quotas = [q for q in quotas if q.limit_id == request_limit_id] if request_limit_id else []
+    token_quotas = [q for q in quotas if q.limit_id == token_limit_id] if token_limit_id else []
 
     return request_quotas, token_quotas
 
