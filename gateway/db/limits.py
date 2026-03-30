@@ -7,27 +7,25 @@ from shared.db import get_transactional_session
 MAX_VALUE = 1 << 60
 
 async def db_limit_check_and_allocation(api_key: APIKey, estimate: int) -> bool:
-    remaining_expr = (func.coalesce(Quota.limit_value, MAX_VALUE) - Quota.allocated).label("remaining")
-
     async with get_transactional_session() as session:
-        result = await session.execute(
-            select(Quota)
-            .where(_quota_filter(api_key))
-            .order_by(remaining_expr, Quota.id)
-            .limit(1)
-            .with_for_update()
-        )
+        
+        request_quotas, token_quotas = await db_get_quotas_by_key(api_key, session=session)
 
-        quota = result.scalars().one_or_none()
-
-        if not quota:
+        if not request_quotas and not token_quotas:
             return True # There is no active quota for the key.
         
-        new_allocated = quota.allocated + estimate
+        strictest_request_quota = min(request_quotas, key=lambda q: (q.limit_value or MAX_VALUE) - q.allocated, default=None)
+        strictest_token_quota = min(token_quotas, key=lambda q: (q.limit_value or MAX_VALUE) - q.allocated, default=None)
+        
+        new_allocated_request = strictest_request_quota.allocated + estimate if strictest_request_quota else 0
+        new_allocated_token = strictest_token_quota.allocated + estimate if strictest_token_quota else 0
 
-        if quota.limit_value is None:
+
+        if strictest_request_quota and strictest_request_quota.limit_value is None:
             return True
-        elif new_allocated > quota.limit_value:
+        elif new_allocated_request > strictest_request_quota.limit_value:
+            return False
+        elif new_allocated_token > strictest_token_quota.limit_value:
             return False
         else:
             await db_limit_change(api_key, estimate, session=session)
