@@ -23,9 +23,9 @@ async def db_limit_check_and_allocation(api_key: APIKey, estimate: int) -> bool:
 
         if strictest_request_quota and strictest_request_quota.limit_value is None:
             return True
-        elif new_allocated_request > strictest_request_quota.limit_value:
+        elif strictest_request_quota and new_allocated_request > strictest_request_quota.limit_value:
             return False
-        elif new_allocated_token > strictest_token_quota.limit_value:
+        elif strictest_token_quota and new_allocated_token > strictest_token_quota.limit_value:
             return False
         else:
             await db_limit_change(api_key, update_req_count=True, change_by=estimate, session=session)
