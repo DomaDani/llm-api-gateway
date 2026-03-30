@@ -28,21 +28,27 @@ async def db_limit_check_and_allocation(api_key: APIKey, estimate: int) -> bool:
         elif new_allocated_token > strictest_token_quota.limit_value:
             return False
         else:
-            await db_limit_change(api_key, estimate, session=session)
+            await db_limit_change(api_key, update_req_count=True, change_by=estimate, session=session)
             return True
 
-async def db_limit_change(api_key: APIKey, change_by: int, session = None):
+async def db_limit_change(api_key: APIKey, update_req_count: bool, change_by: int, session = None):
     # Check if a session was provided, if not, create a new transactional session
     if session is None:
         async with get_transactional_session() as session:
-            await db_limit_change(api_key, change_by, session=session)
+            await db_limit_change(api_key, update_req_count, change_by, session=session)
             return
 
-    quotas, _ = await db_get_quotas_by_key(api_key, session=session)
+    request_delta = (change_by > 0) - (change_by < 0)
 
-    for quota in quotas:
-        if quota.limit_value is not None:
-            quota.allocated = min(max(quota.allocated + change_by, 0), quota.limit_value)
+    request_quotas, token_quotas = await db_get_quotas_by_key(api_key, session=session)
+
+    if update_req_count:
+        for r_quota in request_quotas:
+            if r_quota.limit_value is not None:
+                r_quota.allocated = min(max(r_quota.allocated + request_delta, 0), r_quota.limit_value)
+    for t_quota in token_quotas:
+        if t_quota.limit_value is not None:
+            t_quota.allocated = min(max(t_quota.allocated + change_by, 0), t_quota.limit_value)
 
 # Returns a tuple of the different quota types (request, token) for a given key.
 async def db_get_quotas_by_key(api_key: APIKey, session = None) -> Tuple[list[Quota], list[Quota]]:
