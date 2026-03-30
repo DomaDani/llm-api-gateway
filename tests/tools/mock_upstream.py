@@ -55,6 +55,7 @@ async def _choose_mapping(request: Request) -> Dict[str, Any]:
 async def chat_completions(request: Request):
     status, response = await _choose_mapping(request)
     if status == 200:
+        response = dict(response)
         response["id"] += str(randint(1000, 999999))
     return JSONResponse(content=response, status_code=status)
 

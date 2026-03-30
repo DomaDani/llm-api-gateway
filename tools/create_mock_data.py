@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from sqlalchemy import select
+
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 from datetime import datetime, timezone
@@ -19,9 +21,60 @@ ph = PasswordHasher()
 import asyncio
 
 
-async def create_mock_data():
+async def create_mock_data(default_only: bool = False):
     async with get_transactional_session() as session:
         
+        existing_roles_result = await session.execute(select(Role))        
+        role_map = {role.name: role for role in existing_roles_result.scalars().all()}
+
+        existing_limits_result = await session.execute(select(Limit))
+        limit_map = {limit.name: limit for limit in existing_limits_result.scalars().all()}
+
+        existing_limits_result = await session.execute(select(Limit.name))
+        existing_limit_names = set(existing_limits_result.scalars().all())
+
+        if "Project Manager" not in role_map:
+            pm_role = Role(
+                name="Project Manager",
+                description="Manages the project, sets quotas and permissions."
+            )
+            session.add(pm_role)
+        else:
+            pm_role = role_map["Project Manager"]
+
+
+        if "User" not in role_map:
+            user_role = Role(
+                name="User",
+                description="Has access to the project and can make API calls within the assigned quotas."
+            )
+            session.add(user_role)
+        else:
+            user_role = role_map["User"]
+
+
+        if "Request Limit" not in limit_map:
+            request_limit = Limit(
+                name="Request Limit",
+                description="Limits the number of requests that can be made within a certain period.",
+            )
+            session.add(request_limit)
+        else:
+            request_limit = limit_map["Request Limit"]
+
+
+        if "Token Limit" not in limit_map:
+            token_limit = Limit(
+                name="Token Limit",
+                description="Limits the number of tokens that can be used within a certain period.",
+            )
+            session.add(token_limit)
+        else:
+            token_limit = limit_map["Token Limit"]
+
+        if default_only:
+            return
+
         user1 = User(
             email="gipsz.jakab@teshervaals.com",
             username="GipszJakab38",
@@ -46,28 +99,17 @@ async def create_mock_data():
 
         session.add(project)
 
-        role1 = Role(
-            name="Project Manager",
-            description="Manages the project, sets quotas and permissions."
-        )
-        role2 = Role(
-            name="User",
-            description="Has access to the project and can make API calls within the assigned quotas."
-        )
-
-        session.add_all([role1, role2])
-
         project_permission1 = ProjectPermission(
             project=project,
             user=user1,
-            role=role1,
+            role=pm_role,
             join_date=datetime.now(timezone.utc)
         )
 
         project_permission2 = ProjectPermission(
             project=project,
             user=user2,
-            role=role2,
+            role=user_role,
             join_date=datetime.now(timezone.utc)
         )
 
@@ -105,16 +147,9 @@ async def create_mock_data():
 
         session.add_all([api_key1, api_key2, api_key3])
 
-        limit = Limit(
-            name="Token Limit",
-            description="Limits the number of tokens that can be used within a certain period.",
-        )
-
-        session.add(limit)
-
         quota = Quota(
             api_key=api_key2,
-            limit=limit,
+            limit=token_limit,
             limit_value=1000,
             period=Period.HOUR,
             status=Status.ACTIVE

@@ -16,11 +16,11 @@ class Quota(SQLAlchemyBase):
     user_id : Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"))
     key_id : Mapped[Optional[int]] = mapped_column(ForeignKey("api_keys.id"))
     limit_id : Mapped[int] = mapped_column(ForeignKey("limits.id"))
-    limit_value : Mapped[Optional[int]]
+    limit_value : Mapped[Optional[float]]
     period : Mapped[Period] = mapped_column(SQLAlchemyEnum(Period))
     expires_at : Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
     status : Mapped[Status] = mapped_column(SQLAlchemyEnum(Status), default=Status.ACTIVE)
-    allocated: Mapped[int] = mapped_column(default=0)
+    allocated: Mapped[float] = mapped_column(default=0)
 
     project = relationship("Project", back_populates="quotas")
     api_key = relationship("APIKey", back_populates="quotas")

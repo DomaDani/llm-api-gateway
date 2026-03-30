@@ -23,6 +23,7 @@ async def forward_request(request: Request, validated_request: ValidatedRequest 
     chat_completion = None
 
     upstream_latency = 0.0
+    failed_upstream = False
 
     try:
         upstream_start = time.perf_counter()
@@ -30,6 +31,7 @@ async def forward_request(request: Request, validated_request: ValidatedRequest 
         status_code = 200
     except Exception as e:
         status_code = 502
+        failed_upstream = True
         raise HTTPException(status_code=502, detail=f"LLM error: {str(e)}")
     finally:
         upstream_latency = time.perf_counter() - upstream_start
@@ -66,6 +68,6 @@ async def forward_request(request: Request, validated_request: ValidatedRequest 
         )
 
 
-        asyncio.create_task(usage_logger(metadata))
+        asyncio.create_task(usage_logger(metadata, failed_upstream=failed_upstream))
 
     return chat_completion
