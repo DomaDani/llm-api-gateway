@@ -1,7 +1,7 @@
 from sqlalchemy import select, func, or_, and_
-from typing import Union
+from typing import Tuple
 
-from shared.models import APIKey, Quota, Status
+from shared.models import APIKey, Quota, Limit, Status
 from shared.db import get_transactional_session
 
 MAX_VALUE = 1 << 60
@@ -40,19 +40,36 @@ async def db_limit_change(api_key: APIKey, change_by: int, session = None):
             await db_limit_change(api_key, change_by, session=session)
             return
 
-    quotas = await db_get_quotas_by_key(api_key, session=session)
+    quotas, _ = await db_get_quotas_by_key(api_key, session=session)
 
     for quota in quotas:
         if quota.limit_value is not None:
             quota.allocated = min(max(quota.allocated + change_by, 0), quota.limit_value)
 
-async def db_get_quotas_by_key(api_key: APIKey, session = None) -> list[Quota]:
+# Returns a tuple of the different quota types (request, token) for a given key.
+async def db_get_quotas_by_key(api_key: APIKey, session = None) -> Tuple[list[Quota], list[Quota]]:
     # Check if a session was provided, if not, create a new transactional session
     if session is None:
         # Session is transactional to use locks.
         async with get_transactional_session() as session:
             return await db_get_quotas_by_key(api_key, session=session)
     
+    result = await session.execute(
+        select(Limit)
+        .where(Limit.name == "Request Limit")
+        .order_by(Limit.id)
+    )
+
+    request_limit_id = result.scalars().one().id
+
+    result = await session.execute(
+        select(Limit)
+        .where(Limit.name == "Token Limit")
+        .order_by(Limit.id)
+    )
+
+    token_limit_id = result.scalars().one().id
+
     result = await session.execute(
         select(Quota)
         .where(_quota_filter(api_key))
@@ -61,7 +78,10 @@ async def db_get_quotas_by_key(api_key: APIKey, session = None) -> list[Quota]:
     )
     quotas = result.scalars().all()
 
-    return quotas
+    request_quotas = [q for q in quotas if q.limit_id == request_limit_id]
+    token_quotas = [q for q in quotas if q.limit_id == token_limit_id]
+
+    return request_quotas, token_quotas
 
 def _quota_filter(api_key: APIKey):
     return and_(
