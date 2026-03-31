@@ -2,7 +2,6 @@
 from sqlalchemy import select
 
 from argon2 import PasswordHasher
-from argon2.exceptions import VerifyMismatchError
 from datetime import datetime, timezone
 
 import sys
