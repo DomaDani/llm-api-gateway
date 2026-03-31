@@ -31,7 +31,7 @@ async def _choose_mapping(request: Request) -> Dict[str, Any]:
     incoming = await request.json()
 
     for _, data in _mappings.items():
-        if "request" in data and data["request"] == incoming:
+        if "request" in data and _matches(data["request"], incoming):
             if data.get("completion") is not None:
                 return 200, data["completion"]
 
@@ -60,6 +60,22 @@ async def _choose_mapping(request: Request) -> Dict[str, Any]:
 
     return 200, {"detail": "no mapping found"}
 
+def _matches(expected, actual):
+    if isinstance(expected, dict) and isinstance(actual, dict):
+        for k, v in expected.items():
+            if k not in actual:
+                return False
+            if not _matches(v, actual[k]):
+                return False
+        return True
+    if isinstance(expected, list) and isinstance(actual, list):
+        if len(expected) != len(actual):
+            return False
+        for e_item, a_item in zip(expected, actual):
+            if not _matches(e_item, a_item):
+                return False
+        return True
+    return expected == actual
 
 @app.post("/v1/chat/completions")
 async def chat_completions(request: Request):
