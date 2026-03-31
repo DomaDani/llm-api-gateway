@@ -32,5 +32,3 @@ class UsageLogEntry(BaseModel):
 
     is_streaming : Optional[bool]
     status_code : Optional[int]
-
-    is_complete : bool
