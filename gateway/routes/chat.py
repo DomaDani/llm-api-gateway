@@ -29,7 +29,7 @@ async def forward_request(request: Request, validated_request: ValidatedRequest 
     try:
         upstream_start = time.perf_counter()
         if is_streaming:
-            raw_stream = await upstream_client.create_chat_completion(payload, stream=True)
+            raw_stream = await upstream_client.create_chat_completion(payload)
             status_code = 200
             return StreamingResponse(stream_generator(raw_stream), media_type="text/event-stream")
         else:
@@ -69,5 +69,5 @@ async def forward_request(request: Request, validated_request: ValidatedRequest 
             status_code=status_code,
             failed_upstream=failed_upstream,
         ))
-        
+
         raise HTTPException(status_code=502, detail=f"LLM error: {str(e)}")
