@@ -9,6 +9,7 @@ from gateway.limits.quota import check_limits_costs
 from gateway.logging import usage_logger
 from gateway.clients import UpstreamClient
 from gateway.models.dto_models.usage import UsageLogEntry
+from gateway.utils import stream_generator
 
 
 router  = APIRouter(prefix="/v1/chat", tags=["chat"])
@@ -20,6 +21,7 @@ def get_upstream_client(request: Request) -> UpstreamClient:
 async def forward_request(request: Request, validated_request: ValidatedRequest = Depends(check_limits_costs)):
     upstream_client = get_upstream_client(request)
     payload = validated_request.body.model_dump(exclude_unset=True)
+    is_streaming = payload.get("stream", False)
     chat_completion = None
 
     upstream_latency = 0.0
