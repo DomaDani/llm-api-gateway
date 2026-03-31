@@ -25,8 +25,6 @@ async def stream_generator(raw_stream: AsyncStream[ChatCompletionChunk], request
             chunk_metadata = chunk.model_dump(exclude={"choices"}, exclude_none=True)
             metadata.update(chunk_metadata)
 
-            if chunk.usage:
-                metadata["usage"] = chunk.usage.model_dump(exclude_none=True)
 
             for choice in chunk.choices:
                 if choice.finish_reason is not None:
@@ -36,6 +34,10 @@ async def stream_generator(raw_stream: AsyncStream[ChatCompletionChunk], request
                             "finish_reason": choice.finish_reason,
                             "message": {"role": "assistant", "content": ""}
                         })
+                    
+            if chunk.usage:
+                metadata["usage"] = chunk.usage.model_dump(exclude_none=True)
+                break
 
             chunk_data = chunk.model_dump_json(exclude_unset=True)
             yield f"data: {chunk_data}\n\n"
