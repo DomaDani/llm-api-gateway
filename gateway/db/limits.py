@@ -17,7 +17,7 @@ async def db_limit_check_and_allocation(api_key: APIKey, estimate: int) -> bool:
         strictest_request_quota = min(request_quotas, key=lambda q: (q.limit_value or MAX_VALUE) - q.allocated, default=None)
         strictest_token_quota = min(token_quotas, key=lambda q: (q.limit_value or MAX_VALUE) - q.allocated, default=None)
         
-        new_allocated_request = strictest_request_quota.allocated + estimate if strictest_request_quota else 0
+        new_allocated_request = strictest_request_quota.allocated + 1 if strictest_request_quota else 0
         new_allocated_token = strictest_token_quota.allocated + estimate if strictest_token_quota else 0
 
 
