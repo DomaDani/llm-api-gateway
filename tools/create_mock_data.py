@@ -12,7 +12,7 @@ if __package__ is None:
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from shared.models import *
-from shared.utils import hash_key
+from shared.utils import hash_key, calculate_date_after_period
 
 from shared.db import get_transactional_session
 
@@ -162,7 +162,8 @@ async def create_mock_data(default_only: bool = False):
             limit=token_limit,
             limit_value=1000,
             period=Period.HOUR,
-            status=Status.ACTIVE
+            status=Status.ACTIVE,
+            next_reset=calculate_date_after_period(Period.HOUR)
         )
 
         quota2 = Quota(
@@ -170,7 +171,8 @@ async def create_mock_data(default_only: bool = False):
             limit=request_limit,
             limit_value=50,
             period=Period.DAY,
-            status=Status.ACTIVE
+            status=Status.ACTIVE,
+            next_reset=calculate_date_after_period(Period.DAY)
         )
 
         session.add_all([quota1, quota2])

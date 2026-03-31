@@ -21,6 +21,7 @@ class Quota(SQLAlchemyBase):
     expires_at : Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
     status : Mapped[Status] = mapped_column(SQLAlchemyEnum(Status), default=Status.ACTIVE)
     allocated: Mapped[float] = mapped_column(default=0)
+    next_reset: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
     project = relationship("Project", back_populates="quotas")
     api_key = relationship("APIKey", back_populates="quotas")
