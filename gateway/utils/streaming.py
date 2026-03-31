@@ -25,6 +25,9 @@ async def stream_generator(raw_stream: AsyncStream[ChatCompletionChunk], request
             chunk_metadata = chunk.model_dump(exclude={"choices"}, exclude_none=True)
             metadata.update(chunk_metadata)
 
+            if chunk.usage:
+                metadata["usage"] = chunk.usage.model_dump(exclude_none=True)
+
             for choice in chunk.choices:
                 if choice.finish_reason is not None:
                     choices.append(
