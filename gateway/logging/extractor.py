@@ -34,4 +34,4 @@ async def prepare_usage_entry(request: Request, validated_request: ValidatedRequ
         status_code=status_code
     )
 
-    usage_logger(metadata, failed_upstream=failed_upstream)
+    await usage_logger(metadata, failed_upstream=failed_upstream)
