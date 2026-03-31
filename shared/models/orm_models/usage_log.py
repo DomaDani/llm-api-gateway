@@ -40,8 +40,6 @@ class UsageLog(SQLAlchemyBase):
     is_streaming: Mapped[Optional[bool]] = mapped_column(Boolean)
     status_code: Mapped[Optional[int]] = mapped_column(Integer)
 
-    is_complete : Mapped[bool] = mapped_column(Boolean)
-
     api_key = relationship("APIKey", lazy="select")
     project = relationship("Project", lazy="select")
     user = relationship("User", lazy="select")
