@@ -5,7 +5,17 @@ from fastapi import Request
 from gateway.models import ValidatedRequest, UsageLogEntry
 from gateway.logging import usage_logger
 
-async def prepare_usage_entry(request: Request, validated_request: ValidatedRequest, upstream_latency, gateway_overhead, total_time, chat_completion=None, status_code=200, failed_upstream=False):
+async def prepare_usage_entry(
+    request: Request,
+    validated_request: ValidatedRequest,
+    upstream_latency,
+    gateway_overhead,
+    ttft,
+    total_time,
+    chat_completion=None, 
+    status_code=200,
+    failed_upstream=False
+):
     usage = getattr(chat_completion, "usage", None)
     choices = getattr(chat_completion, "choices", None)
 
@@ -29,7 +39,7 @@ async def prepare_usage_entry(request: Request, validated_request: ValidatedRequ
         upstream_latency=upstream_latency,
         gateway_overhead=gateway_overhead,
         total_latency=total_time,
-        ttft=time.perf_counter() - request.state.start_time,
+        ttft=ttft,
         is_streaming=getattr(chat_completion, "is_streaming", None),
         status_code=status_code
     )

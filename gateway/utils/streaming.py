@@ -59,6 +59,7 @@ async def stream_generator(raw_stream: AsyncStream[ChatCompletionChunk], request
             validated_request=validated_request,
             upstream_latency=upstream_latency,
             gateway_overhead=gateway_overhead,
+            ttft=ttft,
             total_time=total_time,
             chat_completion=chat_completion,
             status_code=(502 if failed_upstream else 200),
