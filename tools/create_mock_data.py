@@ -128,7 +128,7 @@ async def create_mock_data(default_only: bool = False):
         api_key2 = APIKey(
             project=project,
             user=user2,
-            name="Limited API key",
+            name="Token Limited API key",
             fingerprint="WQC-GPp6L8gl",
             key_hash=hash_key("WQC-GPp6L8glbHgIqAmyTQjwwr6mOV3Ar3uuWG33x0j_HzGsD-7DxujaCl-EzkTkQwZBWSekQwvtnw-WNUKnDQ"),
             create_date=datetime.now(timezone.utc),
@@ -145,9 +145,19 @@ async def create_mock_data(default_only: bool = False):
             status=Status.EXPIRED
         )
 
-        session.add_all([api_key1, api_key2, api_key3])
+        api_key4 = APIKey(
+            project=project,
+            user=user2,
+            name="Request Limited API key",
+            fingerprint="xGn6E7jl5ocd",
+            key_hash=hash_key("xGn6E7jl5ocdBNti1jZ3lQGIkznOzGgkTDsK48ng-B4f0HcNnmiChC295AWjlArwtcRICNDNukmT0Z1YFpR7-w"),
+            create_date=datetime.now(timezone.utc),
+            status=Status.ACTIVE
+        )
 
-        quota = Quota(
+        session.add_all([api_key1, api_key2, api_key3, api_key4])
+
+        quota1 = Quota(
             api_key=api_key2,
             limit=token_limit,
             limit_value=1000,
@@ -155,7 +165,15 @@ async def create_mock_data(default_only: bool = False):
             status=Status.ACTIVE
         )
 
-        session.add(quota)
+        quota2 = Quota(
+            api_key=api_key4,
+            limit=request_limit,
+            limit_value=50,
+            period=Period.DAY,
+            status=Status.ACTIVE
+        )
+
+        session.add_all([quota1, quota2])
 
 
 if __name__ == "__main__":
