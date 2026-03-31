@@ -31,7 +31,7 @@ async def forward_request(request: Request, validated_request: ValidatedRequest 
         if is_streaming:
             raw_stream = await upstream_client.create_chat_completion(payload)
             status_code = 200
-            return StreamingResponse(stream_generator(raw_stream), media_type="text/event-stream")
+            return StreamingResponse(stream_generator(raw_stream=raw_stream, request=request, validated_request=validated_request), media_type="text/event-stream")
         else:
             chat_completion = await upstream_client.create_chat_completion(payload)
             status_code = 200
