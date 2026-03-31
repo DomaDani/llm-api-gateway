@@ -37,9 +37,19 @@ async def _choose_mapping(request: Request) -> Dict[str, Any]:
 
             ue = data.get("upstream_error")
             if ue is not None:
-                status = ue.get("status") or 500
+                status = int(ue.get("status") or 500)
                 response = ue.get("response") or {"detail": "upstream error"}
-                return int(status), response
+                if not (isinstance(response, dict) and "error" in response):
+                    message = response.get("detail") if isinstance(response, dict) else str(response)
+                    response = {
+                        "error": {
+                            "message": message,
+                            "type": "upstream_error",
+                            "param": None,
+                            "code": status,
+                        }
+                    }
+                return status, response
 
             break
 
