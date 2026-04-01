@@ -1,0 +1,14 @@
+from sqlalchemy import select, func
+from shared.models import Quota
+from shared.db import get_transactional_session
+
+
+async def get_quota_count(session=None):
+    if session is None:
+        async with get_transactional_session() as session:
+            return await get_quota_count(session=session)
+
+    count_stmt = select(func.count()).select_from(Quota)
+    res = await session.execute(count_stmt)
+    count = res.scalar_one()
+    return count
