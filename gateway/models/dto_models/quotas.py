@@ -13,4 +13,4 @@ class ValidatedRequest(BaseModel):
     user_id: int
     body: OpenAIRequest
     estimated_tokens: int
-    internal_cost: Optional[float]
+    internal_cost_estimate: Optional[float]
