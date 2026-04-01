@@ -154,7 +154,17 @@ async def create_mock_data(default_only: bool = False):
             status=Status.ACTIVE
         )
 
-        session.add_all([api_key1, api_key2, api_key3, api_key4])
+        api_key5 = APIKey(
+            project=project,
+            user=user2,
+            name="Token Limited by Minute API key",
+            fingerprint="0bcj5-dQyDB9",
+            key_hash=hash_key("0bcj5-dQyDB9GIgVq9AnoyAcU56IhdPLl9DgffZ4qyXqVqEd2gq6AiDL9g3AreQbcsNKtZvlg7QJe69je3pUPw"),
+            create_date=datetime.now(timezone.utc),
+            status=Status.ACTIVE
+        )
+
+        session.add_all([api_key1, api_key2, api_key3, api_key4, api_key5])
 
         quota1 = Quota(
             api_key=api_key2,
@@ -174,7 +184,16 @@ async def create_mock_data(default_only: bool = False):
             next_reset=calculate_date_after_period(Period.DAY)
         )
 
-        session.add_all([quota1, quota2])
+        quota3 = Quota(
+            api_key=api_key5,
+            limit=token_limit,
+            limit_value=500,
+            period=Period.MINUTE,
+            status=Status.ACTIVE,
+            next_reset=calculate_date_after_period(Period.MINUTE)
+        )
+
+        session.add_all([quota1, quota2, quota3])
 
 
 if __name__ == "__main__":
