@@ -19,12 +19,12 @@ async def usage_logger(entry: UsageLogEntry, failed_upstream: bool = False):
         estimated_tokens = entry.estimated_tokens or 0
         internal_cost_estimate = entry.internal_cost_estimate or 0
         internal_cost_final = entry.internal_cost_final or 0
-        
+
         await db_limit_change(
             api_key,
             update_req_count=not failed_upstream,
             change_by_tokens=total_tokens-estimated_tokens,
-            change_by_cost=internal_cost_final-internal_cost_estimate,
+            change_by_price=internal_cost_final-internal_cost_estimate,
             session=session
         )
 
