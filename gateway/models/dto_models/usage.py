@@ -17,7 +17,8 @@ class UsageLogEntry(BaseModel):
     completion_tokens : Optional[int]
     total_tokens : Optional[int]
 
-    internal_cost : Optional[float]
+    internal_cost_estimate : Optional[float]
+    internal_cost_final : Optional[float]
 
     model : Optional[str]
     temperature : Optional[float]

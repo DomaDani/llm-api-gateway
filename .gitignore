@@ -76,3 +76,6 @@ Thumbs.db
 dist/
 build/
 .next/
+
+# Configuration files
+providers.json
