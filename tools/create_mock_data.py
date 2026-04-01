@@ -193,7 +193,15 @@ async def create_mock_data(default_only: bool = False):
             next_reset=calculate_date_after_period(Period.MINUTE)
         )
 
-        session.add_all([quota1, quota2, quota3])
+        quota_global = Quota(
+            limit=request_limit,
+            limit_value=10000,
+            period=Period.MINUTE,
+            status=Status.ACTIVE,
+            next_reset=calculate_date_after_period(Period.MINUTE)
+        )
+
+        session.add_all([quota1, quota2, quota3, quota_global])
 
 
 if __name__ == "__main__":
