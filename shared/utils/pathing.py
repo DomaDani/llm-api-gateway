@@ -1,6 +1,6 @@
 from pathlib import Path
 
-def find_project_root(start: Path = None, marker: str = "docker-compose.yml") -> Path:
+def find_project_root(start: Path = None, marker: str = "shared/") -> Path:
     if start is None:
         start = Path(__file__).parent
     current = start.resolve()

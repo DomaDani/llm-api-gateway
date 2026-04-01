@@ -68,8 +68,8 @@ async def _quota_refresh_job():
 					break
 			logger.info(f"Quota reset completed: {change_count} quotas reset")
 
-		except Exception:
-			logger.exception("quota reset failed")
+		except Exception as e:
+			logger.exception(f"Quota reset failed with error: {e}")
 		await asyncio.sleep(60)
 
 async def _price_update_job():
@@ -77,13 +77,13 @@ async def _price_update_job():
 		try:
 			with UpdatePrices() as updater:
 				updater.wait()
-				_merge_custom_providers()
-				logger.info("Price update completed.")
-		except Exception:
-			logger.exception("Price update failed")
+			_merge_custom_providers(verbose=True)
+			logger.info("Price update completed.")
+		except Exception as e:
+			logger.exception(f"Price update failed with error: {e}")
 		await asyncio.sleep(3600)
 
-def _merge_custom_providers():
+def _merge_custom_providers(verbose: bool = False):
 	providers_file = find_project_root() / "shared/config/providers.json"
 
 	if providers_file.exists():
@@ -104,6 +104,8 @@ def _merge_custom_providers():
 				existing_ids.add(provider.id)
 
 			data_snapshot.set_custom_snapshot(DataSnapshot(providers=merged, from_auto_update=False))
+			if verbose:
+				logger.info(f"Loaded and merged {len(custom_providers)} custom providers from {providers_file}")
 		except Exception as e:
 			logger.error(f"Failed to load custom providers from {providers_file}: {e}")
 	else:
