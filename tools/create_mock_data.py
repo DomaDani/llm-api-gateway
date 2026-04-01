@@ -29,9 +29,6 @@ async def create_mock_data(default_only: bool = False):
         existing_limits_result = await session.execute(select(Limit))
         limit_map = {limit.name: limit for limit in existing_limits_result.scalars().all()}
 
-        existing_limits_result = await session.execute(select(Limit.name))
-        existing_limit_names = set(existing_limits_result.scalars().all())
-
         if "Project Manager" not in role_map:
             pm_role = Role(
                 name="Project Manager",
@@ -70,6 +67,15 @@ async def create_mock_data(default_only: bool = False):
             session.add(token_limit)
         else:
             token_limit = limit_map["Token Limit"]
+
+        if "Price Limit" not in limit_map:
+            price_limit = Limit(
+                name="Price Limit",
+                description="Limits the cost that can be incurred within a certain period.",
+            )
+            session.add(price_limit)
+        else:
+            price_limit = limit_map["Price Limit"]
 
         if default_only:
             return
@@ -164,7 +170,17 @@ async def create_mock_data(default_only: bool = False):
             status=Status.ACTIVE
         )
 
-        session.add_all([api_key1, api_key2, api_key3, api_key4, api_key5])
+        api_key6 = APIKey(
+            project=project,
+            user=user2,
+            name="Price Limited API key",
+            fingerprint="PriceLimit1",
+            key_hash=hash_key("PriceLimit1GIgVq9AnoyAcU56IhdPLl9DgffZ4qyXqVqEd2gq6AiDL9g3AreQbcsNKtZvlg7QJe69je3pUPw"),
+            create_date=datetime.now(timezone.utc),
+            status=Status.ACTIVE
+        )
+
+        session.add_all([api_key1, api_key2, api_key3, api_key4, api_key5, api_key6])
 
         quota1 = Quota(
             api_key=api_key2,
@@ -193,6 +209,15 @@ async def create_mock_data(default_only: bool = False):
             next_reset=calculate_date_after_period(Period.MINUTE)
         )
 
+        quota4 = Quota(
+            api_key=api_key6,
+            limit=price_limit,
+            limit_value=10.0,
+            period=Period.HOUR,
+            status=Status.ACTIVE,
+            next_reset=calculate_date_after_period(Period.HOUR)
+        )
+
         quota_global = Quota(
             limit=request_limit,
             limit_value=10000,
@@ -201,7 +226,7 @@ async def create_mock_data(default_only: bool = False):
             next_reset=calculate_date_after_period(Period.MINUTE)
         )
 
-        session.add_all([quota1, quota2, quota3, quota_global])
+        session.add_all([quota1, quota2, quota3, quota4, quota_global])
 
 
 if __name__ == "__main__":
