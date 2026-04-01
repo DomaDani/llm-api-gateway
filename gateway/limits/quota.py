@@ -22,7 +22,7 @@ async def check_limits_costs(body: OpenAIRequest, key_info: APIKey = Depends(val
         ),
         model_ref=body.model,
         provider_id=PROVIDER_ID
-    )
+    ).total_price
 
     if not await db_limit_check_and_allocation(key_info, estimated_total_tokens, estimated_cost):
         raise HTTPException(status_code=429, detail="Quota exceeded.")
