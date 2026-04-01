@@ -22,6 +22,7 @@ logger = logging.getLogger("uvicorn.error")
 @asynccontextmanager
 async def lifespan(app: FastAPI):
 	await app.state.upstream_client.startup()
+	_merge_custom_providers()
 	app.state.reset_task = asyncio.create_task(_quota_refresh_job())
 	app.state.price_update_task = asyncio.create_task(_price_update_job())
 	try:
