@@ -1,12 +1,12 @@
 import math
 
 from fastapi import Depends, HTTPException
-from genai_prices import Usage, calc_price
+from genai_prices import Usage
 
 from gateway.models import ValidatedRequest, OpenAIRequest
 from shared.models import APIKey
 from gateway.auth import validate_api_key
-from gateway.utils import get_token_count
+from gateway.utils import get_token_count, calculate_cost
 from gateway.db import db_limit_check_and_allocation
 
 from shared.config import DEFAULT_MAX_COMPLETION_TOKENS, QUOTA_STRICTNESS, PROVIDER_ID
@@ -17,14 +17,14 @@ async def check_limits_costs(body: OpenAIRequest, key_info: APIKey = Depends(val
     est_completion_tokens = int(math.ceil((body.max_completion_tokens or DEFAULT_MAX_COMPLETION_TOKENS) * QUOTA_STRICTNESS))
     estimated_total_tokens = est_input_tokens + est_completion_tokens
 
-    estimated_cost = calc_price(
+    estimated_cost = calculate_cost(
         usage=Usage(
             input_tokens=est_input_tokens,
             output_tokens=est_completion_tokens
         ),
         model_ref=body.model,
         provider_id=PROVIDER_ID
-    ).total_price
+    )
 
     if not await db_limit_check_and_allocation(key_info, estimated_total_tokens, estimated_cost):
         raise HTTPException(status_code=429, detail="Quota exceeded.")
