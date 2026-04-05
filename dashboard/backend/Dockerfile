@@ -12,6 +12,6 @@ RUN python -m pip install --no-cache-dir --user -r requirements.txt
 COPY --chown=dashboard-backend:dashboard-backend shared/ ./shared
 
 COPY --chown=dashboard-backend:dashboard-backend dashboard/backend/ ./dashboard/backend
-EXPOSE 8081
+EXPOSE 8080
 
-CMD ["uvicorn", "dashboard.backend.app.factory:create_app", "--host", "0.0.0.0", "--factory", "--port", "8081"]
+CMD ["uvicorn", "dashboard.backend.app.factory:create_app", "--host", "0.0.0.0", "--factory", "--port", "8080"]

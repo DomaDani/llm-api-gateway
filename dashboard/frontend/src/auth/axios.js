@@ -2,7 +2,7 @@ import axios from 'axios';
 
 
 const api = axios.create({
-    baseURL: `${import.meta.env.FRONTEND_ADDRESS}:8081`,
+    baseURL: `${import.meta.env.FRONTEND_ADDRESS}:8080`,
     headers: {
         'Content-Type': 'application/json'
     }
