@@ -31,3 +31,10 @@ DEFAULT_OUTPUT_MTOKEN_PRICE = float(os.getenv("DEFAULT_OUTPUT_MTOKEN_PRICE", 1.1
 # --- Database configuration ---
 
 SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./test.db")
+
+# --- Dashboard configuration ---
+
+LOGIN_SECRET_KEY = os.getenv("LOGIN_SECRET_KEY")
+TOKEN_EXPIRATION_MINS = int(os.getenv("TOKEN_EXPIRATION_MINS", 30))
+TOKEN_ENCODING_ALGORITHM = os.getenv("TOKEN_ENCODING_ALGORITHM", "HS256")
+FRONTEND_ADDRESS = os.getenv("FRONTEND_ADDRESS", "http://localhost")
