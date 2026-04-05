@@ -4,7 +4,7 @@ import './App.css';
 import Login from './pages/Login';
 import Welcome from './pages/Welcome';
 import { AuthProvider } from './auth/AuthProvider';
-import ProtectedRoute from './components/protectedRoute';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (

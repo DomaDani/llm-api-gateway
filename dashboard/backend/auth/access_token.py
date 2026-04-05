@@ -16,16 +16,16 @@ def create_access_token(data: dict):
 
     return encoded_jwt
 
-def get_user_from_token(token: str) -> UserDisplayInfo | None:
+async def get_user_from_token(token: str) -> UserDisplayInfo | None:
     try:
         payload = jwt.decode(token, LOGIN_SECRET_KEY, algorithms=[TOKEN_ENCODING_ALGORITHM])
         user_id: int = payload.get("user_id")
-        email: str = payload.get("email")
+        email: str = payload.get("sub")
 
         if user_id is None or email is None:
             return None
 
-        user_record = get_user_by_email(email)
+        user_record = await get_user_by_email(email)
 
         if user_record is None or user_record.id != user_id:
             return None
