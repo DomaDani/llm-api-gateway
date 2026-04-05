@@ -1,3 +1,5 @@
 fastapi
 uvicorn
 argon2-cffi
+sqlalchemy>=1.4
+asyncpg
