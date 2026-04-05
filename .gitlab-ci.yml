@@ -164,7 +164,7 @@ compose:
       fi
 
     - |
-      # Perform dashboard-backend smoke test
+      # Perform dashboard-backend health check
       elapsed=0
       until curl -sSf http://docker:8080/health || [ $elapsed -ge 120 ]; do
         sleep 1
@@ -178,7 +178,7 @@ compose:
       fi
 
     - |
-      # Perform dashboard-frontend smoke test
+      # Perform dashboard-frontend health check
       elapsed=0
       until curl -sSf http://docker:5173 || [ $elapsed -ge 120 ]; do
         sleep 1
