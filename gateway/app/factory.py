@@ -40,14 +40,6 @@ async def lifespan(app: FastAPI):
 def create_app() -> FastAPI:
 	app = FastAPI(title="LLM API Gateway", lifespan=lifespan)
 
-	app.add_middleware(
-		CORSMiddleware,
-		allow_origins=["*"],
-		allow_credentials=True,
-		allow_methods=["*"],
-		allow_headers=["*"],
-	)
-
 	logger.info("TARGET_URL=%s", TARGET_URL)
 	app.state.upstream_client = UpstreamClient(TARGET_URL, TARGET_KEY)
 

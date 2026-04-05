@@ -1,7 +1,7 @@
 from jose import JWTError, jwt
 from datetime import datetime, timezone, timedelta
 
-from models.dto_models import UserDisplayInfo
+from backend.models.dto_models import UserDisplayInfo
 from db.users import get_user_by_email
 
 from shared.config import LOGIN_SECRET_KEY, TOKEN_EXPIRATION_MINS, TOKEN_ENCODING_ALGORITHM
