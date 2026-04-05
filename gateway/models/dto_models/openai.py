@@ -14,3 +14,5 @@ class OpenAIRequest(BaseModel):
     temperature: Optional[float] = Field(default=None, ge=0.0, le=2.0, description="What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.")
     max_completion_tokens: Optional[int] = Field(default=None, description="An upper bound for the number of tokens that can be generated for a completion, including visible output tokens and reasoning tokens.")
     stream: Optional[bool] = Field(default=False, description="If set to true, the model response data will be streamed to the client as it is generated using server-sent events.")
+
+# extra_body
