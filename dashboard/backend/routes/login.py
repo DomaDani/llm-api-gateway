@@ -1,9 +1,9 @@
 from fastapi import APIRouter, HTTPException
 
-from backend.models import LoginRequest, TokenResponse
-from backend.db import get_user_by_email
-from backend.auth.password import verify_password
-from backend.auth import create_access_token
+from dashboard.backend.models import LoginRequest, TokenResponse
+from dashboard.backend.db import get_user_by_email
+from dashboard.backend.auth.password import verify_password
+from dashboard.backend.auth import create_access_token
 
 router = APIRouter()
 

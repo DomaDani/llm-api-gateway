@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
-from backend.models import UserDisplayInfo
-from backend.auth import get_user_from_token
+from dashboard.backend.models import UserDisplayInfo
+from dashboard.backend.auth import get_user_from_token
 
 router = APIRouter(prefix="/users", tags=["users"])
 

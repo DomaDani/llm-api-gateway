@@ -2,7 +2,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
-from backend.routes import health_router, login_router, me_router
+from dashboard.backend.routes import health_router, login_router, me_router
 
 from .middleware import init_middleware
 
