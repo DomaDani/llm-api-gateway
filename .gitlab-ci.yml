@@ -59,10 +59,28 @@ build:
       --cache=true
 
     - |
+      # Build & push dashboard-backend image
+      /kaniko/executor \
+      --context $CI_PROJECT_DIR \
+      --dockerfile dashboard/backend/Dockerfile \
+      --destination $CI_REGISTRY_IMAGE:dashboard-backend-$IMAGE_TAG \
+      --cache=true
+
+    - |
+      # Build & push dashboard-frontend image
+      /kaniko/executor \
+      --context $CI_PROJECT_DIR \
+      --dockerfile dashboard/frontend/Dockerfile \
+      --destination $CI_REGISTRY_IMAGE:dashboard-frontend-$IMAGE_TAG \
+      --cache=true
+
+    - |
       # Write artifact
       echo "GATEWAY_IMAGE=$CI_REGISTRY_IMAGE:gateway-$IMAGE_TAG" > images.env
       echo "INIT_DB_IMAGE=$CI_REGISTRY_IMAGE:init-db-$IMAGE_TAG" >> images.env
       echo "MOCK_UPSTREAM_IMAGE=$CI_REGISTRY_IMAGE:mock-upstream-$IMAGE_TAG" >> images.env
+      echo "DASHBOARD_BACKEND_IMAGE=$CI_REGISTRY_IMAGE:dashboard-backend-$IMAGE_TAG" >> images.env
+      echo "DASHBOARD_FRONTEND_IMAGE=$CI_REGISTRY_IMAGE:dashboard-frontend-$IMAGE_TAG" >> images.env
 
   artifacts:
     paths:
@@ -140,6 +158,34 @@ compose:
       done
       if ! curl -sSf http://docker:8000/health; then
         docker-compose -f docker-compose.yml -f ci.override.yml logs gateway --tail=300
+        docker-compose -f docker-compose.yml -f ci.override.yml down -v
+        rm -f ci.override.yml
+        exit 1
+      fi
+
+    - |
+      # Perform dashboard-backend smoke test
+      elapsed=0
+      until curl -sSf http://docker:8080/health || [ $elapsed -ge 120 ]; do
+        sleep 1
+        elapsed=$((elapsed+1))
+      done
+      if ! curl -sSf http://docker:8080/health; then
+        docker-compose -f docker-compose.yml -f ci.override.yml logs dashboard-backend --tail=300
+        docker-compose -f docker-compose.yml -f ci.override.yml down -v
+        rm -f ci.override.yml
+        exit 1
+      fi
+
+    - |
+      # Perform dashboard-frontend smoke test
+      elapsed=0
+      until curl -sSf http://docker:5173 || [ $elapsed -ge 120 ]; do
+        sleep 1
+        elapsed=$((elapsed+1))
+      done
+      if ! curl -sSf http://docker:5173; then
+        docker-compose -f docker-compose.yml -f ci.override.yml logs dashboard-frontend --tail=300
         docker-compose -f docker-compose.yml -f ci.override.yml down -v
         rm -f ci.override.yml
         exit 1
