@@ -2,30 +2,22 @@
 
 import { useState, useRef, useEffect } from "react"
 
-const PLACEHOLDER_PROJECTS = [
-    "Project 1",
-    "Project 2",
-    "Project 3",
-    "Project 4",
-    "Project 5",
-]
-
-export default function ProjectDropdown({ projects = PLACEHOLDER_PROJECTS, onSelect })
+export default function Dropdown({ items, itemName, onSelect })
 {
     const [isOpen, setIsOpen]       = useState(false)
     const [search, setSearch]       = useState("")
     const [selected, setSelected]   = useState(null)
     const containerRef              = useRef(null)
 
-    const filtered = projects.filter((p) =>
+    const filtered = items.filter((p) =>
         p.toLowerCase().includes(search.toLowerCase())
     )
 
-    function handleSelect(project) {
-        setSelected(project)
+    function handleSelect(items) {
+        setSelected(items)
         setSearch("")
         setIsOpen(false)
-        onSelect?.(project)
+        onSelect?.(items)
     }
 
     useEffect(() => {
@@ -49,7 +41,7 @@ export default function ProjectDropdown({ projects = PLACEHOLDER_PROJECTS, onSel
                 className="flex w-full items-center justify-between rounded-md bg-white/5 px-3 py-1.5 text-sm text-white outline-1 -outline-offset-1 outline-white/10 hover:bg-white/10 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500"
             >
                 <span className={selected ? "text-white" : "text-gray-500"}>
-                    {selected ?? "Select project…"}
+                    {selected ?? `Select ${itemName}...`}
                 </span>
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -76,26 +68,26 @@ export default function ProjectDropdown({ projects = PLACEHOLDER_PROJECTS, onSel
                         />
                     </div>
 
-                    {/* Project list */}
+                    {/* Item list */}
                     <ul className="max-h-48 overflow-y-auto">
                         {filtered.length > 0 ? (
-                            filtered.map((project) => (
-                                <li key={project}>
+                            filtered.map((items) => (
+                                <li key={items}>
                                     <button
                                         type="button"
-                                        onClick={() => handleSelect(project)}
+                                        onClick={() => handleSelect(items)}
                                         className={`w-full px-3 py-2 text-left text-sm transition-colors hover:bg-white/5 hover:text-white ${
-                                            selected === project
+                                            selected === items
                                                 ? "bg-indigo-500/20 text-white"
                                                 : "text-gray-400"
                                         }`}
                                     >
-                                        {project}
+                                        {items}
                                     </button>
                                 </li>
                             ))
                         ) : (
-                            <li className="px-3 py-2 text-sm text-gray-500">No projects found</li>
+                            <li className="px-3 py-2 text-sm text-gray-500">No {itemName} found</li>
                         )}
                     </ul>
                 </div>

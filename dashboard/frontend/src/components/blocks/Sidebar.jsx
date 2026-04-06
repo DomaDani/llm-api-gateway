@@ -2,7 +2,15 @@
 // Reworked for react and navigation.
 import { useState } from "react"
 import { NavLink } from "react-router-dom"
-import ProjectDropdown from "../primitives/ProjectDropdown"
+import Dropdown from "../primitives/Dropdown"
+
+const PLACEHOLDER_PROJECTS = [
+    "Project 1",
+    "Project 2",
+    "Project 3",
+    "Project 4",
+    "Project 5",
+]
 
 export default function Sidebar({ children })
 {
@@ -134,7 +142,7 @@ export default function Sidebar({ children })
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                             </svg>
                         </button>
-                        <ProjectDropdown />
+                        <Dropdown items={PLACEHOLDER_PROJECTS} itemName="project" />
                     </div>
 
                     <div className="flex items-center pr-4">
