@@ -43,7 +43,7 @@ const PERSONAL_USAGE = [
 export default function Home()
 {
     return (
-        <div className="flex h-90 flex-col gap-">
+        <div className="flex h-90 flex-col gap-4">
 
             {/* Top section: project name + active quotas */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
