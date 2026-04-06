@@ -1,15 +1,15 @@
 export default function UsageTable({ title, rows = [] })
 {
     return (
-        <div className="flex h-full flex-col rounded-md bg-white/5 outline outline-1 outline-white/10">
+        <div className="flex flex-col rounded-md bg-white/5 outline outline-1 outline-white/10">
 
             {/* Table header */}
-            <div className="border-b border-white/10 px-4 py-3">
+            <div className="border-b border-white/10 px-4 py-3 bg-indigo-500/10">
                 <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-400">{title}</h3>
             </div>
 
             {/* Scrollable body */}
-            <div className="min-h-0 flex-1 overflow-y-auto">
+            <div className="max-h-64 overflow-y-auto">
                 <table className="w-full text-sm">
                     <thead className="sticky top-0 bg-gray-900">
                         <tr>

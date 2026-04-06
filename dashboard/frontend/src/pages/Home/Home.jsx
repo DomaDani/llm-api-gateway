@@ -1,5 +1,5 @@
 import ActiveQuotaCard from "./components/ActiveQuotaCard"
-import UsageTable from "./components/UsageTable"
+import UsageTable from "../../components/blocks/UsageTable"
 
 // --- Placeholder data (replace with API calls later) ---
 
