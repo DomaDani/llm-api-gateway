@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import {useAuth} from '../auth/AuthProvider';
+import {useAuth} from '../../../auth/AuthProvider';
 
 export default function LoginForm() {
   const { login } = useAuth();
@@ -23,6 +23,7 @@ export default function LoginForm() {
     }
   };
 
+  // From: https://tailwindcss.com/plus/ui-blocks/application-ui/forms/sign-in-forms
   return (
     <>
       <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
