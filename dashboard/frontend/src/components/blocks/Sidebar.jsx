@@ -142,7 +142,11 @@ export default function Sidebar({ children })
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                             </svg>
                         </button>
-                        <Dropdown items={PLACEHOLDER_PROJECTS} itemName="project" />
+                        <Dropdown
+                            items={PLACEHOLDER_PROJECTS}
+                            itemName="project"
+                            containerClassName="mx-4 w-64"
+                        />
                     </div>
 
                     <div className="flex items-center pr-4">
@@ -162,7 +166,7 @@ export default function Sidebar({ children })
                 </div>
 
                 {/* Page content */}
-                <div className="flex flex-1 flex-col overflow-y p-10 text-white">
+                <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-10 text-white">
                     {children}
                 </div>
 

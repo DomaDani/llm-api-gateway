@@ -2,8 +2,8 @@ export default function ActiveQuotaCard({ name, resetDate, used, limit })
 {
     const percentage = Math.round((used / limit) * 100)
     const barColor   = percentage >= 90 ? "bg-red-500"
-                     : percentage >= 70 ? "bg-yellow-500"
-                     : "bg-indigo-500"
+                    : percentage >= 70 ? "bg-yellow-500"
+                    : "bg-indigo-500"
 
     return (
         <div className="rounded-md bg-white/5 p-4 outline outline-1 outline-white/10">

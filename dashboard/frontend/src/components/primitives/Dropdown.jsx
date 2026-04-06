@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react"
 
-export default function Dropdown({ items, itemName, onSelect })
+export default function Dropdown({ items = [], itemName, onSelect, containerClassName = "" })
 {
     const [isOpen, setIsOpen]       = useState(false)
     const [search, setSearch]       = useState("")
@@ -32,7 +32,7 @@ export default function Dropdown({ items, itemName, onSelect })
     }, [])
 
     return (
-        <div ref={containerRef} className="relative mx-4 w-64">
+        <div ref={containerRef} className={`relative ${containerClassName}`.trim()}>
 
             {/* Trigger button */}
             <button
