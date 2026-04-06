@@ -119,7 +119,7 @@ export default function Sidebar({ children })
             </div>
 
             {/* Main content */}
-            <div className="flex flex-1 flex-col overflow-y-auto">
+            <div className="flex flex-1 flex-col">
 
                 {/* Top bar */}
                 <div className="flex h-16 items-center justify-between border-b border-white/10 bg-gray-900">
@@ -154,7 +154,7 @@ export default function Sidebar({ children })
                 </div>
 
                 {/* Page content */}
-                <div className="p-4 text-white">
+                <div className="flex flex-1 flex-col overflow-y p-10 text-white">
                     {children}
                 </div>
 
