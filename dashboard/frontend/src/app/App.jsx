@@ -6,6 +6,7 @@ import GlobalSettings from '../pages/Global/GlobalSettings';
 import ProjectSetings from '../pages/Project/ProjectSettings';
 import ApiKeys from '../pages/Keys/ApiKeys';
 import Usage from '../pages/Usage/Usage';
+import Profile from '../pages/Profile/Profile';
 
 function App() {
   return (
@@ -17,7 +18,7 @@ function App() {
       <Route path="/keys"   element={<Sidebar><ApiKeys /></Sidebar>} />
       {/* <Route path="/statistics"   element={<Sidebar></Sidebar>} /> */}
       <Route path="/usage"   element={<Sidebar><Usage /></Sidebar>} />
-      <Route path="/profile"   element={<Sidebar></Sidebar>} />
+      <Route path="/profile"   element={<Sidebar><Profile /></Sidebar>} />
     </Routes>
 
   )
