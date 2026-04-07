@@ -1,17 +1,18 @@
 import { useMemo, useState } from "react"
 
 const SORTABLE_COLUMNS = {
-    username: "Username",
-    email: "Email",
-    role: "Role",
-    createdAt: "Created",
+    user: "User",
+    name: "Name",
+    fingerprint: "Fingerprint",
+    created_date: "Created",
+    status: "Status",
 }
 
-const HIDDEN_ON_MOBILE = new Set(["role", "createdAt"])
+const HIDDEN_ON_MOBILE = new Set(["fingerprint", "created_date"])
 
-export default function UsersTable({ title = "Users", rows = [], onAction, actionLabel = "Delete" })
+export default function ApiKeysTable({ title = "API Keys", rows = [], onAction, actionLabel = "Delete" })
 {
-    const [sortBy, setSortBy] = useState("username")
+    const [sortBy, setSortBy] = useState("name")
     const [sortDirection, setSortDirection] = useState("asc")
 
     const sortedRows = useMemo(() => {
@@ -79,10 +80,11 @@ export default function UsersTable({ title = "Users", rows = [], onAction, actio
                         {sortedRows.length > 0 ? (
                             sortedRows.map((row) => (
                                 <tr key={row.id} className="hover:bg-white/5">
-                                    <td className="max-w-0 truncate px-4 py-2 text-gray-300" title={row.username}>{row.username}</td>
-                                    <td className="max-w-0 truncate px-4 py-2 text-gray-300" title={row.email}>{row.email}</td>
-                                    <td className="hidden max-w-0 truncate px-4 py-2 text-gray-400 sm:table-cell" title={row.role}>{row.role}</td>
-                                    <td className="hidden max-w-0 truncate px-4 py-2 text-gray-400 sm:table-cell" title={row.createdAt}>{row.createdAt}</td>
+                                    <td className="max-w-0 truncate px-4 py-2 text-gray-300" title={row.user}>{row.user}</td>
+                                    <td className="max-w-0 truncate px-4 py-2 text-gray-300" title={row.name}>{row.name}</td>
+                                    <td className="hidden max-w-0 truncate px-4 py-2 text-gray-400 sm:table-cell" title={row.fingerprint}>{row.fingerprint}</td>
+                                    <td className="hidden max-w-0 truncate px-4 py-2 text-gray-400 sm:table-cell" title={row.created_date}>{row.created_date}</td>
+                                    <td className="max-w-0 truncate px-4 py-2 text-gray-300" title={row.status}>{row.status}</td>
                                     {onAction && (
                                         <td className="px-4 py-2 text-right">
                                             <button
@@ -98,8 +100,8 @@ export default function UsersTable({ title = "Users", rows = [], onAction, actio
                             ))
                         ) : (
                             <tr>
-                                <td colSpan={onAction ? 5 : 4} className="px-4 py-6 text-center text-gray-500">
-                                    No users found
+                                <td colSpan={onAction ? 6 : 5} className="px-4 py-6 text-center text-gray-500">
+                                    No API keys found
                                 </td>
                             </tr>
                         )}

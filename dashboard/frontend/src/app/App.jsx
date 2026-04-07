@@ -3,6 +3,7 @@ import Sidebar from '../components/blocks/Sidebar';
 
 import Home from '../pages/Home/Home'
 import GlobalSettings from '../pages/Global/GlobalSettings';
+import ProjectSetings from '../pages/Project/ProjectSettings';
 
 function App() {
   return (
@@ -10,7 +11,7 @@ function App() {
       <Route path="/" element={<Navigate to="/home" replace />} />
       <Route path="/home" element={<Sidebar><Home /></Sidebar>} />
       <Route path="/global"  element={<Sidebar><GlobalSettings /></Sidebar>} />
-      <Route path="/project"  element={<Sidebar></Sidebar>} />
+      <Route path="/project"  element={<Sidebar><ProjectSetings /></Sidebar>} />
       <Route path="/keys"   element={<Sidebar></Sidebar>} />
       <Route path="/statistics"   element={<Sidebar></Sidebar>} />
       <Route path="/usage"   element={<Sidebar></Sidebar>} />

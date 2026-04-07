@@ -12,7 +12,7 @@ const SORTABLE_COLUMNS = {
 }
 
 const OPTIONAL_COLUMNS = new Set(["user", "key"])
-const HIDDEN_ON_MOBILE = new Set(["expires_at", "allocated", "key"])
+const HIDDEN_ON_MOBILE = new Set(["expires_at", "allocated"])
 
 export default function QuotasTable({ title = "Quotas", rows = [], showUser = false, showKey = false, onAction, actionLabel = "Delete" })
 {
@@ -95,7 +95,7 @@ export default function QuotasTable({ title = "Quotas", rows = [], showUser = fa
                             sortedRows.map((row) => (
                                 <tr key={row.id} className="hover:bg-white/5">
                                     {showUser && <td className="max-w-0 truncate px-4 py-2 text-gray-300" title={row.user}>{row.user}</td>}
-                                    {showKey && <td className="hidden max-w-0 truncate px-4 py-2 text-gray-300 sm:table-cell" title={row.key}>{row.key}</td>}
+                                    {showKey && <td className="max-w-0 truncate px-4 py-2 text-gray-300 sm:table-cell" title={row.key}>{row.key}</td>}
                                     <td className="max-w-0 truncate px-4 py-2 text-gray-300" title={row.period}>{row.period}</td>
                                     <td className="hidden max-w-0 truncate px-4 py-2 text-gray-400 sm:table-cell" title={row.expires_at}>{row.expires_at}</td>
                                     <td className="max-w-0 truncate px-4 py-2 text-gray-300" title={row.limit_name}>{row.limit_name}</td>

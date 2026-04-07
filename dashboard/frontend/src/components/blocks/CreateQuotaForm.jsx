@@ -27,7 +27,7 @@ const PLACEHOLDER_TARGET_KEYS = [
     "Key 3",
 ]
 
-export default function QuotaForm({
+export default function CreateQuotaForm({
     title,
     typeOptions = PLACEHOLDER_QUOTA_TYPES,
     refreshFrequencyOptions = PLACEHOLDER_REFRESH_FREQUENCIES,

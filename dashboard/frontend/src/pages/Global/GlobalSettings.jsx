@@ -1,4 +1,4 @@
-import QuotaForm from "../../components/blocks/CreateQuotaForm"
+import CreateQuotaForm from "../../components/blocks/CreateQuotaForm"
 import UsersTable from "../../components/blocks/UsersTable"
 import CreateUserForm from "./components/CreateUserForm"
 import CreateProjectForm from "./components/CreateProjectForm"
@@ -213,7 +213,7 @@ export default function GlobalSettings() {
                 <CreateProjectForm />
             </div>
             <div className="border-b border-white/10">
-                <QuotaForm title="Global quotas" />
+                <CreateQuotaForm title="Create Global Quota" />
             </div>
             <div className="border-b border-white/10 pb-5">
                 <QuotasTable title="Global Quotas" rows={PLACEHOLDER_QUOTAS} showUser="true" onAction={() => {}} />
