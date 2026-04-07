@@ -6,8 +6,8 @@ import UsageTable from "../../components/blocks/UsageTable"
 const ACTIVE_QUOTAS = [
     { name: "Monthly Token Quota", resetDate: "May 1, 2026",  used: 6800, limit: 10000 },
     { name: "Daily Request Quota", resetDate: "Apr 7, 2026",  used: 45,   limit: 100   },
-    { name: "Monthly Token Quota", resetDate: "May 1, 2026",  used: 6800, limit: 10000 },
-    { name: "Daily Request Quota", resetDate: "Apr 7, 2026",  used: 45,   limit: 100   },
+    { name: "Beep", resetDate: "May 1, 2026",  used: 6800, limit: 10000 },
+    { name: "Boop", resetDate: "Apr 7, 2026",  used: 45,   limit: 100   },
     
 ]
 

@@ -67,10 +67,10 @@ export default function ProjectSetings() {
                     <AddUserForm />
                 </div>
                 <div className="border-b border-white/10">
-                    <CreateQuotaForm title="Create Project Quota" enableKeyTarget="true" />
+                    <CreateQuotaForm title="Create Project Quota" enableKeyTarget={true} />
                 </div>
                 <div className="border-b border-white/10 pb-5">
-                    <QuotasTable title="Project Quotas" rows={PLACEHOLDER_QUOTAS} showUser="true" showKey="true" onAction={() => { }} />
+                    <QuotasTable title="Project Quotas" rows={PLACEHOLDER_QUOTAS} showUser={true} showKey={true} onAction={() => { }} />
                 </div>
                 <div className="border-b border-white/10 pb-5">
                     <UsersTable title="Project Users" rows={PLACEHOLDER_USERS} onAction={() => { }} actionLabel="Remove" />

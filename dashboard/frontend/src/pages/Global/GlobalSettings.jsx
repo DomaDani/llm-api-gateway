@@ -34,84 +34,84 @@ const PLACEHOLDER_USERS = [
         createdAt: "2026-04-03",
     },
         {
-        id: "u-1",
+        id: "u-5",
         username: "alice",
         email: "alice@example.com",
         role: "administrator",
         createdAt: "2026-03-20",
     },
     {
-        id: "u-2",
+        id: "u-6",
         username: "bence",
         email: "bence@example.com",
         role: "project manager",
         createdAt: "2026-03-25",
     },
     {
-        id: "u-3",
+        id: "u-7",
         username: "csilla",
         email: "csilla@example.com",
         role: "user",
         createdAt: "2026-04-01",
     },
     {
-        id: "u-4",
+        id: "u-8",
         username: "david",
         email: "david@example.com",
         role: "project manager",
         createdAt: "2026-04-03",
     },
         {
-        id: "u-1",
+        id: "u-9",
         username: "alice",
         email: "alice@example.com",
         role: "administrator",
         createdAt: "2026-03-20",
     },
     {
-        id: "u-2",
+        id: "u-10",
         username: "bence",
         email: "bence@example.com",
         role: "project manager",
         createdAt: "2026-03-25",
     },
     {
-        id: "u-3",
+        id: "u-11",
         username: "csilla",
         email: "csilla@example.com",
         role: "user",
         createdAt: "2026-04-01",
     },
     {
-        id: "u-4",
+        id: "u-12",
         username: "david",
         email: "david@example.com",
         role: "project manager",
         createdAt: "2026-04-03",
     },
         {
-        id: "u-1",
+        id: "u-13",
         username: "alice",
         email: "alice@example.com",
         role: "administrator",
         createdAt: "2026-03-20",
     },
     {
-        id: "u-2",
+        id: "u-14",
         username: "bence",
         email: "bence@example.com",
         role: "project manager",
         createdAt: "2026-03-25",
     },
     {
-        id: "u-3",
+        id: "u-15",
         username: "csilla",
         email: "csilla@example.com",
         role: "user",
         createdAt: "2026-04-01",
     },
     {
-        id: "u-4",
+        id: "u-16",
         username: "vmjpoqwrfsscobbgayziqdbdtnqpaqdrdxrpbapodzkuanexveiwxjhpwvofdwfxsywnbcunmbelixqvpduvkoqewdfqwngwwikwjfannacmspcguffguplfxosqlriljnatyoykaclcxjwgdydzubuywgdgbuobdneylleihizzhxfsfyfmvdrekgchcuomjxzknaxdulmwaivqkbiemhqhbepifsdxniouqeuf",
         email: "david@example.com",
         role: "project manager",
@@ -130,7 +130,7 @@ const PLACEHOLDER_QUOTAS = [
         status: "Active",
     },
     {
-        user: "GipszJakab",
+        user: "GipszJakab2",
         period: "Daily",
         expires_at: "n/a",
         limit_name: "Token Limit",
@@ -139,7 +139,7 @@ const PLACEHOLDER_QUOTAS = [
         status: "Active",
     },
     {
-        user: "GipszJakab",
+        user: "GipszJakab3",
         period: "Daily",
         expires_at: "n/a",
         limit_name: "Token Limit",
@@ -148,7 +148,7 @@ const PLACEHOLDER_QUOTAS = [
         status: "Active",
     },
     {
-        user: "GipszJakab",
+        user: "GipszJakab4",
         period: "Daily",
         expires_at: "n/a",
         limit_name: "Token Limit",
@@ -157,7 +157,7 @@ const PLACEHOLDER_QUOTAS = [
         status: "Active",
     },
     {
-        user: "GipszJakab",
+        user: "GipszJakab5",
         period: "Daily",
         expires_at: "n/a",
         limit_name: "Token Limit",
@@ -166,7 +166,7 @@ const PLACEHOLDER_QUOTAS = [
         status: "Active",
     },
     {
-        user: "GipszJakab",
+        user: "GipszJakab6",
         period: "Daily",
         expires_at: "n/a",
         limit_name: "Token Limit",
@@ -175,7 +175,7 @@ const PLACEHOLDER_QUOTAS = [
         status: "Active",
     },
     {
-        user: "GipszJakab",
+        user: "GipszJakab7",
         period: "Daily",
         expires_at: "n/a",
         limit_name: "Token Limit",
@@ -184,7 +184,7 @@ const PLACEHOLDER_QUOTAS = [
         status: "Active",
     },
     {
-        user: "GipszJakab",
+        user: "GipszJakab8",
         period: "Daily",
         expires_at: "n/a",
         limit_name: "Token Limit",
@@ -193,7 +193,7 @@ const PLACEHOLDER_QUOTAS = [
         status: "Active",
     },
     {
-        user: "GipszJakab",
+        user: "GipszJakab9",
         period: "Daily",
         expires_at: "n/a",
         limit_name: "Token Limit",
@@ -216,7 +216,7 @@ export default function GlobalSettings() {
                 <CreateQuotaForm title="Create Global Quota" />
             </div>
             <div className="border-b border-white/10 pb-5">
-                <QuotasTable title="Global Quotas" rows={PLACEHOLDER_QUOTAS} showUser="true" onAction={() => {}} />
+                <QuotasTable title="Global Quotas" rows={PLACEHOLDER_QUOTAS} showUser={true} onAction={() => {}} />
             </div>
             <div className="border-b border-white/10 pb-5">
                 <UsersTable title="Global Users" rows={PLACEHOLDER_USERS} onAction={() => {}} />

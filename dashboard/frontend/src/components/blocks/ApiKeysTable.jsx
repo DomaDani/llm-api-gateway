@@ -8,12 +8,21 @@ const SORTABLE_COLUMNS = {
     status: "Status",
 }
 
+const OPTIONAL_COLUMNS = new Set(["user"])
 const HIDDEN_ON_MOBILE = new Set(["fingerprint", "created_date"])
 
-export default function ApiKeysTable({ title = "API Keys", rows = [], onAction, actionLabel = "Delete" })
+export default function ApiKeysTable({ title = "API Keys", rows = [], onAction, actionLabel = "Delete", showUser = true })
 {
     const [sortBy, setSortBy] = useState("name")
     const [sortDirection, setSortDirection] = useState("asc")
+
+    const visibleColumns = useMemo(() => {
+        return Object.keys(SORTABLE_COLUMNS).filter((col) => {
+            if (col === "user") return showUser
+            return true
+        })
+    }, [showUser])
+
 
     const sortedRows = useMemo(() => {
         const copy = [...rows]
@@ -44,6 +53,8 @@ export default function ApiKeysTable({ title = "API Keys", rows = [], onAction, 
         setSortDirection("asc")
     }
 
+    const columnCount = visibleColumns.length + (onAction ? 1 : 0)
+
     return (
         <div className="flex min-w-0 flex-col rounded-md bg-white/5 outline outline-1 outline-white/10">
             <div className="border-b border-white/10 bg-indigo-500/10 px-4 py-3">
@@ -54,14 +65,14 @@ export default function ApiKeysTable({ title = "API Keys", rows = [], onAction, 
                 <table className="min-w-full text-sm">
                     <thead className="sticky top-0 bg-gray-900">
                         <tr>
-                            {Object.entries(SORTABLE_COLUMNS).map(([column, label]) => (
+                            {visibleColumns.map((column) => (
                                 <th key={column} className={`px-4 py-2 text-left text-xs font-medium uppercase tracking-wide text-gray-500${HIDDEN_ON_MOBILE.has(column) ? " hidden sm:table-cell" : ""}`}>
                                     <button
                                         type="button"
                                         onClick={() => handleSort(column)}
                                         className="inline-flex cursor-pointer items-center gap-1 hover:text-white"
                                     >
-                                        {label}
+                                        {SORTABLE_COLUMNS[column]}
                                         {sortBy === column ? (
                                             <span className="text-[10px]">{sortDirection === "asc" ? "▲" : "▼"}</span>
                                         ) : null}
@@ -80,11 +91,23 @@ export default function ApiKeysTable({ title = "API Keys", rows = [], onAction, 
                         {sortedRows.length > 0 ? (
                             sortedRows.map((row) => (
                                 <tr key={row.id} className="hover:bg-white/5">
-                                    <td className="max-w-0 truncate px-4 py-2 text-gray-300" title={row.user}>{row.user}</td>
-                                    <td className="max-w-0 truncate px-4 py-2 text-gray-300" title={row.name}>{row.name}</td>
-                                    <td className="hidden max-w-0 truncate px-4 py-2 text-gray-400 sm:table-cell" title={row.fingerprint}>{row.fingerprint}</td>
-                                    <td className="hidden max-w-0 truncate px-4 py-2 text-gray-400 sm:table-cell" title={row.created_date}>{row.created_date}</td>
-                                    <td className="max-w-0 truncate px-4 py-2 text-gray-300" title={row.status}>{row.status}</td>
+                                    {showUser && (
+                                        <td className="max-w-0 truncate px-4 py-2 text-gray-300" title={row.user}>
+                                            {row.user}
+                                        </td>
+                                    )}
+                                    <td className="max-w-0 truncate px-4 py-2 text-gray-300" title={row.name}>
+                                        {row.name}
+                                    </td>
+                                    <td className="hidden max-w-0 truncate px-4 py-2 text-gray-400 sm:table-cell" title={row.fingerprint}>
+                                        {row.fingerprint}
+                                    </td>
+                                    <td className="hidden max-w-0 truncate px-4 py-2 text-gray-400 sm:table-cell" title={row.created_date}>
+                                        {row.created_date}
+                                    </td>
+                                    <td className="max-w-0 truncate px-4 py-2 text-gray-300" title={row.status}>
+                                        {row.status}
+                                    </td>
                                     {onAction && (
                                         <td className="px-4 py-2 text-right">
                                             <button
@@ -100,7 +123,7 @@ export default function ApiKeysTable({ title = "API Keys", rows = [], onAction, 
                             ))
                         ) : (
                             <tr>
-                                <td colSpan={onAction ? 6 : 5} className="px-4 py-6 text-center text-gray-500">
+                                <td colSpan={columnCount} className="px-4 py-6 text-center text-gray-500">
                                     No API keys found
                                 </td>
                             </tr>
