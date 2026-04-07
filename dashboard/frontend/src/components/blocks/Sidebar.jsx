@@ -167,7 +167,7 @@ export default function Sidebar({ children })
                         <button
                             type="button"
                             onClick={logout}
-                            className="text-sm font-medium text-gray-400 transition-colors hover:text-white"
+                            className="cursor-pointer text-sm font-medium text-gray-400 transition-colors hover:text-white"
                         >
                             SIGN OUT
                         </button>
