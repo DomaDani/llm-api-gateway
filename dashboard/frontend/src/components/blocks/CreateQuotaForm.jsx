@@ -75,6 +75,8 @@ export default function CreateQuotaForm({
                                     items={typeOptions}
                                     itemName="type"
                                     onSelect={setType}
+                                    required
+                                    name="quota-type"
                                 />
                             </div>
                         </div>
@@ -88,6 +90,8 @@ export default function CreateQuotaForm({
                                     items={refreshFrequencyOptions}
                                     itemName="refresh frequency"
                                     onSelect={setRefreshFrequency}
+                                    required
+                                    name="refresh-frequency"
                                 />
                             </div>
                         </div>
@@ -106,6 +110,7 @@ export default function CreateQuotaForm({
                                     autoComplete="off"
                                     value={value}
                                     onChange={(event) => setValue(event.target.value)}
+                                    required
                                     className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"
                                 />
                             </div>
@@ -123,6 +128,7 @@ export default function CreateQuotaForm({
                                     value={expiration}
                                     disabled={isPermanent}
                                     onChange={(event) => setExpiration(event.target.value)}
+                                    required={!isPermanent}
                                     className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 [color-scheme:dark] focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm/6"
                                 />
                             </div>
@@ -273,6 +279,8 @@ export default function CreateQuotaForm({
                                         items={targetType === "key" ? targetKeyOptions : targetUserOptions}
                                         itemName={targetType}
                                         onSelect={setTargetValue}
+                                        required
+                                        name="target-value"
                                     />
                                 </div>
                             </div>

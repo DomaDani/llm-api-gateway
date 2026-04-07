@@ -42,6 +42,7 @@ export default function CreateProjectForm({ users = PLACEHOLDER_USERS, onSubmit 
                                     autoComplete="off"
                                     value={projectName}
                                     onChange={(event) => setProjectName(event.target.value)}
+                                    required
                                     className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"
                                 />
                             </div>
@@ -56,6 +57,8 @@ export default function CreateProjectForm({ users = PLACEHOLDER_USERS, onSubmit 
                                     items={users}
                                     itemName="user"
                                     onSelect={setProjectManager}
+                                    required
+                                    name="project-manager"
                                 />
                             </div>
                         </div>

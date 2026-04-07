@@ -37,6 +37,8 @@ export default function AddUserForm({ users = PLACEHOLDER_USERS, onSubmit }) {
                                     items={users}
                                     itemName="user"
                                     onSelect={setUsername}
+                                    required
+                                    name="username"
                                 />
                             </div>
                         </div>

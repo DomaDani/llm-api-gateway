@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react"
 
-export default function Dropdown({ items = [], itemName, onSelect, containerClassName = "" })
+export default function Dropdown({ items = [], itemName, onSelect, containerClassName = "", required = false, name })
 {
     const [isOpen, setIsOpen]       = useState(false)
     const [search, setSearch]       = useState("")
@@ -34,10 +34,20 @@ export default function Dropdown({ items = [], itemName, onSelect, containerClas
     return (
         <div ref={containerRef} className={`relative ${containerClassName}`.trim()}>
 
+            {/* Invisible validation input is positioned over the control so native tooltip appears in-place. */}
+            <input
+                name={name ?? `dropdown-${itemName?.toLowerCase().replace(/\s+/g, "-")}`}
+                value={selected ?? ""}
+                required={required}
+                onChange={() => {}}
+                className="pointer-events-none absolute inset-0 h-full w-full opacity-0"
+            />
+
             {/* Trigger button */}
             <button
                 type="button"
                 onClick={() => setIsOpen((prev) => !prev)}
+                aria-required={required}
                 className="flex w-full items-center justify-between rounded-md bg-white/5 px-3 py-1.5 text-sm text-white outline-1 -outline-offset-1 outline-white/10 hover:bg-white/10 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500"
             >
                 <span className={selected ? "text-white" : "text-gray-500"}>

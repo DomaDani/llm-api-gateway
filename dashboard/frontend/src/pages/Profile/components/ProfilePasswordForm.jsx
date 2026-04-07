@@ -13,6 +13,7 @@ export default function ProfilePasswordForm() {
                         type="password"
                         placeholder="Current password"
                         autoComplete="current-password"
+                        required
                         className="block w-full rounded-md bg-white/5 px-3 py-2 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500"
                     />
                 </div>
@@ -28,6 +29,7 @@ export default function ProfilePasswordForm() {
                         type="password"
                         placeholder="New password"
                         autoComplete="new-password"
+                        required
                         className="block w-full rounded-md bg-white/5 px-3 py-2 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500"
                     />
                 </div>
@@ -43,6 +45,7 @@ export default function ProfilePasswordForm() {
                         type="password"
                         placeholder="Retype new password"
                         autoComplete="new-password"
+                        required
                         className="block w-full rounded-md bg-white/5 px-3 py-2 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500"
                     />
                 </div>
