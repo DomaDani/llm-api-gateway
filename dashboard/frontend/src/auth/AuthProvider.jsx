@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }) => {
             
             setLoading(true);
 
-            navigate('/welcome');
+            navigate('/home');
         } catch (error) {
             console.error(error);
             throw error;
