@@ -2,6 +2,7 @@
 // Reworked for react and navigation.
 import { useState } from "react"
 import { NavLink } from "react-router-dom"
+import { useAuth } from "../../auth/AuthProvider"
 import Dropdown from "../primitives/Dropdown"
 
 const PLACEHOLDER_PROJECTS = [
@@ -15,6 +16,7 @@ const PLACEHOLDER_PROJECTS = [
 export default function Sidebar({ children })
 {
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
+    const { logout } = useAuth()
 
     return (
         <div className="flex h-screen bg-gray-900">
@@ -149,7 +151,7 @@ export default function Sidebar({ children })
                         />
                     </div>
 
-                    <div className="flex items-center pr-4">
+                    <div className="flex items-center gap-4 pr-4">
                         <NavLink
                             to="/profile"
                             className={({ isActive }) =>
@@ -162,6 +164,13 @@ export default function Sidebar({ children })
                         >
                             PROFILE
                         </NavLink>
+                        <button
+                            type="button"
+                            onClick={logout}
+                            className="text-sm font-medium text-gray-400 transition-colors hover:text-white"
+                        >
+                            SIGN OUT
+                        </button>
                     </div>
                 </div>
 
