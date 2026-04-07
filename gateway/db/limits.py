@@ -68,7 +68,7 @@ async def db_get_quotas_by_key(api_key: APIKey, session = None) -> Tuple[list[Qu
 
     result = await session.execute(
         select(Quota)
-        .where(_quota_filter(api_key) and Quota.status == Status.ACTIVE)
+        .where(_quota_filter(api_key))
         .order_by(Quota.id)
         .with_for_update()
     )
