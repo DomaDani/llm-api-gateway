@@ -14,7 +14,7 @@ function App() {
       <Route path="/global"  element={<Sidebar><GlobalSettings /></Sidebar>} />
       <Route path="/project"  element={<Sidebar><ProjectSetings /></Sidebar>} />
       <Route path="/keys"   element={<Sidebar><ApiKeys /></Sidebar>} />
-      <Route path="/statistics"   element={<Sidebar></Sidebar>} />
+      {/* <Route path="/statistics"   element={<Sidebar></Sidebar>} /> */}
       <Route path="/usage"   element={<Sidebar></Sidebar>} />
       <Route path="/profile"   element={<Sidebar></Sidebar>} />
     </Routes>

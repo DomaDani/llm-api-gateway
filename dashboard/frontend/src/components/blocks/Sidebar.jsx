@@ -96,7 +96,7 @@ export default function Sidebar({ children })
                         API keys
                     </NavLink>
 
-                    <NavLink
+                    {/* <NavLink
                         to="/statistics"
                         className={({ isActive }) =>
                             `mt-1 flex items-center rounded-md px-4 py-2 text-sm font-medium transition-colors ${
@@ -108,7 +108,7 @@ export default function Sidebar({ children })
                         onClick={() => setIsMobileSidebarOpen(false)}
                     >
                         Statistics
-                    </NavLink>
+                    </NavLink> */}
 
                     <NavLink
                         to="/usage"
