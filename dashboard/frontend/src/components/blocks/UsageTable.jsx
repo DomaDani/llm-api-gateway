@@ -10,7 +10,7 @@ export default function UsageTable({ title, rows = [] })
 
             {/* Scrollable body */}
             <div className="max-h-64 overflow-y-auto">
-                <table className="w-full text-sm">
+                <table className="w-full table-fixed text-sm">
                     <thead className="sticky top-0 bg-gray-900">
                         <tr>
                             <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Time</th>

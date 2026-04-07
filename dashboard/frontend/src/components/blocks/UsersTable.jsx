@@ -50,7 +50,7 @@ export default function UsersTable({ title = "Users", rows = [], onAction, actio
             </div>
 
             <div className="max-h-80 overflow-auto">
-                <table className="min-w-full text-sm">
+                <table className="w-full table-fixed text-sm">
                     <thead className="sticky top-0 bg-gray-900">
                         <tr>
                             {Object.entries(SORTABLE_COLUMNS).map(([column, label]) => (

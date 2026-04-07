@@ -203,24 +203,31 @@ const PLACEHOLDER_QUOTAS = [
     },
 ]
 
+const TEST = [
+
+]
+
 export default function GlobalSettings() {
     return (
-        <div className="flex flex-col gap-5">
-            <div className="border-b border-white/10">
-                <CreateUserForm />
+        <>
+            <div className="flex flex-col gap-5">
+                <h1 className="shrink-0 text-3xl font-bold text-white">Global Settings</h1>
+                <div className="border-b border-white/10">
+                    <CreateUserForm />
+                </div>
+                <div className="border-b border-white/10">
+                    <CreateProjectForm />
+                </div>
+                <div className="border-b border-white/10">
+                    <CreateQuotaForm title="Create Global Quota" />
+                </div>
+                <div className="border-b border-white/10 pb-5">
+                    <QuotasTable title="Global Quotas" rows={PLACEHOLDER_QUOTAS} showUser={true} onAction={() => {}} />
+                </div>
+                <div className="border-b border-white/10 pb-5">
+                    <UsersTable title="Global Users" rows={PLACEHOLDER_USERS} onAction={() => {}} />
+                </div>
             </div>
-            <div className="border-b border-white/10">
-                <CreateProjectForm />
-            </div>
-            <div className="border-b border-white/10">
-                <CreateQuotaForm title="Create Global Quota" />
-            </div>
-            <div className="border-b border-white/10 pb-5">
-                <QuotasTable title="Global Quotas" rows={PLACEHOLDER_QUOTAS} showUser={true} onAction={() => {}} />
-            </div>
-            <div className="border-b border-white/10 pb-5">
-                <UsersTable title="Global Users" rows={PLACEHOLDER_USERS} onAction={() => {}} />
-            </div>
-        </div>
+        </>
     )
 }

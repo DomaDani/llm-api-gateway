@@ -62,7 +62,7 @@ export default function ApiKeysTable({ title = "API Keys", rows = [], onAction, 
             </div>
 
             <div className="max-h-80 overflow-auto">
-                <table className="min-w-full text-sm">
+                <table className="w-full table-fixed text-sm">
                     <thead className="sticky top-0 bg-gray-900">
                         <tr>
                             {visibleColumns.map((column) => (

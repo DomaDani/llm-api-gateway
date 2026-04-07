@@ -5,6 +5,7 @@ import Home from '../pages/Home/Home'
 import GlobalSettings from '../pages/Global/GlobalSettings';
 import ProjectSetings from '../pages/Project/ProjectSettings';
 import ApiKeys from '../pages/Keys/ApiKeys';
+import Usage from '../pages/Usage/Usage';
 
 function App() {
   return (
@@ -15,7 +16,7 @@ function App() {
       <Route path="/project"  element={<Sidebar><ProjectSetings /></Sidebar>} />
       <Route path="/keys"   element={<Sidebar><ApiKeys /></Sidebar>} />
       {/* <Route path="/statistics"   element={<Sidebar></Sidebar>} /> */}
-      <Route path="/usage"   element={<Sidebar></Sidebar>} />
+      <Route path="/usage"   element={<Sidebar><Usage /></Sidebar>} />
       <Route path="/profile"   element={<Sidebar></Sidebar>} />
     </Routes>
 

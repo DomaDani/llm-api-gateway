@@ -7,7 +7,7 @@ const SORTABLE_COLUMNS = {
     expires_at: "Expiration Date",
     limit_name: "Limit Type",
     limit_value: "Limit Value",
-    allocated: "allocated",
+    allocated: "Allocated",
     status: "Status",
 }
 

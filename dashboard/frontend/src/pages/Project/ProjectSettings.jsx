@@ -63,6 +63,7 @@ export default function ProjectSetings() {
     return (
         <>
             <div className="flex flex-col gap-5">
+                <h1 className="shrink-0 text-3xl font-bold text-white">Project Settings</h1>
                 <div className="border-b border-white/10">
                     <AddUserForm />
                 </div>
