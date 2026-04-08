@@ -1,5 +1,5 @@
 from .login import LoginRequest, TokenResponse
-from .display_info import UserDisplayInfo
+from .user import UserDisplayInfo
 
 __all__ = [
     "LoginRequest",
