@@ -65,3 +65,15 @@ async def require_valid_access_token(
         raise HTTPException(status_code=401, detail="Invalid or expired access token")
 
     return True
+
+async def require_current_user(
+    credentials: HTTPAuthorizationCredentials | None = Depends(_bearer),
+) -> UserDisplayInfo:
+    if credentials is None:
+        raise HTTPException(status_code=401, detail="Missing access token")
+
+    user = await get_user_from_token(credentials.credentials)
+    if user is None:
+        raise HTTPException(status_code=401, detail="Invalid or expired access token")
+
+    return user

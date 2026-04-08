@@ -1,9 +1,8 @@
 import api from "../../axios";
 
-export async function changeIdentity({ id, email, username }) {
+export async function changeIdentity({ email, username }) {
     try {
         const response = await api.put('/users/change-identity', {
-            id,
             email,
             username
         });

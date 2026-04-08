@@ -42,7 +42,7 @@ export default function ProfileIdentityForm() {
         setLoading(true);
 
         try {
-            const message = await changeIdentity({ id: user.id, email, username });
+            const message = await changeIdentity({ email, username });
 
             setSuccess(message)
             setUsername(username)
