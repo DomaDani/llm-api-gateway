@@ -4,7 +4,7 @@ from jose import JWTError, jwt
 from datetime import datetime, timezone, timedelta
 
 from dashboard.backend.models.dto_models import UserDisplayInfo, AccessTokenInfo
-from dashboard.backend.db.users import get_user_by_email
+from dashboard.backend.db.users import get_user_by_id
 
 from shared.config import LOGIN_SECRET_KEY, TOKEN_EXPIRATION_MINS, TOKEN_ENCODING_ALGORITHM
 
@@ -24,14 +24,12 @@ async def get_user_from_token(token: str) -> UserDisplayInfo | None:
     try:
         payload = jwt.decode(token, LOGIN_SECRET_KEY, algorithms=[TOKEN_ENCODING_ALGORITHM])
         user_id: int = payload.get("user_id")
-        email: str = payload.get("sub")
 
-        if user_id is None or email is None:
+        if user_id is None:
             return None
 
-        user_record = await get_user_by_email(email)
-
-        if user_record is None or user_record.id != user_id:
+        user_record = await get_user_by_id(user_id)
+        if user_record is None:
             return None
         
         return UserDisplayInfo(

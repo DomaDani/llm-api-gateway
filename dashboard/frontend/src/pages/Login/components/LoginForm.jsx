@@ -66,11 +66,11 @@ export default function LoginForm() {
                 <label htmlFor="password" className="block text-sm/6 font-medium text-gray-100">
                   Password
                 </label>
-                <div className="text-sm">
+                {/* <div className="text-sm">
                   <a href="#" className="font-semibold text-indigo-400 hover:text-indigo-300">
                     Forgot password?
                   </a>
-                </div>
+                </div> */}
               </div>
               <div className="mt-2">
                 <input
@@ -97,12 +97,12 @@ export default function LoginForm() {
             </div>
           </form>
 
-          <p className="mt-10 text-center text-sm/6 text-gray-400">
+          {/* <p className="mt-10 text-center text-sm/6 text-gray-400">
             Not a member?{' '}
             <a href="#" className="font-semibold text-indigo-400 hover:text-indigo-300">
               Register now!
             </a>
-          </p>
+          </p> */}
         </div>
       </div>
     </>

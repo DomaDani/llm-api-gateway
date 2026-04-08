@@ -31,7 +31,10 @@ api.interceptors.request.use(
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error?.response?.status === 401) {
+        const isUnauthorized = error?.response?.status === 401
+        const authHeader = error?.config?.headers?.Authorization ?? error?.config?.headers?.authorization
+
+        if (isUnauthorized && authHeader) {
             localStorage.removeItem('token')
             window.dispatchEvent(new Event('auth:expired'))
         }

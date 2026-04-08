@@ -13,7 +13,7 @@ async def login(request: LoginRequest):
     user = await get_user_by_email(request.email)
 
     if user is None or not verify_password(stored_hash=user.password_hash, provided_password=request.password):
-        raise HTTPException(status_code=401, detail="Incorrect email or password!")
+        raise HTTPException(status_code=400, detail="Incorrect email or password!")
 
     access_token = create_access_token(data=AccessTokenInfo(user_id=user.id, sub=user.email))
     return TokenResponse(access_token=access_token, token_type="bearer")

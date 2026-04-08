@@ -19,4 +19,4 @@ async def change_identity(
     except Exception as e:
         raise HTTPException(status_code=400, detail="Something went wrong while changing user identity. Please try again later.") from e
 
-    return {"message": "User identity changed successfully."}
+    return {"message": "Profile updated successfully."}
