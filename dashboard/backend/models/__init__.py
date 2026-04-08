@@ -1,8 +1,9 @@
-from .dto_models import LoginRequest, TokenResponse, UserDisplayInfo, UserRegistrationRequest, UserIdentityChangeRequest, UserPasswordChangeRequest
+from .dto_models import LoginRequest, TokenResponse, AccessTokenInfo, UserDisplayInfo, UserRegistrationRequest, UserIdentityChangeRequest, UserPasswordChangeRequest
 
 __all__ = [
     "LoginRequest",
     "TokenResponse",
+    "AccessTokenInfo",
     "UserDisplayInfo",
     "UserRegistrationRequest",
     "UserIdentityChangeRequest",

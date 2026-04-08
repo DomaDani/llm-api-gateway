@@ -3,15 +3,15 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
 from datetime import datetime, timezone, timedelta
 
-from dashboard.backend.models.dto_models import UserDisplayInfo
+from dashboard.backend.models.dto_models import UserDisplayInfo, AccessTokenInfo
 from dashboard.backend.db.users import get_user_by_email
 
 from shared.config import LOGIN_SECRET_KEY, TOKEN_EXPIRATION_MINS, TOKEN_ENCODING_ALGORITHM
 
 _bearer = HTTPBearer(auto_error=False)
 
-def create_access_token(data: dict):
-    to_encode = data.copy()
+def create_access_token(data: AccessTokenInfo):
+    to_encode = data.model_dump()
 
     expire = datetime.now(timezone.utc) + timedelta(minutes=TOKEN_EXPIRATION_MINS)
     to_encode.update({"exp": expire})

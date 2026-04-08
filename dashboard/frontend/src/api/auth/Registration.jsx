@@ -10,12 +10,9 @@ export async function registerUser({ username, email, password, mandateReset }) 
 		})
 
 		return response.data?.message || 'User created successfully.'
-	} catch (err) {
-		const backendMessage = err?.response?.data?.detail
-		const normalizedMessage = Array.isArray(backendMessage)
-			? backendMessage.map((issue) => issue.msg).join(', ')
-			: backendMessage
+	} catch (error) {
+		const backendMessage = error?.response?.data?.detail
 
-		throw new Error(normalizedMessage || 'Could not create user. Please try again.')
+		throw new Error(backendMessage || 'Could not create user. Please try again.')
 	}
 }

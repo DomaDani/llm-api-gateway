@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import {useAuth} from '../../../api/auth/AuthProvider';
+import AlertBox from '../../../components/primitives/AlertBox';
 
 export default function LoginForm() {
   const { login } = useAuth();
@@ -39,13 +40,7 @@ export default function LoginForm() {
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
           <form onSubmit={handleSubmit} className="space-y-6">
 
-            {
-              error && (
-                <div className="bg-red-500/10 vorder border-red/500 text-red-500 text-sm p-2 rounded">
-                  {error}
-                </div>
-              )
-            }
+            <AlertBox message={error} variant="error" className="mt-0" />
 
 
             <div>

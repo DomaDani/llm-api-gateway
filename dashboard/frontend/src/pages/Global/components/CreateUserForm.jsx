@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { registerUser } from '../../../api/auth/Registration'
 import { useAuth } from '../../../api/auth/AuthProvider'
 import { isTokenExpired } from '../../../api/auth/token'
+import AlertBox from '../../../components/primitives/AlertBox'
 
 export default function CreateUserForm() {
     const { token } = useAuth()
@@ -56,27 +57,18 @@ export default function CreateUserForm() {
     }
 
     return (
-        <form autoComplete="off" onSubmit={handleSubmit}>
+        <form autoComplete="off" className="w-full max-w-md" onSubmit={handleSubmit}>
             <div className="space-y-12">
                 <div className="pb-5">
                     <h2 className="text-base/7 font-semibold text-white">Create New User</h2>
                     {/* <p className="mt-1 text-sm/6 text-gray-400">
                     </p> */}
 
-                    {error && (
-                        <div className="mt-3 rounded border border-red-500/50 bg-red-500/10 p-2 text-sm text-red-300">
-                            {error}
-                        </div>
-                    )}
+                    <div className="mt-3 space-y-8">
+                        <AlertBox message={error} variant="error" className="mt-0" />
+                        <AlertBox message={success} variant="success" className="mt-0" />
 
-                    {success && (
-                        <div className="mt-3 rounded border border-emerald-500/50 bg-emerald-500/10 p-2 text-sm text-emerald-300">
-                            {success}
-                        </div>
-                    )}
-
-                    <div className="mt-3 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                        <div className="sm:col-span-4">
+                        <div>
                             <label htmlFor="username" className="block text-sm/6 font-medium text-white">
                                 Username
                             </label>
@@ -95,7 +87,7 @@ export default function CreateUserForm() {
                             </div>
                         </div>
 
-                        <div className="sm:col-span-4">
+                        <div>
                             <label htmlFor="email" className="block text-sm/6 font-medium text-white">
                                 Email address
                             </label>
@@ -114,7 +106,7 @@ export default function CreateUserForm() {
                             </div>
                         </div>
 
-                        <div className="sm:col-span-4">
+                        <div>
                             <label htmlFor="password" className="block text-sm/6 font-medium text-white">
                                 Password
                             </label>
@@ -133,7 +125,7 @@ export default function CreateUserForm() {
                             </div>
                         </div>
 
-                        <div className="sm:col-span-4">
+                        <div>
                             <div className="flex gap-3">
                                 <div className="flex h-6 shrink-0 items-center">
                                     <div className="group grid size-4 grid-cols-1">
@@ -179,7 +171,7 @@ export default function CreateUserForm() {
                             </div>
                         </div>
                     </div>
-                    <div className="sm:col-span-4 pt-6">
+                    <div className="pt-6">
                         <button
                             type="submit"
                             disabled={loading || sessionExpired}
