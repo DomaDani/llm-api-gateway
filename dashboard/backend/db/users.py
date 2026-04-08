@@ -28,11 +28,13 @@ async def get_user_by_username(username: str) -> User | None:
 
         return user_record
 
-async def user_email_free(email: str) -> bool:
-    return await get_user_by_email(email) is None
+async def user_email_free(email: str, exclude_user_id: int | None = None) -> bool:
+    user = await get_user_by_email(email)
+    return user is None or (exclude_user_id is not None and user.id == exclude_user_id)
 
-async def user_username_free(username: str) -> bool:
-    return await get_user_by_username(username) is None
+async def user_username_free(username: str, exclude_user_id: int | None = None) -> bool:
+    user = await get_user_by_username(username)
+    return user is None or (exclude_user_id is not None and user.id == exclude_user_id)
 
 async def change_user_identity(user_id: int, new_email: str, new_username: str) -> User:
     async with get_transactional_session() as session:

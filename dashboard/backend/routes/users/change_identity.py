@@ -12,7 +12,7 @@ async def change_identity(
     request: UserIdentityChangeRequest,
     current_user: UserDisplayInfo = Depends(require_current_user)
 ):
-    await enforce_availability(email=request.email, username=request.username)
+    await enforce_availability(email=request.email, username=request.username, exclude_user_id=current_user.id)
 
     try:
         await change_user_identity(user_id=current_user.id, new_email=request.email, new_username=request.username)
