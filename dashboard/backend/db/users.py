@@ -1,4 +1,5 @@
 from sqlalchemy import select
+from datetime import datetime, timezone
 
 from shared.db import get_session, get_transactional_session
 from shared.models import User
@@ -55,12 +56,23 @@ async def change_user_password(user_id: int, new_password_hash: str) -> User:
             raise ValueError("User not found.")
 
         user_record.password_hash = new_password_hash
+        user_record.password_expires_at = None
 
         return user_record
     
-async def create_user(email: str, username: str, password_hash: str) -> User:
+async def create_user(email: str, username: str, password_hash: str, mandate_reset: bool = False) -> User:
     async with get_transactional_session() as session:
-        new_user = User(email=email, username=username, password_hash=password_hash)
+        new_user = User(email=email, username=username, password_hash=password_hash, password_expires_at=datetime.now(tz=timezone.utc) if mandate_reset else None)
         session.add(new_user)
 
         return new_user
+    
+async def delete_user(user_id: int) -> None:
+    async with get_transactional_session() as session:
+        result = await session.execute(select(User).where(User.id == user_id).with_for_update())
+        user_record = result.scalars().first()
+
+        if user_record is None:
+            raise ValueError("User not found.")
+
+        await session.delete(user_record)

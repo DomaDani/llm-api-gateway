@@ -1,16 +1,33 @@
-import { createContext, useState, useContext, useEffect } from "react";
+import { createContext, useState, useContext, useEffect, useCallback } from "react";
 import api from '../axios'
 import { useNavigate } from "react-router-dom";
+import { getTokenExpiryMs, isTokenExpired } from './token'
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [token, setToken] = useState(localStorage.getItem("token") || null);
+    const [token, setToken] = useState(() => {
+        const storedToken = localStorage.getItem('token')
+
+        if (storedToken && !isTokenExpired(storedToken)) {
+            return storedToken
+        }
+
+        localStorage.removeItem('token')
+        return null
+    });
     const [user, setUser] = useState(null);
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
 
-    const fetchMe = async () => {
+    const logout = useCallback(() => {
+        setToken(null);
+        setUser(null);
+        localStorage.removeItem('token');
+        navigate('/');
+    }, [navigate]);
+
+    const fetchMe = useCallback(async () => {
         try {
             const response = await api.get('/users/me');
             setUser(response.data);
@@ -19,21 +36,64 @@ export const AuthProvider = ({ children }) => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [logout]);
 
     useEffect(() => {
         if(token) {
+            if (isTokenExpired(token)) {
+                logout();
+                setLoading(false);
+                return;
+            }
+
             fetchMe();
         } else {
             setLoading(false);
         }
-    }, [token]);
+    }, [fetchMe, logout, token]);
+
+    useEffect(() => {
+        if (!token) {
+            return
+        }
+
+        const expirationMs = getTokenExpiryMs(token)
+
+        if (!expirationMs) {
+            return
+        }
+
+        const timeoutMs = Math.max(expirationMs - Date.now(), 0)
+        const timeoutId = window.setTimeout(() => {
+            logout()
+        }, timeoutMs)
+
+        return () => {
+            window.clearTimeout(timeoutId)
+        }
+    }, [logout, token])
+
+    useEffect(() => {
+        const onAuthExpired = () => {
+            logout()
+        }
+
+        window.addEventListener('auth:expired', onAuthExpired)
+
+        return () => {
+            window.removeEventListener('auth:expired', onAuthExpired)
+        }
+    }, [logout])
 
     const login = async (email, password) => {
         try {
             const response = await api.post('/auth/login', { email, password });
             
             const receivedToken = response.data.access_token;
+
+            if (isTokenExpired(receivedToken)) {
+                throw new Error('Received expired token. Please sign in again.')
+            }
             
             setToken(receivedToken);
             localStorage.setItem('token', receivedToken);
@@ -45,13 +105,6 @@ export const AuthProvider = ({ children }) => {
             console.error(error);
             throw error;
         }
-    };
-
-    const logout = () => {
-        setToken(null);
-        setUser(null);
-        localStorage.removeItem('token');
-        navigate('/');
     };
 
     return (
