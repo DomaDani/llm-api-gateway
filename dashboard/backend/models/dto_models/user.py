@@ -14,12 +14,15 @@ class UserRegistrationRequest(BaseModel):
     email: EmailStr
     username: str
     password: str
+    mandate_reset: bool = False
 
 class UserIdentityChangeRequest(BaseModel):
+    id: int
     email: EmailStr
     username: str
 
 class UserPasswordChangeRequest(BaseModel):
+    id: int
     current_password: str
     new_password: str
     new_password_confirm: str
