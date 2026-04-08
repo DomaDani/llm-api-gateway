@@ -1,11 +1,66 @@
+import { useState } from 'react'
+
+import api from '../../../api/axios'
+
 export default function CreateUserForm() {
+    const [username, setUsername] = useState('')
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+    const [mandateReset, setMandateReset] = useState(false)
+    const [error, setError] = useState('')
+    const [success, setSuccess] = useState('')
+    const [loading, setLoading] = useState(false)
+
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+        setError('')
+        setSuccess('')
+        setLoading(true)
+
+        try {
+            const response = await api.post('/auth/register', {
+                username,
+                email,
+                password
+            })
+
+            setSuccess(response.data?.message || 'User created successfully.')
+            setUsername('')
+            setEmail('')
+            setPassword('')
+            setMandateReset(false)
+        } catch (err) {
+            const backendMessage = err?.response?.data?.detail
+            const normalizedMessage = Array.isArray(backendMessage)
+                ? backendMessage.map((issue) => issue.msg).join(', ')
+                : backendMessage
+
+            setError(normalizedMessage || 'Could not create user. Please try again.')
+        } finally {
+            setLoading(false)
+        }
+    }
+
     return (
-        <form autoComplete="off">
+        <form autoComplete="off" onSubmit={handleSubmit}>
             <div className="space-y-12">
                 <div className="pb-5">
                     <h2 className="text-base/7 font-semibold text-white">Create New User</h2>
                     {/* <p className="mt-1 text-sm/6 text-gray-400">
                     </p> */}
+
+                    {error && (
+                        <div className="mt-3 rounded border border-red-500/50 bg-red-500/10 p-2 text-sm text-red-300">
+                            {error}
+                        </div>
+                    )}
+
+                    {success && (
+                        <div className="mt-3 rounded border border-emerald-500/50 bg-emerald-500/10 p-2 text-sm text-emerald-300">
+                            {success}
+                        </div>
+                    )}
+
                     <div className="mt-3 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                         <div className="sm:col-span-4">
                             <label htmlFor="username" className="block text-sm/6 font-medium text-white">
@@ -19,6 +74,8 @@ export default function CreateUserForm() {
                                     placeholder="Username"
                                     autoComplete="off"
                                     required
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
                                     className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"
                                 />
                             </div>
@@ -36,6 +93,8 @@ export default function CreateUserForm() {
                                     placeholder="Email address"
                                     autoComplete="off"
                                     required
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
                                     className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"
                                 />
                             </div>
@@ -53,6 +112,8 @@ export default function CreateUserForm() {
                                     placeholder="Password"
                                     autoComplete="off"
                                     required
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
                                     className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"
                                 />
                             </div>
@@ -67,6 +128,8 @@ export default function CreateUserForm() {
                                             name="pw-reset"
                                             type="checkbox"
                                             aria-describedby="pw-reset-description"
+                                            checked={mandateReset}
+                                            onChange={(e) => setMandateReset(e.target.checked)}
                                             className="col-start-1 row-start-1 appearance-none rounded-sm border border-white/10 bg-white/5 checked:border-indigo-500 checked:bg-indigo-500 indeterminate:border-indigo-500 indeterminate:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:border-white/5 disabled:bg-white/10 disabled:checked:bg-white/10 forced-colors:appearance-auto"
                                         />
                                         <svg
@@ -105,9 +168,10 @@ export default function CreateUserForm() {
                     <div className="sm:col-span-4 pt-6">
                         <button
                             type="submit"
-                            className="cursor-pointer rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 hover:bg-indigo-400"
+                            disabled={loading}
+                            className={`rounded-md px-3 py-2 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 ${loading ? 'cursor-not-allowed bg-indigo-400' : 'cursor-pointer bg-indigo-500 hover:bg-indigo-400'}`}
                         >
-                            Submit
+                            {loading ? 'Creating user...' : 'Submit'}
                         </button>
                     </div>
                 </div>

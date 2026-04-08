@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Sidebar from '../components/blocks/Sidebar';
-import { AuthProvider } from '../auth/AuthProvider';
+import { AuthProvider } from '../api/auth/AuthProvider';
 import ProtectedRoute from '../components/shared/ProtectedRoute';
 
 import Login from '../pages/Login/Login';

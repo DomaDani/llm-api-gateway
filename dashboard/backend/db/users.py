@@ -57,3 +57,10 @@ async def change_user_password(user_id: int, new_password_hash: str) -> User:
         user_record.password_hash = new_password_hash
 
         return user_record
+    
+async def create_user(email: str, username: str, password_hash: str) -> User:
+    async with get_transactional_session() as session:
+        new_user = User(email=email, username=username, password_hash=password_hash)
+        session.add(new_user)
+
+        return new_user

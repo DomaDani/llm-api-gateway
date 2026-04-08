@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import {useAuth} from '../../../auth/AuthProvider';
+import {useAuth} from '../../../api/auth/AuthProvider';
 
 export default function LoginForm() {
   const { login } = useAuth();
