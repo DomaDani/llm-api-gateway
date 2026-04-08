@@ -1,8 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
-import api from '../../../api/axios'
+import { registerUser } from '../../../api/auth/Registration'
+import { useAuth } from '../../../api/auth/AuthProvider'
+import { isTokenExpired } from '../../../api/auth/token'
 
 export default function CreateUserForm() {
+    const { token } = useAuth()
+
     const [username, setUsername] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -11,31 +15,41 @@ export default function CreateUserForm() {
     const [success, setSuccess] = useState('')
     const [loading, setLoading] = useState(false)
 
+    const sessionExpired = !token || isTokenExpired(token)
+
+    useEffect(() => {
+        if (sessionExpired) {
+            setError('Your session has expired. Please sign in again.')
+        }
+    }, [sessionExpired])
+
     const handleSubmit = async (e) => {
         e.preventDefault()
+
+        if (sessionExpired) {
+            setError('Your session has expired. Please sign in again.')
+            return
+        }
+
         setError('')
         setSuccess('')
         setLoading(true)
 
         try {
-            const response = await api.post('/auth/register', {
+            const message = await registerUser({
                 username,
                 email,
-                password
+                password,
+                mandateReset
             })
 
-            setSuccess(response.data?.message || 'User created successfully.')
+            setSuccess(message)
             setUsername('')
             setEmail('')
             setPassword('')
             setMandateReset(false)
         } catch (err) {
-            const backendMessage = err?.response?.data?.detail
-            const normalizedMessage = Array.isArray(backendMessage)
-                ? backendMessage.map((issue) => issue.msg).join(', ')
-                : backendMessage
-
-            setError(normalizedMessage || 'Could not create user. Please try again.')
+            setError(err.message || 'Could not create user. Please try again.')
         } finally {
             setLoading(false)
         }
@@ -168,10 +182,10 @@ export default function CreateUserForm() {
                     <div className="sm:col-span-4 pt-6">
                         <button
                             type="submit"
-                            disabled={loading}
-                            className={`rounded-md px-3 py-2 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 ${loading ? 'cursor-not-allowed bg-indigo-400' : 'cursor-pointer bg-indigo-500 hover:bg-indigo-400'}`}
+                            disabled={loading || sessionExpired}
+                            className={`rounded-md px-3 py-2 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 ${loading || sessionExpired ? 'cursor-not-allowed bg-indigo-400' : 'cursor-pointer bg-indigo-500 hover:bg-indigo-400'}`}
                         >
-                            {loading ? 'Creating user...' : 'Submit'}
+                            {sessionExpired ? 'Session expired' : loading ? 'Creating user...' : 'Submit'}
                         </button>
                     </div>
                 </div>
