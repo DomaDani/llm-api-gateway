@@ -10,20 +10,32 @@ from .roles import get_role_by_name
 from .keys import delete_key
 from .quotas import delete_quota
 
-async def get_project_by_id(project_id: int, session = None) -> Project | None:
+async def get_project_by_id(project_id: int, session = None, options = None) -> Project | None:
     if session is None:
         async with get_session() as session:
-            return await get_project_by_id(project_id=project_id, session=session)
+            return await get_project_by_id(project_id=project_id, session=session, options=options)
 
-    result = await session.execute(select(Project).where(Project.id == project_id))
+    stmt = select(Project).where(Project.id == project_id)
+    if options is None:
+        options = _get_project_relationship_options()
+    if options:
+        stmt = stmt.options(*options)
+
+    result = await session.execute(stmt)
     return result.scalars().first()
 
-async def get_project_by_name(project_name: str, session = None) -> Project | None:
+async def get_project_by_name(project_name: str, session = None, options = None) -> Project | None:
     if session is None:
         async with get_session() as session:
-            return await get_project_by_name(project_name=project_name, session=session)
+            return await get_project_by_name(project_name=project_name, session=session, options=options)
 
-    result = await session.execute(select(Project).where(Project.name == project_name))
+    stmt = select(Project).where(Project.name == project_name)
+    if options is None:
+        options = _get_project_relationship_options()
+    if options:
+        stmt = stmt.options(*options)
+
+    result = await session.execute(stmt)
     return result.scalars().first()
 
 async def get_projects_for_user(user_id: int, session = None) -> list[Project]:
@@ -31,13 +43,7 @@ async def get_projects_for_user(user_id: int, session = None) -> list[Project]:
         async with get_session() as session:
             return await get_projects_for_user(user_id=user_id, session=session)
 
-    user = await get_user_by_id(
-        user_id=user_id,
-        session=session,
-        options=(
-            selectinload(User.permissions).selectinload(ProjectPermission.project),
-        )
-    )
+    user = await get_user_by_id(user_id=user_id, session=session)
     if user is None:
         return []
 
@@ -95,3 +101,10 @@ async def get_all_projects(session = None) -> list[Project]:
 
     result = await session.execute(select(Project).order_by(Project.name))
     return result.scalars().all()
+
+def _get_project_relationship_options():
+    return (
+        selectinload(Project.permissions),
+        selectinload(Project.api_keys),
+        selectinload(Project.quotas),
+    )

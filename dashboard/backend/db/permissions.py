@@ -1,4 +1,5 @@
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from datetime import datetime, timezone
 
 from shared.db import get_session, get_transactional_session
@@ -42,9 +43,14 @@ async def remove_user_from_project(project_id: int, user_id: int, session = None
         raise ValueError("User not found.")
 
     permission = await session.execute(
-        select(ProjectPermission).where(
+        select(ProjectPermission)
+        .where(
             ProjectPermission.project_id == project.id,
             ProjectPermission.user_id == user.id
+        )
+        .options(
+            selectinload(ProjectPermission.role),
+            selectinload(ProjectPermission.project),
         )
     )
     permission = permission.scalars().first()
@@ -70,9 +76,14 @@ async def get_user_permissions_for_project(project_id: int, user_id: int, sessio
         raise ValueError("User not found.")
 
     result = await session.execute(
-        select(ProjectPermission).where(
+        select(ProjectPermission)
+        .where(
             ProjectPermission.project_id == project.id,
             ProjectPermission.user_id == user.id
+        )
+        .options(
+            selectinload(ProjectPermission.role),
+            selectinload(ProjectPermission.project),
         )
     )
     permissions = result.scalars().all()

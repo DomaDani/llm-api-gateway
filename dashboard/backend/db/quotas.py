@@ -4,6 +4,8 @@ from datetime import datetime, timezone, timedelta
 from shared.db import get_session, get_transactional_session
 from shared.models import Quota, Status, Period, User, Project, APIKey
 
+from .lookups import get_user_by_id
+
 async def get_quota_by_id(quota_id: int, session = None) -> Quota | None:
     if session is None:
         async with get_session() as session:
@@ -122,8 +124,7 @@ async def get_quotas_for_user(
 
     active_filter = (Quota.status == Status.ACTIVE) if active_only else True
 
-    user_result = await session.execute(select(User).where(User.id == user_id))
-    user = user_result.scalars().first()
+    user = await get_user_by_id(user_id=user_id, session=session)
     if user is None:
         return []
 

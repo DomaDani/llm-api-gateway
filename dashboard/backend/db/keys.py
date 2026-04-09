@@ -1,15 +1,22 @@
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from datetime import datetime, timezone
 
 from shared.db import get_session, get_transactional_session
 from shared.models import APIKey, Project, User, Status
 
-async def get_key_by_id(key_id: int, session = None) -> APIKey | None:
+async def get_key_by_id(key_id: int, session = None, options = None) -> APIKey | None:
     if session is None:
         async with get_session() as session:
-            return await get_key_by_id(key_id=key_id, session=session)
+            return await get_key_by_id(key_id=key_id, session=session, options=options)
 
-    result = await session.execute(select(APIKey).where(APIKey.id == key_id))
+    stmt = select(APIKey).where(APIKey.id == key_id)
+    if options is None:
+        options = get_key_relationship_options()
+    if options:
+        stmt = stmt.options(*options)
+
+    result = await session.execute(stmt)
     return result.scalars().first()
 
 async def get_keys_for_user(user_id: int, session = None) -> list[APIKey]:
@@ -74,7 +81,12 @@ async def delete_key(key_id: int, session = None) -> None:
         async with get_transactional_session() as session:
             return await delete_key(key_id=key_id, session=session)
 
-    result = await session.execute(select(APIKey).where(APIKey.id == key_id).with_for_update())
+    result = await session.execute(
+        select(APIKey)
+        .where(APIKey.id == key_id)
+        .with_for_update()
+        .options(selectinload(APIKey.quotas))
+    )
     key = result.scalars().first()
     if key is None:
         raise ValueError("API Key not found.")
@@ -89,7 +101,14 @@ async def get_key_ownership(key_id: int, session = None) -> tuple[Project, User]
         async with get_session() as session:
             return await get_key_ownership(key_id=key_id, session=session)
 
-    result = await session.execute(select(APIKey).where(APIKey.id == key_id))
+    result = await session.execute(
+        select(APIKey)
+        .where(APIKey.id == key_id)
+        .options(
+            selectinload(APIKey.project),
+            selectinload(APIKey.user),
+        )
+    )
 
     key = result.scalars().first()
 
@@ -97,3 +116,10 @@ async def get_key_ownership(key_id: int, session = None) -> tuple[Project, User]
         raise ValueError("API Key not found.")
     
     return (key.project, key.user)
+
+def get_key_relationship_options():
+    return (
+        selectinload(APIKey.quotas),
+        selectinload(APIKey.project),
+        selectinload(APIKey.user),
+    )

@@ -1,4 +1,5 @@
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from datetime import datetime, timezone
 
 from shared.db import get_session, get_transactional_session
@@ -39,6 +40,14 @@ async def create_user(email: str, username: str, password_hash: str, mandate_res
         async with get_transactional_session() as session:
             return await create_user(email=email, username=username, password_hash=password_hash, mandate_reset=mandate_reset, session=session)
 
+        new_user = User(
+            email=email,
+            username=username,
+            password_hash=password_hash,
+            mandate_reset=mandate_reset
+        )
+        session.add(new_user)
+        
         return new_user
     
 async def delete_user(user_id: int, session = None) -> None:
@@ -46,7 +55,16 @@ async def delete_user(user_id: int, session = None) -> None:
         async with get_transactional_session() as session:
             return await delete_user(user_id=user_id, session=session)
 
-    result = await session.execute(select(User).where(User.id == user_id).with_for_update())
+    result = await session.execute(
+        select(User)
+        .where(User.id == user_id)
+        .with_for_update()
+        .options(
+            selectinload(User.permissions),
+            selectinload(User.api_keys),
+            selectinload(User.quotas),
+        )
+    )
     user = result.scalars().first()
 
     if user is None:
