@@ -257,7 +257,8 @@ async def delete_quota(quota_id: int, session = None) -> None:
         async with get_transactional_session() as session:
             return await delete_quota(quota_id=quota_id, session=session)
 
-    quota = await get_quota_by_id(quota_id=quota_id, session=session)
+    result = await session.execute(select(Quota).where(Quota.id == quota_id).with_for_update())
+    quota = result.scalars().first()
     if quota is None:
         raise ValueError("Quota not found.")
 

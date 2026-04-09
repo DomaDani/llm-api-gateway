@@ -74,9 +74,13 @@ async def delete_key(key_id: int, session = None) -> None:
         async with get_transactional_session() as session:
             return await delete_key(key_id=key_id, session=session)
 
-    key = await get_key_by_id(key_id=key_id, session=session)
+    result = await session.execute(select(APIKey).where(APIKey.id == key_id).with_for_update())
+    key = result.scalars().first()
     if key is None:
         raise ValueError("API Key not found.")
+    
+    for quota in key.quotas:
+        await session.delete(quota)
 
     await session.delete(key)
 

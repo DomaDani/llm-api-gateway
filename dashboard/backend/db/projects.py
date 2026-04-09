@@ -6,6 +6,8 @@ from shared.models import Project, Status, ProjectPermission
 
 from .users import get_user_by_id
 from .roles import get_role_by_name
+from .keys import delete_key
+from .quotas import delete_quota
 
 async def get_project_by_id(project_id: int, session = None) -> Project | None:
     if session is None:
@@ -57,11 +59,19 @@ async def delete_project(project_id: int, session = None) -> None:
         async with get_transactional_session() as session:
             return await delete_project(project_id=project_id, session=session)
 
-    project = await get_project_by_id(project_id=project_id, session=session)
+    result = await session.execute(select(Project).where(Project.id == project_id).with_for_update())
+    project = result.scalars().first()
     if project is None:
         raise ValueError("Project not found.")
     if project.name == "Global":
         raise ValueError("Cannot delete the Global project.")
+    
+    for permission in project.permissions:
+        await session.delete(permission)
+    for api_key in project.api_keys:
+        await delete_key(key_id=api_key.id, session=session)
+    for quota in project.quotas:
+        await delete_quota(quota_id=quota.id, session=session)
 
     await session.delete(project)
 

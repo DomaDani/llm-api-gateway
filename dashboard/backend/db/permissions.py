@@ -90,13 +90,24 @@ async def is_user_project_member(project_id: int, user_id: int, session = None) 
     permission = await get_user_permissions_for_project(project_id=project_id, user_id=user_id, session=session)
     return permission is not None
 
-async def is_user_project_manager(project_id: int, user_id: int, session = None) -> bool:
+async def is_user_project_manager(user_id: int, project_id: int | None = None, session = None) -> bool:
     if session is None:
         async with get_session() as session:
             return await is_user_project_manager(project_id=project_id, user_id=user_id, session=session)
 
-    permission = await get_user_permissions_for_project(project_id=project_id, user_id=user_id, session=session)
-    return permission is not None and permission.role.name == "Project Manager"
+    if project_id is not None:
+        permission = await get_user_permissions_for_project(project_id=project_id, user_id=user_id, session=session)
+        return permission is not None and permission.role.name == "Project Manager"
+    else:
+        user = await get_user_by_id(user_id=user_id, session=session)
+        if user is None:
+            raise ValueError("User not found.")
+
+        for permission in user.permissions:
+            if permission.role.name == "Project Manager":
+                return True
+
+        return False
 
 async def is_user_administrator(user_id: int, session = None) -> bool:
     if session is None:
