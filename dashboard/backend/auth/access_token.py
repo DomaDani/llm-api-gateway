@@ -1,13 +1,17 @@
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
 from datetime import datetime, timezone, timedelta
 
-from dashboard.backend.models.dto_models import UserDisplayInfo
-from dashboard.backend.db.users import get_user_by_email
+from dashboard.backend.models.dto_models import UserDisplayInfo, AccessTokenInfo
+from dashboard.backend.db.users import get_user_by_id
 
 from shared.config import LOGIN_SECRET_KEY, TOKEN_EXPIRATION_MINS, TOKEN_ENCODING_ALGORITHM
 
-def create_access_token(data: dict):
-    to_encode = data.copy()
+_bearer = HTTPBearer(auto_error=False)
+
+def create_access_token(data: AccessTokenInfo):
+    to_encode = data.model_dump()
 
     expire = datetime.now(timezone.utc) + timedelta(minutes=TOKEN_EXPIRATION_MINS)
     to_encode.update({"exp": expire})
@@ -20,14 +24,12 @@ async def get_user_from_token(token: str) -> UserDisplayInfo | None:
     try:
         payload = jwt.decode(token, LOGIN_SECRET_KEY, algorithms=[TOKEN_ENCODING_ALGORITHM])
         user_id: int = payload.get("user_id")
-        email: str = payload.get("sub")
 
-        if user_id is None or email is None:
+        if user_id is None:
             return None
 
-        user_record = await get_user_by_email(email)
-
-        if user_record is None or user_record.id != user_id:
+        user_record = await get_user_by_id(user_id)
+        if user_record is None:
             return None
         
         return UserDisplayInfo(
@@ -42,3 +44,34 @@ async def get_user_from_token(token: str) -> UserDisplayInfo | None:
 
     except JWTError:
         return None
+    
+async def verify_access_token(token: str) -> bool:
+    try:
+        _ = jwt.decode(token, LOGIN_SECRET_KEY, algorithms=[TOKEN_ENCODING_ALGORITHM])
+        return True
+    except JWTError:
+        return False
+
+
+async def require_valid_access_token(
+    credentials: HTTPAuthorizationCredentials | None = Depends(_bearer),
+) -> bool:
+    if credentials is None:
+        raise HTTPException(status_code=401, detail="Missing access token")
+
+    if not await verify_access_token(credentials.credentials):
+        raise HTTPException(status_code=401, detail="Invalid or expired access token")
+
+    return True
+
+async def require_current_user(
+    credentials: HTTPAuthorizationCredentials | None = Depends(_bearer),
+) -> UserDisplayInfo:
+    if credentials is None:
+        raise HTTPException(status_code=401, detail="Missing access token")
+
+    user = await get_user_from_token(credentials.credentials)
+    if user is None:
+        raise HTTPException(status_code=401, detail="Invalid or expired access token")
+
+    return user

@@ -1,8 +1,12 @@
-from .login import LoginRequest, TokenResponse
-from .display_info import UserDisplayInfo
+from .login import LoginRequest, TokenResponse, AccessTokenInfo
+from .user import UserDisplayInfo, UserRegistrationRequest, UserIdentityChangeRequest, UserPasswordChangeRequest
 
 __all__ = [
     "LoginRequest",
     "TokenResponse",
-    "UserDisplayInfo"
+    "AccessTokenInfo",
+    "UserDisplayInfo",
+    "UserRegistrationRequest",
+    "UserIdentityChangeRequest",
+    "UserPasswordChangeRequest"
 ]

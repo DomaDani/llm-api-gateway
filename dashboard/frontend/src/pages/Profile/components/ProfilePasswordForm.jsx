@@ -1,7 +1,79 @@
+import { useEffect, useState } from "react"
+
+import { changePassword } from "../../../api/management/user/ChangePassword";
+import { useAuth, } from "../../../api/auth/AuthProvider";
+import { isTokenExpired } from "../../../api/auth/token";
+import AlertBox from "../../../components/primitives/AlertBox";
+
 export default function ProfilePasswordForm() {
+    const { user, token } = useAuth();
+
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [newPasswordConfirm, setNewPasswordConfirm] = useState('');
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const sessionExpired = !token || isTokenExpired(token)
+
+    useEffect(() => {
+        if (sessionExpired) {
+            setError("Your session has expired. Please sign in again.")
+        }
+    }, [sessionExpired])
+
+    useEffect(() => {
+        if (user) {
+            setCurrentPassword('')
+            setNewPassword('')
+            setNewPasswordConfirm('')
+        }
+    }, [user]);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (sessionExpired) {
+            setError("Your session has expired. Please sign in again.")
+            return
+        }
+
+        setError('');
+        setSuccess('');
+        setLoading(true);
+
+        try {
+            const message = await changePassword({ currentPassword, newPassword, newPasswordConfirm });
+
+            setSuccess(message)
+            setCurrentPassword('')
+            setNewPassword('')
+            setNewPasswordConfirm('')
+        } catch (error) {
+            setError(error.message || 'Failed to update password.')
+        } finally {
+            setLoading(false)
+        }
+    }
+
     return (
-        <form autoComplete="off" className="w-full max-w-md space-y-3">
+        <form className="w-full max-w-md space-y-3" onSubmit={handleSubmit}>
             <h2 className="text-base/7 font-semibold text-white">Change Password</h2>
+
+            <AlertBox message={error} variant="error" />
+            <AlertBox message={success} variant="success" />
+
+            {/* Chrome autofill is unhinged and needs this, despite the inputs being named correctly */}
+            <input
+                type="email"
+                name="email"
+                autoComplete="username"
+                value={user?.email || ''}
+                readOnly
+                className="hidden"
+            />
+
             <div>
                 <label htmlFor="profile-current-password" className="block text-sm/6 font-medium text-white">
                     Current password
@@ -14,6 +86,8 @@ export default function ProfilePasswordForm() {
                         placeholder="Current password"
                         autoComplete="current-password"
                         required
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
                         className="block w-full rounded-md bg-white/5 px-3 py-2 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500"
                     />
                 </div>
@@ -30,6 +104,8 @@ export default function ProfilePasswordForm() {
                         placeholder="New password"
                         autoComplete="new-password"
                         required
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
                         className="block w-full rounded-md bg-white/5 px-3 py-2 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500"
                     />
                 </div>
@@ -46,6 +122,8 @@ export default function ProfilePasswordForm() {
                         placeholder="Retype new password"
                         autoComplete="new-password"
                         required
+                        value={newPasswordConfirm}
+                        onChange={(e) => setNewPasswordConfirm(e.target.value)}
                         className="block w-full rounded-md bg-white/5 px-3 py-2 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500"
                     />
                 </div>
@@ -53,9 +131,10 @@ export default function ProfilePasswordForm() {
 
             <button
                 type="submit"
+                disabled={loading || sessionExpired}
                 className="cursor-pointer rounded-md bg-indigo-500 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
             >
-                Submit
+                {sessionExpired ? 'Session Expired' : loading ? 'Submitting...' : 'Submit'}
             </button>
         </form>
     )

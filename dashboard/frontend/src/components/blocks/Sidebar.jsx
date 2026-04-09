@@ -2,7 +2,7 @@
 // Reworked for react and navigation.
 import { useState } from "react"
 import { NavLink } from "react-router-dom"
-import { useAuth } from "../../auth/AuthProvider"
+import { useAuth } from "../../api/auth/AuthProvider"
 import Dropdown from "../primitives/Dropdown"
 
 const PLACEHOLDER_PROJECTS = [
