@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 
 from dashboard.backend.models import LoginRequest, TokenResponse, AccessTokenInfo
 from dashboard.backend.db import get_user_by_email
-from dashboard.backend.auth.password import verify_password
+from shared.utils import verify_password
 from dashboard.backend.auth import create_access_token
 
 router = APIRouter(prefix="/auth", tags=["auth"])

@@ -1,4 +1,5 @@
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from datetime import datetime, timezone
 
 from shared.db import get_session, get_transactional_session
@@ -30,7 +31,13 @@ async def get_projects_for_user(user_id: int, session = None) -> list[Project]:
         async with get_session() as session:
             return await get_projects_for_user(user_id=user_id, session=session)
 
-    user = await get_user_by_id(user_id=user_id, session=session)
+    user = await get_user_by_id(
+        user_id=user_id,
+        session=session,
+        options=(
+            selectinload(User.permissions).selectinload(ProjectPermission.project),
+        )
+    )
     if user is None:
         return []
 
@@ -59,7 +66,13 @@ async def delete_project(project_id: int, session = None) -> None:
         async with get_transactional_session() as session:
             return await delete_project(project_id=project_id, session=session)
 
-    result = await session.execute(select(Project).where(Project.id == project_id).with_for_update())
+    result = await session.execute(
+        select(Project).where(Project.id == project_id).with_for_update().options(
+            selectinload(Project.permissions),
+            selectinload(Project.api_keys),
+            selectinload(Project.quotas),
+        )
+    )
     project = result.scalars().first()
     if project is None:
         raise ValueError("Project not found.")

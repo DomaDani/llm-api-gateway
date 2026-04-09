@@ -38,7 +38,7 @@ async def get_user_from_token(token: str) -> UserDisplayInfo | None:
     except JWTError:
         return None
     
-async def verify_access_token(token: str) -> bool:
+def verify_access_token(token: str) -> bool:
     try:
         _ = jwt.decode(token, LOGIN_SECRET_KEY, algorithms=[TOKEN_ENCODING_ALGORITHM])
         return True
@@ -52,7 +52,7 @@ async def require_valid_access_token(
     if credentials is None:
         raise HTTPException(status_code=401, detail="Missing access token")
 
-    if not await verify_access_token(credentials.credentials):
+    if not verify_access_token(credentials.credentials):
         raise HTTPException(status_code=401, detail="Invalid or expired access token")
 
 async def require_current_user(
