@@ -8,47 +8,6 @@ from .permissions import is_user_project_manager, is_user_administrator
 from .keys import delete_key
 from .quotas import delete_quota
 
-async def get_user_by_id(user_id: int, session = None) -> User | None:
-    if session is None:
-        async with get_session() as session:
-            return await get_user_by_id(user_id=user_id, session=session)
-        
-    result = await session.execute(select(User).where(User.id == user_id))
-
-    user = result.scalars().first()
-
-    return user
-
-async def get_user_by_email(email: str, session = None) -> User | None:
-    if session is None:
-        async with get_session() as session:
-            return await get_user_by_email(email=email, session=session)
-
-    result = await session.execute(select(User).where(User.email == email))
-
-    user = result.scalars().first()
-
-    return user
-
-async def get_user_by_username(username: str, session = None) -> User | None:
-    if session is None:
-        async with get_session() as session:
-            return await get_user_by_username(username=username, session=session)
-
-    result = await session.execute(select(User).where(User.username == username))
-
-    user = result.scalars().first()
-
-    return user
-
-async def user_email_free(email: str, exclude_user_id: int | None = None) -> bool:
-    user = await get_user_by_email(email)
-    return user is None or (exclude_user_id is not None and user.id == exclude_user_id)
-
-async def user_username_free(username: str, exclude_user_id: int | None = None) -> bool:
-    user = await get_user_by_username(username)
-    return user is None or (exclude_user_id is not None and user.id == exclude_user_id)
-
 async def change_user_identity(user_id: int, new_email: str, new_username: str) -> User:
     async with get_transactional_session() as session:
         result = await session.execute(select(User).where(User.id == user_id).with_for_update())

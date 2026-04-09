@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from shared.db import get_session, get_transactional_session
 from shared.models import Project, Status, ProjectPermission
 
-from .users import get_user_by_id
+from .lookups import get_user_by_id
 from .roles import get_role_by_name
 from .keys import delete_key
 from .quotas import delete_quota

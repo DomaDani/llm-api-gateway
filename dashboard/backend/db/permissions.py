@@ -5,7 +5,7 @@ from shared.db import get_session, get_transactional_session
 from shared.models import Project, User, ProjectPermission, Role
 
 from .projects import get_project_by_id
-from .users import get_user_by_id
+from .lookups import get_user_by_id
 from .roles import get_role_by_name
 
 async def add_user_to_project(project_id: int, user_id: int, session = None) -> None:
