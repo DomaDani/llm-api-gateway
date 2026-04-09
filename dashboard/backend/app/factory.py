@@ -2,7 +2,15 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
-from dashboard.backend.routes import health_router, login_router, me_router, register_router, change_identity_router, change_password_router
+from dashboard.backend.routes import \
+    health_router, \
+    login_router, \
+    me_router, \
+    register_router, \
+    change_identity_router, \
+    change_password_router, \
+    everyone_router, \
+    all_router
 
 from .middleware import init_middleware
 
@@ -23,5 +31,8 @@ def create_app() -> FastAPI:
     app.include_router(me_router)
     app.include_router(change_identity_router)
     app.include_router(change_password_router)
+    app.include_router(everyone_router)
+    app.include_router(all_router)
+
 
     return app
