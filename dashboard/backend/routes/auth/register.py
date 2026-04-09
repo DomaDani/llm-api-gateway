@@ -18,8 +18,9 @@ async def register(request: UserRegistrationRequest, _: UserDisplayInfo = Depend
     await enforce_password_strength(request.password)
 
     try:
-        new_user = await create_user(email=request.email, username=request.username, password_hash=hash_password(request.password))
+        new_user = await create_user(email=request.email, username=request.username, password_hash=hash_password(request.password), mandate_reset=request.mandate_reset)
     except Exception as e:
+        print(e)
         raise HTTPException(status_code=400, detail="Something went wrong during registration. Please try again later.") from e
 
     return {"message": f"User {new_user.username} registered successfully."}

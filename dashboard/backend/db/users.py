@@ -44,7 +44,8 @@ async def create_user(email: str, username: str, password_hash: str, mandate_res
         email=email,
         username=username,
         password_hash=password_hash,
-        mandate_reset=mandate_reset
+        joined_date=datetime.now(timezone.utc),
+        password_expires_at=datetime.now(timezone.utc) if mandate_reset else None
     )
     session.add(new_user)
     
