@@ -59,6 +59,19 @@ async def user_username_free(username: str, exclude_user_id: int | None = None) 
     user = await get_user_by_username(username)
     return user is None or (exclude_user_id is not None and user.id == exclude_user_id)
 
+async def get_users_by_project(project_id: int, session = None) -> list[User]:
+    if session is None:
+        async with get_session() as session:
+            return await get_users_by_project(project_id=project_id, session=session)
+
+    result = await session.execute(
+        select(User)
+        .join(ProjectPermission)
+        .where(ProjectPermission.project_id == project_id)
+        .order_by(User.username)
+        .options(selectinload(User.permissions))
+    )
+    return result.scalars().all()
 
 def get_user_relationship_options():
     return (

@@ -1,4 +1,4 @@
-from .dto_models import LoginRequest, TokenResponse, AccessTokenInfo, UserDisplayInfo, UserRegistrationRequest, UserIdentityChangeRequest, UserPasswordChangeRequest, ProjectDisplayInfo, QuotaDisplayInfo, QuotaCreateRequest, QuotaInfoRequest, QuotaDeleteRequest
+from .dto_models import LoginRequest, TokenResponse, AccessTokenInfo, UserDisplayInfo, UserRegistrationRequest, UserIdentityChangeRequest, UserPasswordChangeRequest, ProjectDisplayInfo, QuotaDisplayInfo, QuotaCreateRequest, QuotaInfoRequest, QuotaDeleteRequest, UserInformationRequest
 
 __all__ = [
     "LoginRequest",
@@ -12,5 +12,6 @@ __all__ = [
     "QuotaDisplayInfo",
     "QuotaCreateRequest",
     "QuotaInfoRequest",
-    "QuotaDeleteRequest"
+    "QuotaDeleteRequest",
+    "UserInformationRequest",
 ]

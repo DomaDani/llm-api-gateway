@@ -10,4 +10,4 @@ router = APIRouter(prefix="/users", tags=["users"])
 @router.get("/everyone", response_model=list[UserDisplayInfo], description="Get information about all users")
 async def get_all_users(_: None = Depends(require_valid_access_token)) -> list[UserDisplayInfo]:
     user_orms = await get_all_users()
-    return [convert_orm_to_display_info(user_orm) for user_orm in user_orms]
+    return [await convert_orm_to_display_info(user_orm) for user_orm in user_orms]

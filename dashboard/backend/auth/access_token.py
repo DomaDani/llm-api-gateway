@@ -33,7 +33,7 @@ async def get_user_from_token(token: str) -> UserDisplayInfo | None:
         if user_record is None:
             return None
         
-        return convert_orm_to_display_info(user_record)
+        return await convert_orm_to_display_info(user_record)
 
     except JWTError:
         return None
