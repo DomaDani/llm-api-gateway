@@ -3,6 +3,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
 from datetime import datetime, timezone, timedelta
 
+from dashboard.backend.management import convert_orm_to_display_info
 from dashboard.backend.models.dto_models import UserDisplayInfo, AccessTokenInfo
 from dashboard.backend.db import get_user_by_id
 
@@ -32,15 +33,7 @@ async def get_user_from_token(token: str) -> UserDisplayInfo | None:
         if user_record is None:
             return None
         
-        return UserDisplayInfo(
-            id=user_record.id,
-            email=user_record.email,
-            username=user_record.username,
-            profile_picture_url=user_record.profile_picture_url,
-            joined_date=user_record.joined_date,
-            last_login=user_record.last_login,
-            password_expires_at=user_record.password_expires_at
-        )
+        return convert_orm_to_display_info(user_record)
 
     except JWTError:
         return None

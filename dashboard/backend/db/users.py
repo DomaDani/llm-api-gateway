@@ -65,3 +65,11 @@ async def delete_user(user_id: int, session = None) -> None:
         await delete_quota(quota_id=quota.id, session=session)
 
     await session.delete(user)
+
+async def get_all_users(session = None) -> list[User]:
+    if session is None:
+        async with get_session() as session:
+            return await get_all_users(session=session)
+
+    result = await session.execute(select(User).order_by(User.username))
+    return result.scalars().all()
