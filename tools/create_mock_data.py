@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 from sqlalchemy import select
 
-from argon2 import PasswordHasher
 from datetime import datetime, timezone
 
 import sys
@@ -11,11 +10,11 @@ if __package__ is None:
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from shared.models import *
-from shared.utils import hash_key, calculate_date_after_period
+from shared.utils import hash_key, calculate_date_after_period, hash_password
 
 from shared.db import get_transactional_session
 
-ph = PasswordHasher()
+from shared.config import ADMINISTRATOR_EMAIL, ADMINISTRATOR_USERNAME, ADMINISTRATOR_PASSWORD
 
 import asyncio
 
@@ -28,6 +27,32 @@ async def create_mock_data(default_only: bool = False):
 
         existing_limits_result = await session.execute(select(Limit))
         limit_map = {limit.name: limit for limit in existing_limits_result.scalars().all()}
+
+        admin_result = await session.execute(select(User).where(User.id == -1))
+        admin_user = admin_result.scalars().first()
+
+        global_project_result = await session.execute(select(Project).where(Project.name == "Global"))
+        global_project = global_project_result.scalars().first()
+
+        if admin_user and global_project:
+            admin_permission_result = await session.execute(
+                select(ProjectPermission).where(
+                    ProjectPermission.project_id == global_project.id,
+                    ProjectPermission.user_id == admin_user.id
+                )
+            )
+            admin_permission = admin_permission_result.scalars().first()
+        else:
+            admin_permission = None
+
+        if "Administrator" not in role_map:
+            admin_role = Role(
+                name="Administrator",
+                description="Has full access to all projects and management capabilities."
+            )
+            session.add(admin_role)
+        else:
+            admin_role = role_map["Administrator"]
 
         if "Project Manager" not in role_map:
             pm_role = Role(
@@ -68,6 +93,7 @@ async def create_mock_data(default_only: bool = False):
         else:
             token_limit = limit_map["Token Limit"]
 
+
         if "Price Limit" not in limit_map:
             price_limit = Limit(
                 name="Price Limit",
@@ -77,20 +103,52 @@ async def create_mock_data(default_only: bool = False):
         else:
             price_limit = limit_map["Price Limit"]
 
+
+        if not admin_user:
+            admin_user = User(
+                id=-1,
+                email=ADMINISTRATOR_EMAIL,
+                username=ADMINISTRATOR_USERNAME,
+                password_hash=hash_password(ADMINISTRATOR_PASSWORD),
+                joined_date=datetime.now(timezone.utc)
+            )
+            session.add(admin_user)
+
+
+        if not global_project:
+            global_project = Project(
+                name="Global",
+                status=Status.ACTIVE,
+                created_date=datetime.now(timezone.utc)
+            )
+            session.add(global_project)
+
+
+        if not admin_permission:
+            admin_permission = ProjectPermission(
+                project=global_project,
+                user=admin_user,
+                role=admin_role,
+                join_date=datetime.now(timezone.utc)
+            )
+            session.add(admin_permission)
+        
+        
         if default_only:
             return
+
 
         user1 = User(
             email="gipsz.jakab@teshervaals.com",
             username="GipszJakab38",
-            password_hash=ph.hash("Ikarus280T"),
+            password_hash=hash_password("Ikarus280T"),
             joined_date=datetime.now(timezone.utc)
         )
 
         user2 = User(
             email="janos.a.hegyrol@domadani.hu",
             username="JonAHegyrol",
-            password_hash=ph.hash("kisebbmintharomu"),
+            password_hash=hash_password("kisebbmintharomu"),
             joined_date=datetime.now(timezone.utc)
         )
 

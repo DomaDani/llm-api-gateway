@@ -6,3 +6,4 @@ python-dotenv
 sqlalchemy>=1.4
 asyncpg
 genai-prices
+argon2-cffi

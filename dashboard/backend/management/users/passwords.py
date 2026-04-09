@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 
-from dashboard.backend.auth import verify_password
+from shared.utils import verify_password
 
 async def enforce_password_strength(password: str) -> None:
     if len(password) < 8:

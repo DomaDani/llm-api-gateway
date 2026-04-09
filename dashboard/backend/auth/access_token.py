@@ -5,7 +5,7 @@ from datetime import datetime, timezone, timedelta
 
 from dashboard.backend.management import convert_orm_to_display_info
 from dashboard.backend.models.dto_models import UserDisplayInfo, AccessTokenInfo
-from dashboard.backend.db import get_user_by_id
+from dashboard.backend.db import get_user_by_id, is_user_administrator, is_user_project_manager
 
 from shared.config import LOGIN_SECRET_KEY, TOKEN_EXPIRATION_MINS, TOKEN_ENCODING_ALGORITHM
 
@@ -48,14 +48,12 @@ async def verify_access_token(token: str) -> bool:
 
 async def require_valid_access_token(
     credentials: HTTPAuthorizationCredentials | None = Depends(_bearer),
-) -> bool:
+) -> None:
     if credentials is None:
         raise HTTPException(status_code=401, detail="Missing access token")
 
     if not await verify_access_token(credentials.credentials):
         raise HTTPException(status_code=401, detail="Invalid or expired access token")
-
-    return True
 
 async def require_current_user(
     credentials: HTTPAuthorizationCredentials | None = Depends(_bearer),
@@ -66,5 +64,26 @@ async def require_current_user(
     user = await get_user_from_token(credentials.credentials)
     if user is None:
         raise HTTPException(status_code=401, detail="Invalid or expired access token")
+
+    return user
+
+async def require_administrator_user(
+    credentials: HTTPAuthorizationCredentials | None = Depends(_bearer),
+) -> UserDisplayInfo:
+    user = await require_current_user(credentials)
+
+    if not await is_user_administrator(user.id):
+        raise HTTPException(status_code=403, detail="Administrator privileges required")
+
+    return user
+
+async def require_project_manager_user(
+    project_id: int,
+    credentials: HTTPAuthorizationCredentials | None = Depends(_bearer),
+) -> UserDisplayInfo:
+    user = await require_current_user(credentials)
+
+    if not await is_user_project_manager(user.id, project_id):
+        raise HTTPException(status_code=403, detail="Project manager privileges required")
 
     return user

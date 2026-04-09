@@ -1,5 +1,4 @@
-from .access_token import create_access_token, get_user_from_token, require_current_user, require_valid_access_token, verify_access_token
-from .password import hash_password, verify_password
+from .access_token import create_access_token, get_user_from_token, require_current_user, require_valid_access_token, verify_access_token, require_administrator_user, require_project_manager_user
 
 __all__ = [
     "create_access_token",
@@ -7,6 +6,6 @@ __all__ = [
     "require_current_user",
     "require_valid_access_token",
     "verify_access_token",
-    "hash_password",
-    "verify_password"
+    "require_administrator_user",
+    "require_project_manager_user"
 ]   
