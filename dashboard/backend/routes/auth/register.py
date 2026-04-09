@@ -3,9 +3,11 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from dashboard.backend.models import UserRegistrationRequest
 from dashboard.backend.management.users import enforce_availability, enforce_password_strength
-from dashboard.backend.auth import hash_password, require_administrator_user
+from dashboard.backend.auth import require_administrator_user
 from dashboard.backend.db import create_user
 from dashboard.backend.models import UserDisplayInfo
+
+from shared.utils.password import hash_password
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 

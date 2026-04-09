@@ -1,11 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException
 
 from dashboard.backend.models import UserPasswordChangeRequest
-from dashboard.backend.auth import hash_password, require_current_user
+from dashboard.backend.auth import require_current_user
 from dashboard.backend.models import UserDisplayInfo
 from dashboard.backend.db import get_user_by_id
 from dashboard.backend.management.users import enforce_password_change_validity
 from dashboard.backend.db import change_user_password
+
+from shared.utils.password import hash_password
 
 router = APIRouter(prefix="/users", tags=["users"])
 
