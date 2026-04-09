@@ -4,29 +4,38 @@ from datetime import datetime, timezone
 from shared.db import get_session, get_transactional_session
 from shared.models import User
 
-async def get_user_by_id(user_id: int) -> User | None:
-    async with get_session() as session:
-        result = await session.execute(select(User).where(User.id == user_id))
+async def get_user_by_id(user_id: int, session = None) -> User | None:
+    if session is None:
+        async with get_session() as session:
+            return await get_user_by_id(user_id=user_id, session=session)
+        
+    result = await session.execute(select(User).where(User.id == user_id))
 
-        user_record = result.scalars().first()
+    user_record = result.scalars().first()
 
-        return user_record
+    return user_record
 
-async def get_user_by_email(email: str) -> User | None:
-    async with get_session() as session:
-        result = await session.execute(select(User).where(User.email == email))
+async def get_user_by_email(email: str, session = None) -> User | None:
+    if session is None:
+        async with get_session() as session:
+            return await get_user_by_email(email=email, session=session)
 
-        user_record = result.scalars().first()
+    result = await session.execute(select(User).where(User.email == email))
 
-        return user_record
+    user_record = result.scalars().first()
 
-async def get_user_by_username(username: str) -> User | None:
-    async with get_session() as session:
-        result = await session.execute(select(User).where(User.username == username))
+    return user_record
 
-        user_record = result.scalars().first()
+async def get_user_by_username(username: str, session = None) -> User | None:
+    if session is None:
+        async with get_session() as session:
+            return await get_user_by_username(username=username, session=session)
 
-        return user_record
+    result = await session.execute(select(User).where(User.username == username))
+
+    user_record = result.scalars().first()
+
+    return user_record
 
 async def user_email_free(email: str, exclude_user_id: int | None = None) -> bool:
     user = await get_user_by_email(email)
