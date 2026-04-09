@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from dashboard.backend.auth import require_current_user
 from dashboard.backend.models import UserDisplayInfo, UserIdentityChangeRequest
 from dashboard.backend.management.users import enforce_availability
-from dashboard.backend.db.users import change_user_identity
+from dashboard.backend.db import change_user_identity
 
 router = APIRouter(prefix="/users", tags=["users"])
 

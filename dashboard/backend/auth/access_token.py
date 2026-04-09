@@ -4,7 +4,7 @@ from jose import JWTError, jwt
 from datetime import datetime, timezone, timedelta
 
 from dashboard.backend.models.dto_models import UserDisplayInfo, AccessTokenInfo
-from dashboard.backend.db.users import get_user_by_id
+from dashboard.backend.db import get_user_by_id
 
 from shared.config import LOGIN_SECRET_KEY, TOKEN_EXPIRATION_MINS, TOKEN_ENCODING_ALGORITHM
 
