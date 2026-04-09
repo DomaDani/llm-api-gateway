@@ -1,5 +1,5 @@
 from sqlalchemy import select, and_
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 from shared.db import get_session, get_transactional_session
 from shared.models import Quota, Status, Period, User, Project, APIKey
@@ -212,3 +212,53 @@ async def get_quotas_for_api_key(
 
     return inherited_from_user + api_key_quotas
 
+async def create_quota(
+        project_id: int | None,
+        user_id: int | None,
+        key_id: int | None,
+        limit_id: int,
+        limit_value: float | None,
+        period: Period,
+        expires_at: datetime | None,
+        session = None
+):
+    
+    if session is None:
+        async with get_transactional_session() as session:
+            return await create_quota(
+                project_id=project_id,
+                user_id=user_id,
+                key_id=key_id,
+                limit_id=limit_id,
+                limit_value=limit_value,
+                period=period,
+                expires_at=expires_at,
+                session=session
+            )
+
+    new_quota = Quota(
+        project_id=project_id,
+        user_id=user_id,
+        key_id=key_id,
+        limit_id=limit_id,
+        limit_value=limit_value,
+        period=period,
+        expires_at=expires_at,
+        status=Status.ACTIVE,
+        allocated=0,
+        next_reset=datetime.now(timezone.utc) + timedelta(seconds=period.value)
+    )
+    session.add(new_quota)
+
+    return new_quota
+
+async def delete_quota(quota_id: int, session = None) -> None:
+    if session is None:
+        async with get_transactional_session() as session:
+            return await delete_quota(quota_id=quota_id, session=session)
+
+    quota = await get_quota_by_id(quota_id=quota_id, session=session)
+    if quota is None:
+        raise ValueError("Quota not found.")
+
+    await session.delete(quota)
