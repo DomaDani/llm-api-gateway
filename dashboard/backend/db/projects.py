@@ -34,26 +34,6 @@ async def get_projects_for_user(user_id: int, session = None) -> list[Project]:
 
     return [permission.project for permission in user.permissions if permission.project.name != "Global"]
 
-async def add_user_to_project(project_id: int, user_id: int, session = None) -> None:
-    if session is None:
-        async with get_transactional_session() as session:
-            return await add_user_to_project(project_id=project_id, user_id=user_id, session=session)
-
-    project = await get_project_by_id(project_id=project_id, session=session)
-    if project is None:
-        raise ValueError("Project not found.")
-
-    user = await get_user_by_id(user_id=user_id, session=session)
-    if user is None:
-        raise ValueError("User not found.")
-
-    user_role = await get_role_by_name("User", session=session)
-    if user_role is None:
-        raise ValueError("Default role not found.")
-
-    permission = ProjectPermission(project_id=project.id, user_id=user.id, role_id=user_role.id, join_date=datetime.now(timezone.utc))
-    session.add(permission)
-
 async def create_project(name: str, manager_id: int, session = None) -> Project:
     if session is None:
         async with get_transactional_session() as session:
@@ -80,6 +60,15 @@ async def delete_project(project_id: int, session = None) -> None:
     project = await get_project_by_id(project_id=project_id, session=session)
     if project is None:
         raise ValueError("Project not found.")
+    if project.name == "Global":
+        raise ValueError("Cannot delete the Global project.")
 
     await session.delete(project)
 
+async def get_all_projects(session = None) -> list[Project]:
+    if session is None:
+        async with get_session() as session:
+            return await get_all_projects(session=session)
+
+    result = await session.execute(select(Project).order_by(Project.name))
+    return result.scalars().all()
