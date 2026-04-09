@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 from dashboard.backend.models import UserDisplayInfo
 from dashboard.backend.db import get_all_users
 from dashboard.backend.auth import require_valid_access_token
-from dashboard.backend.management import convert_orm_to_display_info
+from dashboard.backend.management import user_convert_orm_to_display_info as convert_orm_to_display_info
 
 router = APIRouter(prefix="/users", tags=["users"])
 

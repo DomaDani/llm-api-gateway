@@ -1,5 +1,6 @@
 from .login import LoginRequest, TokenResponse, AccessTokenInfo
 from .user import UserDisplayInfo, UserRegistrationRequest, UserIdentityChangeRequest, UserPasswordChangeRequest
+from .project import ProjectDisplayInfo
 
 __all__ = [
     "LoginRequest",
@@ -8,5 +9,6 @@ __all__ = [
     "UserDisplayInfo",
     "UserRegistrationRequest",
     "UserIdentityChangeRequest",
-    "UserPasswordChangeRequest"
+    "UserPasswordChangeRequest",
+    "ProjectDisplayInfo"
 ]
