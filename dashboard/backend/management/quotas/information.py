@@ -2,14 +2,17 @@ from shared.models import Quota
 from dashboard.backend.models import QuotaDisplayInformation
 from dashboard.backend.db import get_limit_by_id
 
-async def convert_orm_to_display_info(quota_orm: Quota) -> QuotaDisplayInformation:
+async def convert_orm_to_display_info(quota_orm: Quota, add_name: bool = False) -> QuotaDisplayInformation:
     limit = await get_limit_by_id(limit_id=quota_orm.limit_id)
 
-    project_name = quota_orm.project.name if quota_orm.project else "Global"
-    user_specific = f"User-Specific [{quota_orm.user.username}]" if quota_orm.user else ""
-    key_specific = f"Key-Specific [{quota_orm.api_key.name}]" if quota_orm.api_key else ""
-    limit_name = limit.name if limit else "Unknown"
-    name = f"{project_name} {user_specific} {key_specific} {limit_name}".strip()
+    if add_name:
+        project_name = quota_orm.project.name if quota_orm.project else "Global"
+        user_specific = f"User-Specific [{quota_orm.user.username}]" if quota_orm.user else ""
+        key_specific = f"Key-Specific [{quota_orm.api_key.name}]" if quota_orm.api_key else ""
+        limit_name = limit.name if limit else "Unknown"
+        name = f"{project_name} {user_specific} {key_specific} {limit_name}".strip()
+    else:
+        name = None
 
     return QuotaDisplayInformation(
         id=quota_orm.id,

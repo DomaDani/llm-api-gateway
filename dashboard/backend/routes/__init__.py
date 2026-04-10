@@ -2,6 +2,7 @@ from .users import me_router, change_identity_router, change_password_router, ev
 from .health import router as health_router
 from .auth import login_router, register_router
 from .projects import projects_all_router
+from .quotas import quota_info_router
 
 __all__ = [
     "health_router",
@@ -12,5 +13,6 @@ __all__ = [
     "change_password_router",
     "everyone_router",
     "projects_all_router",
-    "users_info_router"
+    "users_info_router",
+    "quota_info_router"
 ]

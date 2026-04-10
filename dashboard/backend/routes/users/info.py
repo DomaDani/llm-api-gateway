@@ -7,8 +7,8 @@ from dashboard.backend.db import get_all_users, get_users_by_project
 
 router = APIRouter(prefix="/users", tags=["users"])
 
-@router.get("/info", response_model=UserDisplayInfo, description="Get specific information about users either globally or per project")
-async def get_user_information(request: UserInformationRequest, _: UserDisplayInfo = Depends(require_valid_access_token)) -> UserDisplayInfo:
+@router.get("/info", response_model=list[UserDisplayInfo], description="Get specific information about users either globally or per project")
+async def get_user_information(request: UserInformationRequest, _: UserDisplayInfo = Depends(require_valid_access_token)) -> list[UserDisplayInfo]:
     
     if request.project_id is not None:
         user_orms = await get_users_by_project(request.project_id)
