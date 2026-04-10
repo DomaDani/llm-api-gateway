@@ -1,7 +1,7 @@
 from datetime import datetime
 from pydantic import BaseModel, model_validator
 
-from shared.models import Status
+from shared.models import Status, Period
 
 class QuotaDisplayInformation(BaseModel):
     id: int
@@ -24,8 +24,14 @@ class QuotaCreateRequest(BaseModel):
     key_id: int | None = None
     limit_id: int
     limit_value: float | None = None
-    period: str
+    period: Period
     expires_at: datetime | None = None
+
+    @model_validator(mode="after")
+    def validate_request(self):
+        if sum(x is not None for x in [self.user_id, self.key_id]) > 1:
+            raise ValueError("Only one of user_id, or key_id can be provided.")
+        return self
 
 class QuotaInformationRequest(BaseModel):
     project_id: int | None = None
@@ -51,5 +57,4 @@ class LimitTypeDisplayInformation(BaseModel):
 
 class PeriodDisplayInformation(BaseModel):
     name: str
-    value: str
 

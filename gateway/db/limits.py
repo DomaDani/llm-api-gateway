@@ -83,9 +83,25 @@ async def db_get_quotas_by_key(api_key: APIKey, session = None) -> Tuple[list[Qu
 def _quota_filter(api_key: APIKey):
     return and_(
         or_(
-            Quota.key_id == api_key.id,
-            Quota.project_id == api_key.project_id,
-            Quota.user_id == api_key.user_id,
+            and_(
+                Quota.key_id == api_key.id,
+                or_(
+                    Quota.project_id == api_key.project_id,
+                    Quota.project_id.is_(None)
+                )
+            ),
+            and_(
+                Quota.project_id == api_key.project_id,
+                Quota.user_id.is_(None),
+                Quota.key_id.is_(None)
+            ),
+            and_(
+                Quota.user_id == api_key.user_id,
+                or_(
+                    Quota.project_id == api_key.project_id,
+                    Quota.project_id.is_(None)
+                )
+            ),
             and_(
                 Quota.key_id.is_(None),
                 Quota.project_id.is_(None),
