@@ -148,6 +148,7 @@ export default function Sidebar({ children })
                             items={PLACEHOLDER_PROJECTS}
                             itemName="project"
                             containerClassName="mx-4 w-64"
+                            selectFirst={true}
                         />
                     </div>
 

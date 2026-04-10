@@ -2,6 +2,7 @@ import { createContext, useState, useContext, useEffect, useCallback } from "rea
 import api from '../axios'
 import { useNavigate } from "react-router-dom";
 import { getTokenExpiryMs, isTokenExpired } from './token'
+import { clearSelectedProject } from "../../context/ProjectContext";
 
 const AuthContext = createContext();
 
@@ -24,6 +25,7 @@ export const AuthProvider = ({ children }) => {
         setToken(null);
         setUser(null);
         localStorage.removeItem('token');
+        clearSelectedProject();
         navigate('/');
     }, [navigate]);
 

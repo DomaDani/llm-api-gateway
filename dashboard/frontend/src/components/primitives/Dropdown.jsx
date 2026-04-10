@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react"
 
-export default function Dropdown({ items = [], itemName, onSelect, containerClassName = "", required = false, name })
+export default function Dropdown({ items = [], itemName, onSelect, containerClassName = "", required = false, name, selectFirst = false })
 {
     const [isOpen, setIsOpen]       = useState(false)
     const [search, setSearch]       = useState("")
@@ -19,6 +19,12 @@ export default function Dropdown({ items = [], itemName, onSelect, containerClas
         setIsOpen(false)
         onSelect?.(items)
     }
+
+    useEffect(() => {
+        if (selectFirst && items.length > 0 && !selected) {
+            handleSelect(items[0])
+        }
+    }, [selectFirst, items, selected])
 
     useEffect(() => {
         function handleClickOutside(e) {
