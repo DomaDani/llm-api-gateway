@@ -1,6 +1,6 @@
 from .login import LoginRequest, TokenResponse, AccessTokenInfo
 from .user import UserDisplayInformation, UserRegistrationRequest, UserIdentityChangeRequest, UserPasswordChangeRequest, UserInformationRequest
-from .project import ProjectDisplayInfo, CreateProjectRequest
+from .project import ProjectDisplayInfo, CreateProjectRequest, AddUserToProjectRequest
 from .quotas import QuotaDisplayInformation, QuotaCreateRequest, QuotaInformationRequest, QuotaDeleteRequest
 
 __all__ = [

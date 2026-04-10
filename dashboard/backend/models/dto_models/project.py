@@ -13,3 +13,7 @@ class ProjectDisplayInfo(BaseModel):
 class CreateProjectRequest(BaseModel):
     name: str
     manager_id: int
+
+class AddUserToProjectRequest(BaseModel):
+    project_id: int
+    user_id: int
