@@ -28,3 +28,6 @@ class UserPasswordChangeRequest(BaseModel):
 
 class UserInformationRequest(BaseModel):
     project_id: int | None = None
+
+class UserDeleteRequest(BaseModel):
+    user_id: int
