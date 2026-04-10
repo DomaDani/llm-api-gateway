@@ -6,5 +6,5 @@ __all__ = [
     "convert_orm_to_display_info",
     "enforce_password_strength",
     "enforce_password_change_validity",
-    "enforce_existing_user"
+    "enforce_existing_user",
 ]

@@ -99,7 +99,7 @@ async def get_all_projects(session = None) -> list[Project]:
         async with get_session() as session:
             return await get_all_projects(session=session)
 
-    result = await session.execute(select(Project).order_by(Project.name))
+    result = await session.execute(select(Project).where(Project.name != "Global").order_by(Project.name))
     return result.scalars().all()
 
 def _get_project_relationship_options():
