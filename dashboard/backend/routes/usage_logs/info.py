@@ -22,6 +22,7 @@ async def get_log_information(
             user_id=request.user_id,
             project_id=request.project_id,
             aggregate_by_fifteen_minutes=request.aggregate,
+            limit=request.limit,
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e

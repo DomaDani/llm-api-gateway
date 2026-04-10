@@ -9,6 +9,7 @@ async def get_usage_logs(
     user_id: int | None = None,
     project_id: int | None = None,
     aggregate_by_fifteen_minutes: bool = False,
+    limit: int | None = None,
     session = None
 ) -> list[UsageLog] | list[Row]:
 
@@ -18,13 +19,15 @@ async def get_usage_logs(
                 user_id=user_id,
                 project_id=project_id,
                 aggregate_by_fifteen_minutes=aggregate_by_fifteen_minutes,
+                limit=limit,
                 session=session
             )
+
 
     filters = _get_filter(user_id=user_id, project_id=project_id)
 
     if aggregate_by_fifteen_minutes:
-        result = await session.execute(
+        query = (
             select(
                 _get_time_chunk(),
                 UsageLog.project_id,
@@ -36,8 +39,14 @@ async def get_usage_logs(
             .group_by(literal_column("time_chunk"), UsageLog.project_id, UsageLog.user_id)
             .order_by(literal_column("time_chunk").desc())
         )
+        if limit is not None:
+            query = query.limit(limit)
+        result = await session.execute(query)
     else:
-        result = await session.execute(select(UsageLog).where(*filters).order_by(UsageLog.timestamp.desc()))
+        query = select(UsageLog).where(*filters).order_by(UsageLog.timestamp.desc())
+        if limit is not None:
+            query = query.limit(limit)
+        result = await session.execute(query)
 
     return result.all()
 

@@ -7,6 +7,7 @@ class UsageLogInformationRequest(BaseModel):
     project_id: int | None = None
     user_id: int | None = None
     aggregate: bool = False
+    limit: int | None = None
 
     @model_validator(mode="after")
     def validate_request(self):
