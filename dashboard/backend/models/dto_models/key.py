@@ -9,6 +9,10 @@ class CreateApiKeyRequest(BaseModel):
     name: str
 
 
+class ApiKeyDeleteRequest(BaseModel):
+    key_id: int
+
+
 class ApiKeyDisplayInformation(BaseModel):
     id: int
     project_id: int

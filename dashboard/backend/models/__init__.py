@@ -1,5 +1,6 @@
 from .dto_models import (
     AccessTokenInfo,
+    ApiKeyDeleteRequest,
     ApiKeyDisplayInformation,
     CreateApiKeyRequest,
     CreateProjectRequest,
@@ -25,6 +26,7 @@ __all__ = [
     "TokenResponse",
     "AccessTokenInfo",
     "CreateApiKeyRequest",
+    "ApiKeyDeleteRequest",
     "ApiKeyDisplayInformation",
     "UserDisplayInformation",
     "UserRegistrationRequest",
