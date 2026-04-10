@@ -1,22 +1,36 @@
 // Source: https://tailwindflex.com/@oliver-hansen/tailwind-sidebar-layout
 // Reworked for react and navigation.
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { NavLink } from "react-router-dom"
 import { useAuth } from "../../api/auth/AuthProvider"
 import Dropdown from "../primitives/Dropdown"
-
-const PLACEHOLDER_PROJECTS = [
-    "Project 1",
-    "Project 2",
-    "Project 3",
-    "Project 4",
-    "Project 5",
-]
+import { fetchProjectInfosForUser } from "../../api/management/project/Info"
+import { useProject } from "../../context/ProjectContext"
 
 export default function Sidebar({ children })
 {
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
     const { logout } = useAuth()
+    const { selectedProject, selectProject } = useProject()
+    const [projects, setProjects] = useState([])
+
+    useEffect(() => {
+        let mounted = true
+
+        fetchProjectInfosForUser()
+            .then((data) => {
+                if (!mounted) return
+                setProjects(data || [])
+                if (!selectedProject && Array.isArray(data) && data.length > 0) {
+                    selectProject(data[0])
+                }
+            })
+            .catch((err) => {
+                console.error("Failed to load projects:", err)
+            })
+
+        return () => { mounted = false }
+    }, [selectedProject, selectProject])
 
     return (
         <div className="flex h-screen bg-gray-900">
@@ -145,10 +159,15 @@ export default function Sidebar({ children })
                             </svg>
                         </button>
                         <Dropdown
-                            items={PLACEHOLDER_PROJECTS}
+                            items={projects.map((p) => p.name)}
                             itemName="project"
                             containerClassName="mx-4 w-64"
-                            selectFirst={true}
+                            selectFirst={!selectedProject}
+                            initialSelected={selectedProject?.name ?? null}
+                            onSelect={(name) => {
+                                const proj = projects.find((p) => p.name === name)
+                                if (proj) selectProject(proj)
+                            }}
                         />
                     </div>
 

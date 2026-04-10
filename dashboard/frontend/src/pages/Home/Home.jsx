@@ -1,5 +1,6 @@
 import ActiveQuotaCard from "./components/ActiveQuotaCard"
 import UsageTable from "../../components/blocks/UsageTable"
+import { useProject } from "../../context/ProjectContext"
 
 // --- Placeholder data (replace with API calls later) ---
 
@@ -42,12 +43,14 @@ const PERSONAL_USAGE = [
 
 export default function Home()
 {
+    const { selectedProject } = useProject()
+
     return (
         <div className="flex h-90 flex-col gap-4">
 
             {/* Top section: project name + active quotas */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                <h1 className="shrink-0 text-3xl font-bold text-white">Project Name</h1>
+                <h1 className="shrink-0 text-3xl font-bold text-white">{selectedProject?.name || "Project Name"}</h1>
                 <div className="flex max-h-70 flex-col gap-3 overflow-y-auto sm:w-96">
                     {ACTIVE_QUOTAS.map((quota) => (
                         <ActiveQuotaCard key={quota.name} {...quota} />

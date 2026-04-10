@@ -154,32 +154,45 @@ async def create_mock_data(default_only: bool = False):
 
         session.add_all([user1, user2])
 
-        project = Project(
-            name="Test Project",
+        project1 = Project(
+            name="Test Project 1",
             status=Status.ACTIVE,
             created_date=datetime.now(timezone.utc)
         )
 
-        session.add(project)
+        project2 = Project(
+            name="Test Project 2",
+            status=Status.ACTIVE,
+            created_date=datetime.now(timezone.utc)
+        )
+
+        session.add_all([project1, project2])
 
         project_permission1 = ProjectPermission(
-            project=project,
+            project=project1,
             user=user1,
             role=pm_role,
             join_date=datetime.now(timezone.utc)
         )
 
         project_permission2 = ProjectPermission(
-            project=project,
+            project=project1,
             user=user2,
             role=user_role,
             join_date=datetime.now(timezone.utc)
         )
 
-        session.add_all([project_permission1, project_permission2])
+        project_permission3 = ProjectPermission(
+            project=project2,
+            user=user1,
+            role=pm_role,
+            join_date=datetime.now(timezone.utc)
+        )
+
+        session.add_all([project_permission1, project_permission2, project_permission3])
 
         api_key1 = APIKey(
-            project=project,
+            project=project1,
             user=user2,
             name="End to end API key",
             fingerprint="TTcj1lxYOY9d",
@@ -189,7 +202,7 @@ async def create_mock_data(default_only: bool = False):
         )
 
         api_key2 = APIKey(
-            project=project,
+            project=project1,
             user=user2,
             name="Token Limited API key",
             fingerprint="WQC-GPp6L8gl",
@@ -199,7 +212,7 @@ async def create_mock_data(default_only: bool = False):
         )
 
         api_key3 = APIKey(
-            project=project,
+            project=project1,
             user=user2,
             name="Expired API key",
             fingerprint="ExpiredKey12",
@@ -209,7 +222,7 @@ async def create_mock_data(default_only: bool = False):
         )
 
         api_key4 = APIKey(
-            project=project,
+            project=project1,
             user=user2,
             name="Request Limited API key",
             fingerprint="xGn6E7jl5ocd",
@@ -219,7 +232,7 @@ async def create_mock_data(default_only: bool = False):
         )
 
         api_key5 = APIKey(
-            project=project,
+            project=project1,
             user=user2,
             name="Token Limited by Minute API key",
             fingerprint="0bcj5-dQyDB9",
@@ -229,7 +242,7 @@ async def create_mock_data(default_only: bool = False):
         )
 
         api_key6 = APIKey(
-            project=project,
+            project=project1,
             user=user2,
             name="Price Limited API key",
             fingerprint="PriceLimit1",
