@@ -42,3 +42,14 @@ class QuotaInformationRequest(BaseModel):
 class QuotaDeleteRequest(BaseModel):
     id: int
 
+
+class LimitTypeDisplayInformation(BaseModel):
+    id: int
+    name: str
+    description: str
+
+
+class PeriodDisplayInformation(BaseModel):
+    name: str
+    value: str
+

@@ -81,6 +81,15 @@ async def get_limit_by_id(limit_id: int, session = None) -> Limit | None:
     result = await session.execute(select(Limit).where(Limit.id == limit_id))
     return result.scalars().first()
 
+
+async def get_all_limits(session = None) -> list[Limit]:
+    if session is None:
+        async with get_session() as session:
+            return await get_all_limits(session=session)
+
+    result = await session.execute(select(Limit).order_by(Limit.name))
+    return result.scalars().all()
+
 def get_user_relationship_options():
     return (
         selectinload(User.permissions).selectinload(ProjectPermission.project),

@@ -2,7 +2,7 @@ from .login import LoginRequest, TokenResponse, AccessTokenInfo
 from .key import CreateApiKeyRequest, ApiKeyDeleteRequest, KeyInformationRequest, ApiKeyDisplayInformation
 from .user import UserDisplayInformation, UserRegistrationRequest, UserIdentityChangeRequest, UserPasswordChangeRequest, UserInformationRequest, UserDeleteRequest
 from .project import ProjectDisplayInfo, CreateProjectRequest, AddUserToProjectRequest, ProjectDeleteRequest
-from .quotas import QuotaDisplayInformation, QuotaCreateRequest, QuotaInformationRequest, QuotaDeleteRequest
+from .quotas import QuotaDisplayInformation, QuotaCreateRequest, QuotaInformationRequest, QuotaDeleteRequest, LimitTypeDisplayInformation, PeriodDisplayInformation
 
 __all__ = [
     "LoginRequest",
@@ -20,6 +20,8 @@ __all__ = [
     "UserDeleteRequest",
     "ProjectDisplayInfo",
     "QuotaDisplayInformation",
+    "LimitTypeDisplayInformation",
+    "PeriodDisplayInformation",
     "QuotaCreateRequest",
     "QuotaInformationRequest",
     "QuotaDeleteRequest",

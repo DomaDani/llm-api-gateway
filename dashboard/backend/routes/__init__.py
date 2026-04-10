@@ -3,7 +3,7 @@ from .health import router as health_router
 from .auth import login_router, register_router
 from .keys import keys_create_router, keys_delete_router, keys_info_router
 from .projects import projects_all_router, projects_info_router, projects_create_router, projects_add_user_router, projects_remove_user_router, projects_delete_router
-from .quotas import quota_info_router
+from .quotas import quota_info_router, quota_limit_types_router, quota_periods_router
 
 __all__ = [
     "health_router",
@@ -24,5 +24,7 @@ __all__ = [
     "projects_delete_router",
     "users_info_router",
     "quota_info_router",
+    "quota_limit_types_router",
+    "quota_periods_router",
     "projects_create_router"
 ]
