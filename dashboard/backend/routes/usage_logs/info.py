@@ -8,13 +8,13 @@ from dashboard.backend.models import UsageLogInformationRequest, UsageLogDisplay
 router = APIRouter(prefix="/logs", tags=["logs"])
 
 
-@router.post(
+@router.get(
     "/info",
     response_model=list[UsageLogDisplayInformation] | list[UsageLogAggregateDisplayInformation],
     description="Get usage logs globally, by project, or by user. Supports optional aggregation by 15-minute chunks.",
 )
 async def get_log_information(
-    request: UsageLogInformationRequest,
+    request: UsageLogInformationRequest = Depends(),
     _: None = Depends(require_valid_access_token),
 ) -> list[UsageLogDisplayInformation] | list[UsageLogAggregateDisplayInformation]:
     try:

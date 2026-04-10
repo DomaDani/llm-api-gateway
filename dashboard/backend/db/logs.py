@@ -42,13 +42,13 @@ async def get_usage_logs(
         if limit is not None:
             query = query.limit(limit)
         result = await session.execute(query)
+        return result.all()
     else:
         query = select(UsageLog).where(*filters).order_by(UsageLog.timestamp.desc())
         if limit is not None:
             query = query.limit(limit)
         result = await session.execute(query)
-
-    return result.all()
+        return result.scalars().all()
 
 def _get_filter(
     user_id: int | None = None,

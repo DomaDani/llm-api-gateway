@@ -1,6 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
 from pydantic import BaseModel, model_validator
+from pydantic_core import PydanticCustomError
 
 
 class UsageLogInformationRequest(BaseModel):
@@ -8,12 +9,6 @@ class UsageLogInformationRequest(BaseModel):
     user_id: int | None = None
     aggregate: bool = False
     limit: int | None = None
-
-    @model_validator(mode="after")
-    def validate_request(self):
-        if sum(x is not None for x in [self.project_id, self.user_id]) > 1:
-            raise ValueError("Only one of project_id or user_id can be provided.")
-        return self
 
 
 class UsageLogDisplayInformation(BaseModel):

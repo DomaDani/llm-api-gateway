@@ -1,5 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel, model_validator
+from pydantic_core import PydanticCustomError
 
 from shared.models import Status, Period
 
@@ -30,7 +31,10 @@ class QuotaCreateRequest(BaseModel):
     @model_validator(mode="after")
     def validate_request(self):
         if sum(x is not None for x in [self.user_id, self.key_id]) > 1:
-            raise ValueError("Only one of user_id, or key_id can be provided.")
+            raise PydanticCustomError(
+                "invalid_combination",
+                "Only one of user_id, or key_id can be provided."
+            )
         return self
 
 class QuotaInformationRequest(BaseModel):
@@ -42,7 +46,10 @@ class QuotaInformationRequest(BaseModel):
     @model_validator(mode="after")
     def validate_request(self):
         if sum(x is not None for x in [self.project_id, self.user_id, self.key_id]) > 1:
-            raise ValueError("Only one of project_id, user_id, or key_id can be provided.")
+            raise PydanticCustomError(
+                "invalid_combination",
+                "Only one of project_id, user_id, or key_id can be provided."
+            )
         return self
 
 class QuotaDeleteRequest(BaseModel):

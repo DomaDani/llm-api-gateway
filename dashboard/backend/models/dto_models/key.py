@@ -1,5 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel, model_validator
+from pydantic_core import PydanticCustomError
 
 from shared.models import Status
 
@@ -20,7 +21,10 @@ class KeyInformationRequest(BaseModel):
     @model_validator(mode="after")
     def validate_request(self):
         if sum(x is not None for x in [self.project_id, self.user_id]) != 1:
-            raise ValueError("Exactly one of project_id or user_id must be provided.")
+            raise PydanticCustomError(
+                "invalid_combination",
+                "Exactly one of project_id or user_id must be provided."
+                )
         return self
 
 

@@ -1,5 +1,4 @@
-export default function UsageTable({ title, rows = [] })
-{
+export default function UsageTable({ title, rows = [] }) {
     return (
         <div className="flex flex-col rounded-md bg-white/5 outline outline-1 outline-white/10">
 
@@ -22,9 +21,19 @@ export default function UsageTable({ title, rows = [] })
                         {rows.length > 0 ? (
                             rows.map((row, i) => (
                                 <tr key={i} className="hover:bg-white/5">
-                                    <td className="px-4 py-2 text-gray-400">{row.time}</td>
-                                    <td className="px-4 py-2 text-right text-gray-300">{row.tokens.toLocaleString()}</td>
-                                    <td className="px-4 py-2 text-right text-gray-300">{row.price}</td>
+                                    <td className="px-4 py-2 text-gray-400">{
+                                        row.timestamp
+                                            ? (row.timestamp instanceof Date
+                                                ? row.timestamp.toLocaleString()
+                                                : new Date(row.timestamp).toLocaleString())
+                                            : '-'
+                                    }</td>
+                                    <td className="px-4 py-2 text-right text-gray-300">{
+                                        Number(row.total_tokens ?? 0).toLocaleString()
+                                    }</td>
+                                    <td className="px-4 py-2 text-right text-gray-300">{
+                                        '$' + (Number(row.internal_cost_final ?? 0)).toFixed(6)
+                                    }</td>
                                 </tr>
                             ))
                         ) : (
