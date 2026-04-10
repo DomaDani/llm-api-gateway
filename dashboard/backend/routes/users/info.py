@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 
 from dashboard.backend.models import UserDisplayInformation, UserInformationRequest
 from dashboard.backend.auth import require_valid_access_token
@@ -9,10 +9,12 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 @router.get("/info", response_model=list[UserDisplayInformation], description="Get specific information about users either globally or per project")
 async def get_user_information(request: UserInformationRequest, _: UserDisplayInformation = Depends(require_valid_access_token)) -> list[UserDisplayInformation]:
-    
-    if request.project_id is not None:
-        user_orms = await get_users_by_project(request.project_id)
-    else:   
-        user_orms = await get_all_users()
+    try:
+        if request.project_id is not None:
+            user_orms = await get_users_by_project(request.project_id)
+        else:
+            user_orms = await get_all_users()
+    except Exception as e:
+        raise HTTPException(status_code=400, detail="Something went wrong while fetching user information. Please try again later.") from e
 
     return [await convert_orm_to_display_info(user_orm, include_role=True, project_id=request.project_id) for user_orm in user_orms]

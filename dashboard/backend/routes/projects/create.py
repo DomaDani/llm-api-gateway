@@ -1,17 +1,22 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 
 from dashboard.backend.models import CreateProjectRequest, UserDisplayInformation
 from dashboard.backend.auth import require_administrator_user
 from dashboard.backend.management import project_enforce_availability, enforce_existing_user
-from dashboard.backend.db import create_project
+from dashboard.backend.db import create_project as db_create_project
 
 router = APIRouter(prefix="/projects", tags=["projects"])
 
 @router.post("/create", description="Create a new project")
 async def create_project(request: CreateProjectRequest, _: UserDisplayInformation = Depends(require_administrator_user)):
     await project_enforce_availability(request.name)
-    await enforce_existing_user(request.owner_id)
+    await enforce_existing_user(request.manager_id)
 
-    project = await create_project(name=request.name, owner_id=request.owner_id)
+    try:
+        project = await db_create_project(name=request.name, manager_id=request.manager_id)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+    except Exception as e:
+        raise HTTPException(status_code=400, detail="Something went wrong while creating project. Please try again later.") from e
 
     return {"message": f"Project '{project.name}' created successfully."}
