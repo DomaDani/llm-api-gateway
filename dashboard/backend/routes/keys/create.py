@@ -2,7 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from dashboard.backend.auth import require_current_user
 from dashboard.backend.db import create_key as db_create_key, is_user_project_member
-from dashboard.backend.management import generate_api_key, project_enforce_existing_project, user_enforce_existing_user
+from dashboard.backend.management import (
+    generate_api_key,
+    key_convert_orm_to_display_info as convert_orm_to_display_info,
+    project_enforce_existing_project,
+    user_enforce_existing_user,
+)
 from dashboard.backend.models import ApiKeyDisplayInformation, CreateApiKeyRequest, UserDisplayInformation
 from shared.config import FINGERPRINT_LENGTH
 from shared.utils import hash_key
@@ -38,13 +43,4 @@ async def create_api_key(
     except Exception as e:
         raise HTTPException(status_code=400, detail="Something went wrong while creating API key. Please try again later.") from e
 
-    return ApiKeyDisplayInformation(
-        id=created_key.id,
-        project_id=created_key.project_id,
-        user_id=created_key.user_id,
-        name=created_key.name,
-        fingerprint=created_key.fingerprint,
-        api_key=api_key_value,
-        create_date=created_key.create_date,
-        status=created_key.status,
-    )
+    return convert_orm_to_display_info(created_key, api_key=api_key_value)
