@@ -10,8 +10,8 @@ from dashboard.backend.routes import \
     change_identity_router, \
     change_password_router, \
     everyone_router, \
-    all_router, \
-    info_router
+    projects_all_router, \
+    users_info_router
 
 from .middleware import init_middleware
 
@@ -33,8 +33,8 @@ def create_app() -> FastAPI:
     app.include_router(change_identity_router)
     app.include_router(change_password_router)
     app.include_router(everyone_router)
-    app.include_router(all_router)
-    app.include_router(info_router)
-    
+    app.include_router(projects_all_router)
+    app.include_router(users_info_router)
+
 
     return app

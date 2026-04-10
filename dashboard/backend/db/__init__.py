@@ -1,4 +1,4 @@
-from .lookups import get_user_by_email, get_user_by_id, get_user_by_username, user_email_free, user_username_free, get_users_by_project
+from .lookups import get_user_by_email, get_user_by_id, get_user_by_username, user_email_free, user_username_free, get_users_by_project, get_limit_by_id
 from .roles import get_role_by_name
 from .keys import get_key_by_id, get_keys_for_user, get_keys_for_project, get_all_keys, create_key, delete_key, get_key_ownership
 from .quotas import get_quota_by_id, get_global_quotas, get_quotas_for_project, get_quotas_for_user, get_quotas_for_api_key, create_quota, delete_quota
@@ -47,4 +47,5 @@ __all__ = [
     "delete_user",
     "get_all_users",
     "get_users_by_project",
+    "get_limit_by_id",
 ]

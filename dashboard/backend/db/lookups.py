@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
 from shared.db import get_session
-from shared.models import User, ProjectPermission
+from shared.models import User, ProjectPermission, Limit
 
 
 async def get_user_by_id(user_id: int, session = None, options = None) -> User | None:
@@ -72,6 +72,14 @@ async def get_users_by_project(project_id: int, session = None) -> list[User]:
         .options(selectinload(User.permissions))
     )
     return result.scalars().all()
+
+async def get_limit_by_id(limit_id: int, session = None) -> Limit | None:
+    if session is None:
+        async with get_session() as session:
+            return await get_limit_by_id(limit_id=limit_id, session=session)
+
+    result = await session.execute(select(Limit).where(Limit.id == limit_id))
+    return result.scalars().first()
 
 def get_user_relationship_options():
     return (
