@@ -17,3 +17,6 @@ class CreateProjectRequest(BaseModel):
 class AddUserToProjectRequest(BaseModel):
     project_id: int
     user_id: int
+
+class ProjectDeleteRequest(BaseModel):
+    project_id: int

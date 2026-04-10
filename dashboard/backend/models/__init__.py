@@ -14,7 +14,8 @@ from .dto_models import (
     UserInformationRequest,
     UserPasswordChangeRequest,
     UserRegistrationRequest,
-    AddUserToProjectRequest
+    AddUserToProjectRequest,
+    ProjectDeleteRequest,
 )
 
 __all__ = [
@@ -33,4 +34,6 @@ __all__ = [
     "QuotaDeleteRequest",
     "UserInformationRequest",
     "CreateProjectRequest",
+    "AddUserToProjectRequest",
+    "ProjectDeleteRequest",
 ]
