@@ -11,7 +11,7 @@ from genai_prices.data_snapshot import DataSnapshot
 from gateway.clients import UpstreamClient
 from gateway.routes import chat_router, health_router
 from gateway.app.middleware import init_middleware
-from gateway.db.refresh import refresh_quotas_by_batch
+from gateway.db.refresh import expire_quotas_by_batch, refresh_quotas_by_batch
 from gateway.db.helpers import get_quota_count
 
 from shared.config import TARGET_URL, TARGET_KEY
@@ -24,14 +24,17 @@ async def lifespan(app: FastAPI):
 	await app.state.upstream_client.startup()
 	_merge_custom_providers()
 	app.state.reset_task = asyncio.create_task(_quota_refresh_job())
+	app.state.expire_task = asyncio.create_task(_quota_expire_job())
 	app.state.price_update_task = asyncio.create_task(_price_update_job())
 	try:
 		yield
 	finally:
 		app.state.reset_task.cancel()
+		app.state.expire_task.cancel()
 		app.state.price_update_task.cancel()
 		try:
 			await app.state.reset_task
+			await app.state.expire_task
 			await app.state.price_update_task
 		except asyncio.CancelledError:
 			pass
@@ -62,6 +65,21 @@ async def _quota_refresh_job():
 
 		except Exception as e:
 			logger.exception(f"Quota reset failed with error: {e}")
+		await asyncio.sleep(60)
+
+async def _quota_expire_job():
+	while True:
+		try:
+			total_count = await get_quota_count()
+			change_count = 0
+			for _ in range(0, total_count // 100 + 1):
+				change_count += await expire_quotas_by_batch(batch_size=100)
+				if change_count == 0:
+					break
+			logger.info(f"Quota expiration completed: {change_count} quotas expired")
+
+		except Exception as e:
+			logger.exception(f"Quota expiration failed with error: {e}")
 		await asyncio.sleep(60)
 
 async def _price_update_job():
