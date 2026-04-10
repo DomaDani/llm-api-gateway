@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 
-from dashboard.backend.db import get_key_by_id, is_user_administrator, is_user_project_manager, is_user_project_member
+from dashboard.backend.db import get_quota_by_id, is_user_administrator, is_user_project_manager
 
 
 async def enforce_quota_creation_permission(
@@ -19,10 +19,17 @@ async def enforce_quota_creation_permission(
     if not is_admin and not await is_user_project_manager(user_id=current_user_id, project_id=project_id):
         raise HTTPException(status_code=403, detail="Project manager privileges required for project quotas.")
 
-    if user_id is not None and not await is_user_project_member(project_id=project_id, user_id=user_id):
-        raise HTTPException(status_code=400, detail="Target user must be a member of the specified project.")
 
-    if key_id is not None:
-        api_key = await get_key_by_id(key_id)
-        if api_key is not None and api_key.project_id != project_id:
-            raise HTTPException(status_code=400, detail="Target API key must belong to the specified project.")
+async def enforce_quota_deletion_permission(current_user_id: int, quota_id: int) -> None:
+    if await is_user_administrator(current_user_id):
+        return
+
+    quota = await get_quota_by_id(quota_id)
+    if quota is None:
+        raise HTTPException(status_code=404, detail="Quota not found.")
+
+    if quota.project_id is None:
+        raise HTTPException(status_code=403, detail="Only administrators can delete global quotas.")
+
+    if not await is_user_project_manager(user_id=current_user_id, project_id=quota.project_id):
+        raise HTTPException(status_code=403, detail="Project manager privileges required for deleting this quota.")

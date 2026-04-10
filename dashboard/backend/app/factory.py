@@ -19,6 +19,7 @@ from dashboard.backend.routes import (
     users_info_router,
     quota_info_router,
     quota_create_router,
+    quota_delete_router,
     quota_limit_types_router,
     quota_periods_router,
     projects_create_router,
@@ -56,6 +57,7 @@ def create_app() -> FastAPI:
     app.include_router(users_info_router)
     app.include_router(quota_info_router)
     app.include_router(quota_create_router)
+    app.include_router(quota_delete_router)
     app.include_router(quota_limit_types_router)
     app.include_router(quota_periods_router)
     app.include_router(projects_create_router)
