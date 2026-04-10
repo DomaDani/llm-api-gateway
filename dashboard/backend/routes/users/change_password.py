@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from dashboard.backend.models import UserPasswordChangeRequest
 from dashboard.backend.auth import require_current_user
-from dashboard.backend.models import UserDisplayInfo
+from dashboard.backend.models import UserDisplayInformation
 from dashboard.backend.db import get_user_by_id
 from dashboard.backend.management.users import enforce_password_change_validity
 from dashboard.backend.db import change_user_password
@@ -14,7 +14,7 @@ router = APIRouter(prefix="/users", tags=["users"])
 @router.put("/change-password", description="Change the password of the current authenticated user.")
 async def change_password(
     request: UserPasswordChangeRequest,
-    current_user: UserDisplayInfo = Depends(require_current_user)
+    current_user: UserDisplayInformation = Depends(require_current_user)
 ):
     user_record = await get_user_by_id(current_user.id)
     if user_record is None:

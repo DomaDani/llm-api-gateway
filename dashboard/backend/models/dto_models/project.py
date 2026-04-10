@@ -9,3 +9,7 @@ class ProjectDisplayInfo(BaseModel):
     status: Status
     created_date: datetime
     modified_date: datetime | None = None
+
+class CreateProjectRequest(BaseModel):
+    name: str
+    manager_id: int

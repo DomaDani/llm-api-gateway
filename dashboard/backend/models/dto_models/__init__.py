@@ -1,13 +1,13 @@
 from .login import LoginRequest, TokenResponse, AccessTokenInfo
-from .user import UserDisplayInfo, UserRegistrationRequest, UserIdentityChangeRequest, UserPasswordChangeRequest, UserInformationRequest
-from .project import ProjectDisplayInfo
+from .user import UserDisplayInformation, UserRegistrationRequest, UserIdentityChangeRequest, UserPasswordChangeRequest, UserInformationRequest
+from .project import ProjectDisplayInfo, CreateProjectRequest
 from .quotas import QuotaDisplayInformation, QuotaCreateRequest, QuotaInformationRequest, QuotaDeleteRequest
 
 __all__ = [
     "LoginRequest",
     "TokenResponse",
     "AccessTokenInfo",
-    "UserDisplayInfo",
+    "UserDisplayInformation",
     "UserRegistrationRequest",
     "UserIdentityChangeRequest",
     "UserPasswordChangeRequest",
@@ -16,5 +16,6 @@ __all__ = [
     "QuotaDisplayInformation",
     "QuotaCreateRequest",
     "QuotaInformationRequest",
-    "QuotaDeleteRequest"
+    "QuotaDeleteRequest",
+    "CreateProjectRequest",
 ]

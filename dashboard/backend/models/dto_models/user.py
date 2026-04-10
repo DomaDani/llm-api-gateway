@@ -1,7 +1,7 @@
 from datetime import datetime
 from pydantic import BaseModel, EmailStr
 
-class UserDisplayInfo(BaseModel):
+class UserDisplayInformation(BaseModel):
     id: int
     email: EmailStr
     username: str

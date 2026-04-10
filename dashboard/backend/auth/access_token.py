@@ -4,7 +4,7 @@ from jose import JWTError, jwt
 from datetime import datetime, timezone, timedelta
 
 from dashboard.backend.management import user_convert_orm_to_display_info as convert_orm_to_display_info
-from dashboard.backend.models.dto_models import UserDisplayInfo, AccessTokenInfo
+from dashboard.backend.models.dto_models import UserDisplayInformation, AccessTokenInfo
 from dashboard.backend.db import get_user_by_id, is_user_administrator, is_user_project_manager
 
 from shared.config import LOGIN_SECRET_KEY, TOKEN_EXPIRATION_MINS, TOKEN_ENCODING_ALGORITHM
@@ -21,7 +21,7 @@ def create_access_token(data: AccessTokenInfo):
 
     return encoded_jwt
 
-async def get_user_from_token(token: str) -> UserDisplayInfo | None:
+async def get_user_from_token(token: str) -> UserDisplayInformation | None:
     try:
         payload = jwt.decode(token, LOGIN_SECRET_KEY, algorithms=[TOKEN_ENCODING_ALGORITHM])
         user_id: int = payload.get("user_id")
@@ -57,7 +57,7 @@ async def require_valid_access_token(
 
 async def require_current_user(
     credentials: HTTPAuthorizationCredentials | None = Depends(_bearer),
-) -> UserDisplayInfo:
+) -> UserDisplayInformation:
     if credentials is None:
         raise HTTPException(status_code=401, detail="Missing access token")
 
@@ -69,7 +69,7 @@ async def require_current_user(
 
 async def require_administrator_user(
     credentials: HTTPAuthorizationCredentials | None = Depends(_bearer),
-) -> UserDisplayInfo:
+) -> UserDisplayInformation:
     user = await require_current_user(credentials)
 
     if not await is_user_administrator(user.id):
@@ -80,7 +80,7 @@ async def require_administrator_user(
 async def require_project_manager_user(
     project_id: int,
     credentials: HTTPAuthorizationCredentials | None = Depends(_bearer),
-) -> UserDisplayInfo:
+) -> UserDisplayInformation:
     user = await require_current_user(credentials)
 
     if not await is_user_project_manager(user.id, project_id):
