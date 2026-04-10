@@ -11,6 +11,7 @@ from dashboard.backend.routes import (
     change_password_router,
     everyone_router,
     delete_user_router,
+    logs_info_router,
     keys_create_router,
     keys_delete_router,
     keys_info_router,
@@ -49,6 +50,7 @@ def create_app() -> FastAPI:
     app.include_router(change_password_router)
     app.include_router(everyone_router)
     app.include_router(delete_user_router)
+    app.include_router(logs_info_router)
     app.include_router(keys_create_router)
     app.include_router(keys_delete_router)
     app.include_router(keys_info_router)

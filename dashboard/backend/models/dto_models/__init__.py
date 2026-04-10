@@ -1,4 +1,5 @@
 from .login import LoginRequest, TokenResponse, AccessTokenInfo
+from .logs import UsageLogInformationRequest, UsageLogDisplayInformation, UsageLogAggregateDisplayInformation
 from .key import CreateApiKeyRequest, ApiKeyDeleteRequest, KeyInformationRequest, ApiKeyDisplayInformation
 from .user import UserDisplayInformation, UserRegistrationRequest, UserIdentityChangeRequest, UserPasswordChangeRequest, UserInformationRequest, UserDeleteRequest
 from .project import ProjectDisplayInfo, CreateProjectRequest, AddUserToProjectRequest, ProjectDeleteRequest
@@ -8,6 +9,9 @@ __all__ = [
     "LoginRequest",
     "TokenResponse",
     "AccessTokenInfo",
+    "UsageLogInformationRequest",
+    "UsageLogDisplayInformation",
+    "UsageLogAggregateDisplayInformation",
     "CreateApiKeyRequest",
     "ApiKeyDeleteRequest",
     "KeyInformationRequest",
