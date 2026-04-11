@@ -11,7 +11,6 @@ async def db_key_check(api_key: str) -> APIKey:
             .join(Project, APIKey.project_id == Project.id)
             .where(
                 APIKey.fingerprint == api_fingerprint,
-                APIKey.status == Status.ACTIVE,
                 Project.status == Status.ACTIVE,
             )
         )

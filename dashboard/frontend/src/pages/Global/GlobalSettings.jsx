@@ -9,6 +9,7 @@ import { fetchUserInfos } from "../../api/management/user/Info"
 import AlertBox from "../../components/primitives/AlertBox"
 import useQuotaDeletion from "../../hooks/useQuotaDeletion"
 import useUserDeletion from "../../hooks/useUserDeletion"
+import useProjectCreation from "../../hooks/useProjectCreation"
 
 function mapUserRow(user) {
     return {
@@ -25,6 +26,7 @@ export default function GlobalSettings() {
     const [users, setUsers] = useState([])
     const { quotaError, quotaSuccess, quotaReloadKey, handleDeleteQuota } = useQuotaDeletion({ quotas, setQuotas })
     const { userError, userSuccess, userReloadKey, handleDeleteUser } = useUserDeletion({ users, setUsers })
+    const { projectError, projectSuccess, projectLoading, handleCreateProject } = useProjectCreation()
 
     useEffect(() => {
         let mounted = true
@@ -65,7 +67,12 @@ export default function GlobalSettings() {
                     <CreateUserForm />
                 </div>
                 <div className="border-b border-white/10">
-                    <CreateProjectForm />
+                    <CreateProjectForm
+                        onSubmit={handleCreateProject}
+                        error={projectError}
+                        success={projectSuccess}
+                        loading={projectLoading}
+                    />
                 </div>
                 <div className="border-b border-white/10">
                     <CreateQuotaForm title="Create Global Quota" />

@@ -16,7 +16,7 @@ def convert_orm_to_display_info(project_orm: Project) -> ProjectDisplayInfo:
 async def enforce_name_availability(name: str) -> None:
     existing_project = await get_project_by_name(name, active_only=False)
     if existing_project is not None:
-        raise ValueError("Project name is already in use.")
+        raise HTTPException(status_code=400, detail="Project name is already in use.")
 
 
 async def enforce_existing_project(project_id: int) -> Project:

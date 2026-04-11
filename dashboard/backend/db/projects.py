@@ -61,6 +61,10 @@ async def create_project(name: str, manager_id: int, session = None) -> Project:
             return await create_project(name=name, manager_id=manager_id, session=session)
 
     project = Project(name=name, status=Status.ACTIVE, created_date=datetime.now(timezone.utc))
+    session.add(project)
+
+    # Ensure the project has a database-generated ID before creating the composite PK permission row.
+    await session.flush()
 
     manager_role = await get_role_by_name("Project Manager", session=session)
     if not manager_role:
@@ -68,7 +72,6 @@ async def create_project(name: str, manager_id: int, session = None) -> Project:
 
     manager_permission = ProjectPermission(project_id=project.id, user_id=manager_id, role_id=manager_role.id, join_date=datetime.now(timezone.utc))
 
-    session.add(project)
     session.add(manager_permission)
 
     return project
@@ -97,6 +100,8 @@ async def delete_project(project_id: int, session = None) -> None:
         if api_key.status == Status.ACTIVE:
             await delete_key(key_id=api_key.id, session=session)
     for quota in project.quotas:
+        if quota.key_id is not None:
+            continue
         await delete_quota(quota_id=quota.id, session=session)
 
     project.status = Status.ARCHIVED

@@ -3,6 +3,7 @@ import QuotasTable from "../../components/blocks/QuotasTable"
 import ApiKeysTable from "../../components/blocks/ApiKeysTable"
 import CreateQuotaForm from "../../components/blocks/CreateQuotaForm"
 import AddUserForm from "./components/AddUserForm"
+import DeleteProjectForm from "./components/DeleteProjectForm"
 import { useEffect, useState } from "react"
 import { useProject } from "../../context/ProjectContext"
 import { fetchQuotaInfos } from "../../api/management/quotas/Info"
@@ -119,6 +120,9 @@ export default function ProjectSetings() {
                 </div>
                 <div className="border-b border-white/10">
                     <CreateQuotaForm title="Create Project Quota" enableKeyTarget={true} />
+                </div>
+                <div className="border-b border-white/10">
+                    <DeleteProjectForm />
                 </div>
                 <div className="border-b border-white/10 pb-5">
                     <div className="mb-3">
