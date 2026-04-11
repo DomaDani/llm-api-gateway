@@ -16,7 +16,7 @@ async def refresh_quotas_by_batch(session=None, batch_size: int = 100):
     while True:
         q_stmt = (
         select(Quota)
-        .where(Quota.next_reset <= func.now(), Quota.allocated != 0)
+        .where(Quota.next_reset <= func.now())
         .with_for_update()
         .limit(batch_size)
         )

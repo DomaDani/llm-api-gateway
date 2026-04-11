@@ -22,7 +22,7 @@ async def usage_logger(entry: UsageLogEntry, failed_upstream: bool = False):
 
         await db_limit_change(
             api_key,
-            update_req_count=not failed_upstream,
+            request_delta=(-1 if failed_upstream else 0),
             change_by_tokens=total_tokens-estimated_tokens,
             change_by_price=internal_cost_final-internal_cost_estimate,
             session=session

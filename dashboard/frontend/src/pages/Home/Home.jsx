@@ -4,18 +4,7 @@ import { useProject } from "../../context/ProjectContext"
 import { fetchUsageLogs } from "../../api/usageLogs/UsageLogs"
 import { useEffect, useState } from "react"
 import { useAuth } from "../../api/auth/AuthProvider"
-
-// --- Placeholder data (replace with API calls later) ---
-
-const ACTIVE_QUOTAS = [
-    { name: "Monthly Token Quota", resetDate: "May 1, 2026",  used: 6800, limit: 10000 },
-    { name: "Daily Request Quota", resetDate: "Apr 7, 2026",  used: 45,   limit: 100   },
-    { name: "Beep", resetDate: "May 1, 2026",  used: 6800, limit: 10000 },
-    { name: "Boop", resetDate: "Apr 7, 2026",  used: 45,   limit: 100   },
-    
-]
-
-// --------------------------------------------------------
+import { fetchQuotaInfos } from "../../api/management/quotas/Info"
 
 export default function Home()
 {
@@ -23,6 +12,7 @@ export default function Home()
     const [projectLogs, setProjectLogs] = useState([])
     const [personalLogs, setPersonalLogs] = useState([])
     const { user } = useAuth()
+    const [activeQuotas, setActiveQuotas] = useState([])
 
     useEffect(() => {
         let mounted = true
@@ -30,6 +20,7 @@ export default function Home()
         if (!selectedProject) {
             setProjectLogs([])
             setPersonalLogs([])
+            setActiveQuotas([])
             return
         }
 
@@ -49,6 +40,14 @@ export default function Home()
             .catch((err) => {
                 console.error("Failed to load personal usage logs:", err)
             })
+        fetchQuotaInfos(selectedProject.id)
+            .then((data) => {
+                if(!mounted) return
+                setActiveQuotas(data || [])
+            })
+            .catch((err) => {
+                console.error("Failed to load active quotas:", err)
+            })
 
         return () => { mounted = false }
     }, [selectedProject])
@@ -60,8 +59,8 @@ export default function Home()
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <h1 className="shrink-0 text-3xl font-bold text-white">{selectedProject?.name || "Project Name"}</h1>
                 <div className="flex max-h-70 flex-col gap-3 overflow-y-auto sm:w-96">
-                    {ACTIVE_QUOTAS.map((quota) => (
-                        <ActiveQuotaCard key={quota.name} {...quota} />
+                    {activeQuotas.map((quota) => (
+                        <ActiveQuotaCard key={quota.name} name={quota.name} resetDate={quota.next_reset} used={quota.allocated} limit={quota.limit_value} type={quota.limit_name} />
                     ))}
                 </div>
             </div>

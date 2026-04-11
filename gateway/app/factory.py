@@ -57,7 +57,7 @@ async def _quota_refresh_job():
 		try:
 			total_count = await get_quota_count()
 			change_count = 0
-			for _ in range(0, total_count // 100 + 1):
+			for _ in range(0, (total_count // 100) + 1):
 				change_count += await refresh_quotas_by_batch(batch_size=100)
 				if change_count == 0:
 					break
@@ -72,7 +72,7 @@ async def _quota_expire_job():
 		try:
 			total_count = await get_quota_count()
 			change_count = 0
-			for _ in range(0, total_count // 100 + 1):
+			for _ in range(0, (total_count // 100) + 1):
 				change_count += await expire_quotas_by_batch(batch_size=100)
 				if change_count == 0:
 					break
