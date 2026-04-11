@@ -7,40 +7,34 @@ import { useEffect, useState } from "react"
 import { useProject } from "../../context/ProjectContext"
 import { fetchQuotaInfos } from "../../api/management/quotas/Info"
 import { fetchKeyInfos } from "../../api/management/keys/Info"
+import { fetchUserInfos } from "../../api/management/user/Info"
 import AlertBox from "../../components/primitives/AlertBox"
 import useQuotaDeletion from "../../hooks/useQuotaDeletion"
 import useApiKeyDeletion from "../../hooks/useApiKeyDeletion"
+import useProjectUserRemoval from "../../hooks/useProjectUserRemoval"
 
-const PLACEHOLDER_USERS = [
-    {
-        id: "u-1",
-        username: "alice",
-        email: "alice@example.com",
-        role: "administrator",
-        createdAt: "2026-03-20",
-    },
-    {
-        id: "u-2",
-        username: "bence",
-        email: "bence@example.com",
-        role: "project manager",
-        createdAt: "2026-03-25",
-    },
-    {
-        id: "u-3",
-        username: "csilla",
-        email: "csilla@example.com",
-        role: "user",
-        createdAt: "2026-04-01",
-    },
-]
+function mapUserRow(user) {
+    return {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        createdAt: user.joined_date,
+    }
+}
 
 export default function ProjectSetings() {
     const { selectedProject } = useProject()
     const [quotas, setQuotas] = useState([])
     const [apiKeys, setApiKeys] = useState([])
+    const [projectUsers, setProjectUsers] = useState([])
     const { quotaError, quotaSuccess, quotaReloadKey, handleDeleteQuota } = useQuotaDeletion({ quotas, setQuotas })
     const { apiKeyError, apiKeySuccess, apiKeyReloadKey, handleDeleteApiKey } = useApiKeyDeletion({ apiKeys, setApiKeys })
+    const { projectUserError, projectUserSuccess, projectUserReloadKey, handleRemoveProjectUser } = useProjectUserRemoval({
+        projectUsers,
+        setProjectUsers,
+        projectId: selectedProject?.id,
+    })
 
     useEffect(() => {
         let mounted = true
@@ -82,6 +76,27 @@ export default function ProjectSetings() {
         return () => { mounted = false }
     }, [selectedProject, apiKeyReloadKey])
 
+    useEffect(() => {
+        let mounted = true
+
+        if (!selectedProject) {
+            setProjectUsers([])
+            return
+        }
+
+        fetchUserInfos(selectedProject.id)
+            .then((data) => {
+                if (!mounted) return
+                const mappedUsers = Array.isArray(data) ? data.map(mapUserRow) : []
+                setProjectUsers(mappedUsers)
+            })
+            .catch((err) => {
+                console.error("Failed to load project users:", err)
+            })
+
+        return () => { mounted = false }
+    }, [selectedProject, projectUserReloadKey])
+
     return (
         <>
             <div className="flex flex-col gap-5">
@@ -100,7 +115,11 @@ export default function ProjectSetings() {
                     <QuotasTable title="Project Quotas" rows={quotas} showUser={true} showKey={true} onAction={handleDeleteQuota} />
                 </div>
                 <div className="border-b border-white/10 pb-5">
-                    <UsersTable title="Project Users" rows={PLACEHOLDER_USERS} onAction={() => { }} actionLabel="Remove" />
+                    <div className="mb-3">
+                        <AlertBox message={projectUserError} variant="error" className="mt-0" />
+                        <AlertBox message={projectUserSuccess} variant="success" className="mt-0" />
+                    </div>
+                    <UsersTable title="Project Users" rows={projectUsers} onAction={handleRemoveProjectUser} actionLabel="Remove" />
                 </div>
                 <div className="border-b border-white/10 pb-5">
                     <div className="mb-3">

@@ -3,7 +3,7 @@ from sqlalchemy.orm import selectinload
 from datetime import datetime, timezone
 
 from shared.db import get_session, get_transactional_session
-from shared.models import User
+from shared.models import User, Status
 
 from .permissions import is_user_project_manager, is_user_administrator
 from .keys import delete_key
@@ -79,7 +79,8 @@ async def delete_user(user_id: int, session = None) -> None:
     for permission in user.permissions:
         await session.delete(permission)
     for api_key in user.api_keys:
-        await delete_key(key_id=api_key.id, session=session)
+        if api_key.status == Status.ACTIVE:
+            await delete_key(key_id=api_key.id, session=session)
     for quota in user.quotas:
         await delete_quota(quota_id=quota.id, session=session)
 

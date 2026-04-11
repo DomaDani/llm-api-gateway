@@ -14,7 +14,7 @@ def convert_orm_to_display_info(project_orm: Project) -> ProjectDisplayInfo:
     )
 
 async def enforce_name_availability(name: str) -> None:
-    existing_project = await get_project_by_name(name)
+    existing_project = await get_project_by_name(name, active_only=False)
     if existing_project is not None:
         raise ValueError("Project name is already in use.")
 
@@ -34,6 +34,6 @@ async def enforce_user_not_in_project(user_id: int, project_id: int) -> None:
     if await is_user_administrator(user_id):
         raise HTTPException(status_code=400, detail="User is already a member of the project.")
     
-    permissions = await get_user_permissions_for_project(user_id, project_id)
+    permissions = await get_user_permissions_for_project(project_id, user_id)
     if permissions is not None:
         raise HTTPException(status_code=400, detail="User is already a member of the project.")

@@ -16,7 +16,11 @@ async def get_key_by_id(
             return await get_key_by_id(key_id=key_id, session=session, options=options, active_only=active_only)
 
     status_filter = (APIKey.status == Status.ACTIVE) if active_only else True
-    stmt = select(APIKey).where(and_(APIKey.id == key_id, status_filter))
+    stmt = (
+        select(APIKey)
+        .join(Project, APIKey.project_id == Project.id)
+        .where(and_(APIKey.id == key_id, status_filter, Project.status == Status.ACTIVE))
+    )
     if options is None:
         options = get_key_relationship_options()
     if options:
@@ -34,7 +38,8 @@ async def get_keys_for_user(user_id: int, session = None, active_only: bool = Tr
 
     result = await session.execute(
         select(APIKey)
-        .where(and_(APIKey.user_id == user_id, status_filter))
+        .join(Project, APIKey.project_id == Project.id)
+        .where(and_(APIKey.user_id == user_id, status_filter, Project.status == Status.ACTIVE))
         .options(selectinload(APIKey.user))
     )
     return result.scalars().all()
@@ -48,7 +53,8 @@ async def get_keys_for_project(project_id: int, session = None, active_only: boo
 
     result = await session.execute(
         select(APIKey)
-        .where(and_(APIKey.project_id == project_id, status_filter))
+        .join(Project, APIKey.project_id == Project.id)
+        .where(and_(APIKey.project_id == project_id, status_filter, Project.status == Status.ACTIVE))
         .options(selectinload(APIKey.user))
     )
     return result.scalars().all()
@@ -59,7 +65,12 @@ async def get_all_keys(session = None, active_only: bool = True) -> list[APIKey]
             return await get_all_keys(session=session, active_only=active_only)
 
     status_filter = (APIKey.status == Status.ACTIVE) if active_only else True
-    result = await session.execute(select(APIKey).where(status_filter).order_by(APIKey.name))
+    result = await session.execute(
+        select(APIKey)
+        .join(Project, APIKey.project_id == Project.id)
+        .where(and_(status_filter, Project.status == Status.ACTIVE))
+        .order_by(APIKey.name)
+    )
     return result.scalars().all()
 
 async def create_key(
@@ -103,11 +114,15 @@ async def delete_key(key_id: int, session = None) -> None:
     result = await session.execute(
         select(APIKey)
         .where(and_(APIKey.id == key_id, APIKey.status == Status.ACTIVE))
+        .options(selectinload(APIKey.quotas))
         .with_for_update()
     )
     key = result.scalars().first()
     if key is None:
         raise ValueError("API Key not found or already archived.")
+    
+    for quota in key.quotas:
+        await session.delete(quota)
 
     key.status = Status.ARCHIVED
 
@@ -118,9 +133,11 @@ async def get_key_ownership(key_id: int, session = None) -> tuple[Project, User]
 
     result = await session.execute(
         select(APIKey)
+        .join(Project, APIKey.project_id == Project.id)
         .where(
             APIKey.id == key_id,
             APIKey.status == Status.ACTIVE,
+            Project.status == Status.ACTIVE,
         )
         .options(
             selectinload(APIKey.project),

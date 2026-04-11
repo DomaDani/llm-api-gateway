@@ -82,7 +82,7 @@ export default function UsersTable({ title = "Users", rows = [], onAction, actio
                                     <td className="max-w-0 truncate px-4 py-2 text-gray-300" title={row.username}>{row.username}</td>
                                     <td className="max-w-0 truncate px-4 py-2 text-gray-300" title={row.email}>{row.email}</td>
                                     <td className="hidden max-w-0 truncate px-4 py-2 text-gray-400 sm:table-cell" title={row.role}>{row.role}</td>
-                                    <td className="hidden max-w-0 truncate px-4 py-2 text-gray-400 sm:table-cell" title={row.createdAt}>{row.createdAt}</td>
+                                    <td className="hidden max-w-0 truncate px-4 py-2 text-gray-400 sm:table-cell" title={new Date(row.createdAt)}>{new Date(row.createdAt).toLocaleDateString()}</td>
                                     {onAction && (
                                         <td className="px-4 py-2 text-right">
                                             <button

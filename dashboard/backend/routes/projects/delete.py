@@ -8,7 +8,7 @@ from dashboard.backend.models import ProjectDeleteRequest
 router = APIRouter(prefix="/projects", tags=["projects"])
 _bearer = HTTPBearer(auto_error=False)
 
-@router.delete("/delete", description="Delete a project by id")
+@router.delete("/delete", description="Archive a project by id")
 async def delete_project(
     request: ProjectDeleteRequest,
     credentials: HTTPAuthorizationCredentials | None = Depends(_bearer),
@@ -22,4 +22,4 @@ async def delete_project(
     except Exception as e:
         raise HTTPException(status_code=400, detail="Something went wrong while deleting project. Please try again later.") from e
 
-    return {"message": "Project deleted successfully."}
+    return {"message": "Project archived successfully."}
