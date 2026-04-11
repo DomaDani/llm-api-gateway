@@ -14,8 +14,9 @@ async def enforce_availability(email: str, username: str, exclude_user_id: int |
 async def convert_orm_to_display_info(user_orm: User, include_role: bool = False, project_id: int | None = None) -> UserDisplayInformation:
 
     if include_role:
+        role = "User"
         if project_id is not None:
-            permission_record = await get_user_permissions_for_project(user_orm.id, project_id)
+            permission_record = await get_user_permissions_for_project(project_id, user_orm.id)
             if permission_record is not None:
                 role = permission_record.role.name
         else:
@@ -23,8 +24,6 @@ async def convert_orm_to_display_info(user_orm: User, include_role: bool = False
                 role = "Administrator"
             elif await is_user_project_manager(user_orm.id):
                 role = "Project Manager"
-            else:
-                role = "User"
 
     return UserDisplayInformation(
         id=user_orm.id,

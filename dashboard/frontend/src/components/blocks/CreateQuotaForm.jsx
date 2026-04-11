@@ -1,40 +1,15 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Dropdown from "../primitives/Dropdown"
+import { fetchQuotaLimitTypes, fetchQuotaPeriods } from "../../api/management/quotas/Info"
+import { fetchUserInfos } from "../../api/management/user/Info"
+import { useProject } from "../../context/ProjectContext"
 
-const PLACEHOLDER_QUOTA_TYPES = [
-    "Token quota",
-    "Request quota",
-    "Daily quota",
-    "Monthly quota",
-]
-
-const PLACEHOLDER_REFRESH_FREQUENCIES = [
-    "Hourly",
-    "Daily",
-    "Weekly",
-    "Monthly",
-]
-
-const PLACEHOLDER_TARGET_USERS = [
-    "User 1",
-    "User 2",
-    "User 3",
-]
-
-const PLACEHOLDER_TARGET_KEYS = [
-    "Key 1",
-    "Key 2",
-    "Key 3",
-]
 
 export default function CreateQuotaForm({
     title,
-    typeOptions = PLACEHOLDER_QUOTA_TYPES,
-    refreshFrequencyOptions = PLACEHOLDER_REFRESH_FREQUENCIES,
-    targetUserOptions = PLACEHOLDER_TARGET_USERS,
-    targetKeyOptions = PLACEHOLDER_TARGET_KEYS,
     enableKeyTarget = false,
     onSubmit,
+    isGlobal = false
 }) {
     const [value, setValue] = useState("")
     const [type, setType] = useState(null)
@@ -43,21 +18,73 @@ export default function CreateQuotaForm({
     const [isPermanent, setIsPermanent] = useState(false)
     const [isTargetedQuota, setIsTargetedQuota] = useState(false)
     const [targetType, setTargetType] = useState("user")
-    const [targetValue, setTargetValue] = useState(null)
+    const [limitTypeOptions, setLimitTypeOptions] = useState([])
+    const [limitTypeMap, setLimitTypeMap] = useState({})
+    const [periodOptions, setPeriodOptions] = useState([])
+    const [periodMap, setPeriodMap] = useState({})
+    const [availableUsers, setAvailableUsers] = useState([])
+    const [userMap, setUserMap] = useState({})
+    const [user, setUser] = useState(null)
+    const [project, setProject] = useState(null)
+    const [key, setKey] = useState(null)
+    const [targetKeyOptions, setTargetKeyOptions] = useState([])
+    const [keyMap, setKeyMap] = useState({})
+    const { selectedProject } = useProject()
 
     function handleSubmit(event) {
         event.preventDefault()
         onSubmit?.({
             value,
-            type,
-            refreshFrequency,
+            limit_id: type,
+            period: refreshFrequency,
             expiration,
             isPermanent,
-            isTargetedQuota,
-            targetType: isTargetedQuota ? targetType : null,
-            targetValue: isTargetedQuota ? targetValue : null,
+            user_id: isTargetedQuota && targetType === "user" ? user : null,
+            key_id: isTargetedQuota && targetType === "key" ? key : null,
         })
     }
+
+    useEffect(() => {
+        let mounted = true
+
+        fetchQuotaLimitTypes()
+            .then((data) => {
+                if (!mounted) return
+                if (Array.isArray(data) && data.length > 0) {
+                    const names = data.map((d) => d.name)
+                    const map = data.reduce((acc, d) => { acc[d.name] = d.id; return acc }, {})
+                    setLimitTypeOptions(names)
+                    setLimitTypeMap(map)
+                }
+            })
+            .catch((err) => console.error("Failed to load limit types:", err))
+
+        fetchQuotaPeriods()
+            .then((data) => {
+                if (!mounted) return
+                if (Array.isArray(data) && data.length > 0) {
+                    const names = data.map((d) => d.name)
+                    const map = data.reduce((acc, d) => { acc[d.name] = d.name.toLowerCase(); return acc }, {})
+                    setPeriodOptions(names)
+                    setPeriodMap(map)
+                }
+            })
+            .catch((err) => console.error("Failed to load periods:", err))
+
+        fetchUserInfos(isGlobal ? null : selectedProject?.id)
+            .then((data) => {
+                if (!mounted) return
+                if (Array.isArray(data) && data.length > 0) {
+                    const names = data.map((u) => u.username)
+                    const map = data.reduce((acc, u) => { acc[u.username] = u.id; return acc }, {})
+                    setAvailableUsers(names)
+                    setUserMap(map)
+                }
+            })
+            .catch((err) => console.error("Failed to load users:", err))
+
+        return () => { mounted = false }
+    }, [selectedProject])
 
     return (
         <form autoComplete="off" onSubmit={handleSubmit}>
@@ -72,9 +99,9 @@ export default function CreateQuotaForm({
                             </label>
                             <div className="mt-2">
                                 <Dropdown
-                                    items={typeOptions}
+                                    items={limitTypeOptions}
                                     itemName="type"
-                                    onSelect={setType}
+                                    onSelect={(name) => setType(limitTypeMap[name] ?? null)}
                                     required
                                     name="quota-type"
                                 />
@@ -87,9 +114,9 @@ export default function CreateQuotaForm({
                             </label>
                             <div className="mt-2">
                                 <Dropdown
-                                    items={refreshFrequencyOptions}
+                                    items={periodOptions}
                                     itemName="refresh frequency"
-                                    onSelect={setRefreshFrequency}
+                                    onSelect={(name) => setRefreshFrequency(periodMap[name] ?? null)}
                                     required
                                     name="refresh-frequency"
                                 />
@@ -198,7 +225,8 @@ export default function CreateQuotaForm({
                                                 const checked = event.target.checked
                                                 setIsTargetedQuota(checked)
                                                 if (!checked) {
-                                                    setTargetValue(null)
+                                                    setUser(null)
+                                                    setKey(null)
                                                 }
                                             }}
                                             className="col-start-1 row-start-1 appearance-none rounded-sm border border-white/10 bg-white/5 checked:border-indigo-500 checked:bg-indigo-500 indeterminate:border-indigo-500 indeterminate:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:border-white/5 disabled:bg-white/10 disabled:checked:bg-white/10 forced-colors:appearance-auto"
@@ -249,7 +277,8 @@ export default function CreateQuotaForm({
                                                 checked={targetType === "user"}
                                                 onChange={() => {
                                                     setTargetType("user")
-                                                    setTargetValue(null)
+                                                    setUser(null)
+                                                    setKey(null)
                                                 }}
                                                 className="cursor-pointer"
                                             />
@@ -264,7 +293,8 @@ export default function CreateQuotaForm({
                                                     checked={targetType === "key"}
                                                     onChange={() => {
                                                         setTargetType("key")
-                                                        setTargetValue(null)
+                                                        setUser(null)
+                                                        setKey(null)
                                                     }}
                                                     className="cursor-pointer"
                                                 />
@@ -275,13 +305,19 @@ export default function CreateQuotaForm({
                                 </fieldset>
 
                                 <div className="mt-4">
-                                    <Dropdown
-                                        items={targetType === "key" ? targetKeyOptions : targetUserOptions}
-                                        itemName={targetType}
-                                        onSelect={setTargetValue}
-                                        required
-                                        name="target-value"
-                                    />
+                                        <Dropdown
+                                            items={targetType === "key" ? targetKeyOptions : availableUsers}
+                                            itemName={targetType}
+                                            onSelect={(name) => {
+                                                if (targetType === "key") {
+                                                    setKey(keyMap[name] ?? null)
+                                                } else {
+                                                    setUser(userMap[name] ?? null)
+                                                }
+                                            }}
+                                            required
+                                            name="target-value"
+                                        />
                                 </div>
                             </div>
                         )}

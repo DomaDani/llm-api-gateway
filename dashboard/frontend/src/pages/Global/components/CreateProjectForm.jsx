@@ -1,5 +1,6 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Dropdown from "../../../components/primitives/Dropdown"
+import { fetchUserInfos } from "../../../api/management/user/Info"
 
 const PLACEHOLDER_USERS = [
     "User 1",
@@ -12,6 +13,27 @@ const PLACEHOLDER_USERS = [
 export default function CreateProjectForm({ users = PLACEHOLDER_USERS, onSubmit }) {
     const [projectName, setProjectName] = useState("")
     const [projectManager, setProjectManager] = useState(null)
+    const [availableUsers, setAvailableUsers] = useState(users)
+    const [userMap, setUserMap] = useState({})
+
+    useEffect(() => {
+        let mounted = true
+        fetchUserInfos()
+            .then((data) => {
+                if (!mounted) return
+                if (Array.isArray(data) && data.length > 0) {
+                    const names = data.map((u) => u.username)
+                    const map = data.reduce((acc, u) => { acc[u.username] = u.id; return acc }, {})
+                    setAvailableUsers(names)
+                    setUserMap(map)
+                }
+            })
+            .catch((err) => {
+                console.error("Failed to load users:", err)
+            })
+
+        return () => { mounted = false }
+    }, [])
 
     function handleSubmit(event) {
         event.preventDefault()
@@ -54,9 +76,11 @@ export default function CreateProjectForm({ users = PLACEHOLDER_USERS, onSubmit 
                             </label>
                             <div className="mt-2">
                                 <Dropdown
-                                    items={users}
+                                    items={availableUsers}
                                     itemName="user"
-                                    onSelect={setProjectManager}
+                                    onSelect={(name) => {
+                                        setProjectManager(userMap[name] ?? null)
+                                    }}
                                     required
                                     name="project-manager"
                                 />

@@ -2,7 +2,7 @@ from fastapi import HTTPException
 
 from shared.models import Project
 from dashboard.backend.models import ProjectDisplayInfo
-from dashboard.backend.db import get_project_by_name, get_project_by_id
+from dashboard.backend.db import get_project_by_name, get_project_by_id, get_user_permissions_for_project, is_user_administrator
 
 def convert_orm_to_display_info(project_orm: Project) -> ProjectDisplayInfo:
     return ProjectDisplayInfo(
@@ -25,3 +25,15 @@ async def enforce_existing_project(project_id: int) -> Project:
         raise HTTPException(status_code=404, detail="Project not found.")
 
     return project
+
+async def enforce_user_not_in_project(user_id: int, project_id: int) -> None:
+    project = await get_project_by_id(project_id)
+    if project is None:
+        raise HTTPException(status_code=404, detail="Project not found.")
+
+    if await is_user_administrator(user_id):
+        raise HTTPException(status_code=400, detail="User is already a member of the project.")
+    
+    permissions = await get_user_permissions_for_project(user_id, project_id)
+    if permissions is not None:
+        raise HTTPException(status_code=400, detail="User is already a member of the project.")
