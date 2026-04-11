@@ -14,8 +14,8 @@ class UsageLogInformationRequest(BaseModel):
 class UsageLogDisplayInformation(BaseModel):
     id: int
     key_id: int
-    project_id: int
-    user_id: int
+    project_name: str
+    user_name: str
     request_id: str | None = None
     timestamp: datetime
     request_type: str | None = None

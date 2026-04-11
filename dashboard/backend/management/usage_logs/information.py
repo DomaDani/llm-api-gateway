@@ -3,11 +3,29 @@ from sqlalchemy import Row
 from shared.models import UsageLog
 from dashboard.backend.models import UsageLogDisplayInformation, UsageLogAggregateDisplayInformation
 from dashboard.backend.db import get_project_by_id, get_user_by_id
+from shared.models.orm_models import project
 
-def convert_orm_to_display_info(usage_log_orm: UsageLog) -> UsageLogDisplayInformation:
+async def convert_orm_to_display_info(usage_log_orm: UsageLog) -> UsageLogDisplayInformation:
+
+    if usage_log_orm.project_id is not None:
+        project = await get_project_by_id(usage_log_orm.project_id)
+        project_name = project.name if project else f"Project {usage_log_orm.project_id}"
+    else:
+        project_name = "N/A"
+
+    if usage_log_orm.user_id is not None:
+        user = await get_user_by_id(usage_log_orm.user_id)
+        user_name = user.username if user else f"User {usage_log_orm.user_id}"
+    else:
+        user_name = "N/A"
+
+
+
     return UsageLogDisplayInformation(
         id=usage_log_orm.id,
         key_id=usage_log_orm.key_id,
+        project_name=project_name,
+        user_name=user_name,
         project_id=usage_log_orm.project_id,
         user_id=usage_log_orm.user_id,
         request_id=usage_log_orm.request_id,
@@ -33,18 +51,18 @@ def convert_orm_to_display_info(usage_log_orm: UsageLog) -> UsageLogDisplayInfor
     )
 
 
-def convert_aggregate_row_to_display_info(row: Row) -> UsageLogAggregateDisplayInformation:
+async def convert_aggregate_row_to_display_info(row: Row) -> UsageLogAggregateDisplayInformation:
     mapping = row._mapping
 
     if mapping["project_id"] is not None:
-        project = get_project_by_id(mapping["project_id"])
+        project = await get_project_by_id(mapping["project_id"])
         project_name = project.name if project else f"Project {mapping['project_id']}"
     else:
         project_name = "N/A"
 
     if mapping["user_id"] is not None:
-        user = get_user_by_id(mapping["user_id"])
-        user_name = user.name if user else f"User {mapping['user_id']}"
+        user = await get_user_by_id(mapping["user_id"])
+        user_name = user.username if user else f"User {mapping['user_id']}"
     else:
         user_name = "N/A"
     

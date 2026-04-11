@@ -30,6 +30,6 @@ async def get_log_information(
         raise HTTPException(status_code=400, detail="Something went wrong while fetching usage logs. Please try again later.") from e
 
     if request.aggregate:
-        return [convert_aggregate_row_to_display_info(row) for row in logs]
+        return [await convert_aggregate_row_to_display_info(row) for row in logs]
 
-    return [convert_orm_to_display_info(log) for log in logs]
+    return [await convert_orm_to_display_info(log) for log in logs]
