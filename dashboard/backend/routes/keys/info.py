@@ -8,9 +8,9 @@ from dashboard.backend.models import ApiKeyDisplayInformation, KeyInformationReq
 router = APIRouter(prefix="/keys", tags=["keys"])
 
 
-@router.post("/info", response_model=list[ApiKeyDisplayInformation], description="Get API keys for either a project or a user.")
+@router.get("/info", response_model=list[ApiKeyDisplayInformation], description="Get API keys for either a project or a user.")
 async def get_key_information(
-    request: KeyInformationRequest,
+    request: KeyInformationRequest = Depends(),
     _: None = Depends(require_valid_access_token),
 ) -> list[ApiKeyDisplayInformation]:
     try:

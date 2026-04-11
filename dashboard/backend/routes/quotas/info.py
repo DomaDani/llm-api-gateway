@@ -7,8 +7,8 @@ from dashboard.backend.db import get_global_quotas, get_quotas_for_project, get_
 
 router = APIRouter(prefix="/quotas", tags=["quotas"])
 
-@router.post("/info", response_model=list[QuotaDisplayInformation], description="Get specific information about quotas either globally, per project, per user or per API key")
-async def get_user_information(request: QuotaInformationRequest, _: None = Depends(require_valid_access_token)) -> list[QuotaDisplayInformation]:
+@router.get("/info", response_model=list[QuotaDisplayInformation], description="Get specific information about quotas either globally, per project, per user or per API key")
+async def get_user_information(request: QuotaInformationRequest = Depends(), _: None = Depends(require_valid_access_token)) -> list[QuotaDisplayInformation]:
     try:
         if request.project_id is not None:
             quota_orms = await get_quotas_for_project(
