@@ -2,7 +2,7 @@ from sqlalchemy import Row
 
 from shared.models import UsageLog
 from dashboard.backend.models import UsageLogDisplayInformation, UsageLogAggregateDisplayInformation
-from dashboard.backend.db import get_project_by_id, get_user_by_id
+from dashboard.backend.db import get_project_by_id, get_user_by_id, get_key_by_id
 from shared.models.orm_models import project
 
 async def convert_orm_to_display_info(usage_log_orm: UsageLog) -> UsageLogDisplayInformation:
@@ -19,11 +19,15 @@ async def convert_orm_to_display_info(usage_log_orm: UsageLog) -> UsageLogDispla
     else:
         user_name = "N/A"
 
-
+    if usage_log_orm.key_id is not None:
+        key = await get_key_by_id(usage_log_orm.key_id)
+        fingerprint = key.fingerprint if key else f"Key {usage_log_orm.key_id}"
+    else:
+        fingerprint = "N/A"
 
     return UsageLogDisplayInformation(
         id=usage_log_orm.id,
-        key_id=usage_log_orm.key_id,
+        fingerprint=fingerprint,
         project_name=project_name,
         user_name=user_name,
         project_id=usage_log_orm.project_id,
@@ -65,12 +69,19 @@ async def convert_aggregate_row_to_display_info(row: Row) -> UsageLogAggregateDi
         user_name = user.username if user else f"User {mapping['user_id']}"
     else:
         user_name = "N/A"
+
+    if mapping["key_id"] is not None:
+        key = await get_key_by_id(mapping["key_id"])
+        fingerprint = key.fingerprint if key else f"Key {mapping['key_id']}"
+    else:
+        fingerprint = "N/A"
     
     return UsageLogAggregateDisplayInformation(
-        time_chunk=mapping["time_chunk"],
+        timestamp=mapping["time_chunk"],
         project_name=project_name,
         user_name=user_name,
+        fingerprint=fingerprint,
         request_count=mapping["request_count"],
         total_tokens=mapping["total_tokens"],
-        total_cost=mapping["total_cost"],
+        internal_cost_final=mapping["total_cost"],
     )

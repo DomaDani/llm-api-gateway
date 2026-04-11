@@ -13,7 +13,7 @@ class UsageLogInformationRequest(BaseModel):
 
 class UsageLogDisplayInformation(BaseModel):
     id: int
-    key_id: int
+    fingerprint: str
     project_name: str
     user_name: str
     request_id: str | None = None
@@ -39,9 +39,10 @@ class UsageLogDisplayInformation(BaseModel):
 
 
 class UsageLogAggregateDisplayInformation(BaseModel):
-    time_chunk: datetime
+    timestamp: datetime
     project_name: str
     user_name: str
+    fingerprint: str
     request_count: int
     total_tokens: int | None = None
-    total_cost: Decimal | None = None
+    internal_cost_final: Decimal | None = None

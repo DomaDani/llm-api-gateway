@@ -32,11 +32,12 @@ async def get_usage_logs(
                 _get_time_chunk(),
                 UsageLog.project_id,
                 UsageLog.user_id,
+                UsageLog.key_id,
                 func.count().label("request_count"),
                 func.sum(UsageLog.total_tokens).label("total_tokens"),
                 func.sum(UsageLog.internal_cost_final).label("total_cost"),
             ).where(*filters)
-            .group_by(literal_column("time_chunk"), UsageLog.project_id, UsageLog.user_id)
+            .group_by(literal_column("time_chunk"), UsageLog.project_id, UsageLog.user_id, UsageLog.key_id)
             .order_by(literal_column("time_chunk").desc())
         )
         if limit is not None:
