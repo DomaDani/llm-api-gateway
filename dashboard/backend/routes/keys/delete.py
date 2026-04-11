@@ -8,7 +8,7 @@ from dashboard.backend.models import ApiKeyDeleteRequest, UserDisplayInformation
 router = APIRouter(prefix="/keys", tags=["keys"])
 
 
-@router.delete("/delete", description="Delete an API key by id.")
+@router.delete("/delete", description="Archive an API key by id.")
 async def delete_api_key(
     request: ApiKeyDeleteRequest,
     current_user: UserDisplayInformation = Depends(require_current_user),
@@ -24,4 +24,4 @@ async def delete_api_key(
     except Exception as e:
         raise HTTPException(status_code=400, detail="Something went wrong while deleting API key. Please try again later.") from e
 
-    return {"message": "API key deleted successfully."}
+    return {"message": "API key archived successfully."}

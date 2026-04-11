@@ -187,6 +187,8 @@ async def get_quotas_for_user(
     if include_keys:
         key_quotas = []
         for api_key in user.api_keys:
+            if api_key.status != Status.ACTIVE:
+                continue
             key_quotas += await get_quotas_for_api_key(
                 key_id=api_key.id,
                 session=session,
@@ -222,7 +224,12 @@ async def get_quotas_for_api_key(
     if options is None:
         options = _get_quotas_relationship_options()
 
-    key_result = await session.execute(select(APIKey).where(APIKey.id == key_id))
+    key_result = await session.execute(
+        select(APIKey).where(
+            APIKey.id == key_id,
+            APIKey.status == Status.ACTIVE,
+        )
+    )
     api_key = key_result.scalars().first()
 
     if api_key is None:

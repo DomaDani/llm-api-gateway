@@ -83,6 +83,8 @@ async def require_project_manager_user(
 ) -> UserDisplayInformation:
     user = await require_current_user(credentials)
 
+    if await is_user_administrator(user.id):
+        return user
     if not await is_user_project_manager(user.id, project_id):
         raise HTTPException(status_code=403, detail="Project manager privileges required")
 

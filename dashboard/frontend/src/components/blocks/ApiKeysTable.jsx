@@ -4,12 +4,11 @@ const SORTABLE_COLUMNS = {
     user: "User",
     name: "Name",
     fingerprint: "Fingerprint",
-    created_date: "Created",
+    create_date: "Created",
     status: "Status",
 }
 
-const OPTIONAL_COLUMNS = new Set(["user"])
-const HIDDEN_ON_MOBILE = new Set(["fingerprint", "created_date"])
+const HIDDEN_ON_MOBILE = new Set(["fingerprint", "create_date"])
 
 export default function ApiKeysTable({ title = "API Keys", rows = [], onAction, actionLabel = "Delete", showUser = true })
 {
@@ -23,11 +22,29 @@ export default function ApiKeysTable({ title = "API Keys", rows = [], onAction, 
         })
     }, [showUser])
 
+    const normalizedRows = useMemo(() => {
+        return rows.map((row) => ({
+            ...row,
+            id: row.id,
+            user: row.user ?? row.username ?? (row.user_id != null ? `User #${row.user_id}` : "N/A"),
+            name: row.name ?? "Unnamed key",
+            fingerprint: row.fingerprint ?? "N/A",
+            create_date: row.create_date ?? row.created_date ?? null,
+            status: row.status ?? "N/A",
+        }))
+    }, [rows])
+
 
     const sortedRows = useMemo(() => {
-        const copy = [...rows]
+        const copy = [...normalizedRows]
 
         copy.sort((a, b) => {
+            if (sortBy === "create_date") {
+                const left = a.create_date ? new Date(a.create_date).getTime() : 0
+                const right = b.create_date ? new Date(b.create_date).getTime() : 0
+                return sortDirection === "asc" ? left - right : right - left
+            }
+
             const left = String(a[sortBy] ?? "").toLowerCase()
             const right = String(b[sortBy] ?? "").toLowerCase()
 
@@ -41,7 +58,7 @@ export default function ApiKeysTable({ title = "API Keys", rows = [], onAction, 
         })
 
         return copy
-    }, [rows, sortBy, sortDirection])
+    }, [normalizedRows, sortBy, sortDirection])
 
     function handleSort(column) {
         if (sortBy === column) {
@@ -102,8 +119,8 @@ export default function ApiKeysTable({ title = "API Keys", rows = [], onAction, 
                                     <td className="hidden max-w-0 truncate px-4 py-2 text-gray-400 sm:table-cell" title={row.fingerprint}>
                                         {row.fingerprint}
                                     </td>
-                                    <td className="hidden max-w-0 truncate px-4 py-2 text-gray-400 sm:table-cell" title={row.created_date}>
-                                        {row.created_date}
+                                    <td className="hidden max-w-0 truncate px-4 py-2 text-gray-400 sm:table-cell" title={row.create_date ?? "N/A"}>
+                                        {row.create_date ? new Date(row.create_date).toLocaleString() : "N/A"}
                                     </td>
                                     <td className="max-w-0 truncate px-4 py-2 text-gray-300" title={row.status}>
                                         {row.status}

@@ -6,8 +6,10 @@ import AddUserForm from "./components/AddUserForm"
 import { useEffect, useState } from "react"
 import { useProject } from "../../context/ProjectContext"
 import { fetchQuotaInfos } from "../../api/management/quotas/Info"
+import { fetchKeyInfos } from "../../api/management/keys/Info"
 import AlertBox from "../../components/primitives/AlertBox"
 import useQuotaDeletion from "../../hooks/useQuotaDeletion"
+import useApiKeyDeletion from "../../hooks/useApiKeyDeletion"
 
 const PLACEHOLDER_USERS = [
     {
@@ -33,20 +35,12 @@ const PLACEHOLDER_USERS = [
     },
 ]
 
-const PLACEHOLDER_KEYS = [
-    {
-        user: "GipszJakab",
-        name: "test key",
-        fingerprint: "asdfasdf",
-        created_date: "2026-03-20",
-        status: "Active"
-    }
-]
-
 export default function ProjectSetings() {
     const { selectedProject } = useProject()
     const [quotas, setQuotas] = useState([])
+    const [apiKeys, setApiKeys] = useState([])
     const { quotaError, quotaSuccess, quotaReloadKey, handleDeleteQuota } = useQuotaDeletion({ quotas, setQuotas })
+    const { apiKeyError, apiKeySuccess, apiKeyReloadKey, handleDeleteApiKey } = useApiKeyDeletion({ apiKeys, setApiKeys })
 
     useEffect(() => {
         let mounted = true
@@ -67,6 +61,26 @@ export default function ProjectSetings() {
 
         return () => { mounted = false }
     }, [selectedProject, quotaReloadKey])
+
+    useEffect(() => {
+        let mounted = true
+
+        if (!selectedProject) {
+            setApiKeys([])
+            return
+        }
+
+        fetchKeyInfos(selectedProject.id, null)
+            .then((data) => {
+                if (!mounted) return
+                setApiKeys(data || [])
+            })
+            .catch((err) => {
+                console.error("Failed to load project API keys:", err)
+            })
+
+        return () => { mounted = false }
+    }, [selectedProject, apiKeyReloadKey])
 
     return (
         <>
@@ -89,7 +103,11 @@ export default function ProjectSetings() {
                     <UsersTable title="Project Users" rows={PLACEHOLDER_USERS} onAction={() => { }} actionLabel="Remove" />
                 </div>
                 <div className="border-b border-white/10 pb-5">
-                    <ApiKeysTable title="Project API Keys" rows={PLACEHOLDER_KEYS} onAction={() => { }} />
+                    <div className="mb-3">
+                        <AlertBox message={apiKeyError} variant="error" className="mt-0" />
+                        <AlertBox message={apiKeySuccess} variant="success" className="mt-0" />
+                    </div>
+                    <ApiKeysTable title="Project API Keys" rows={apiKeys} onAction={handleDeleteApiKey} />
                 </div>
             </div>
         </>

@@ -8,6 +8,7 @@ from shared.models import Project, User, ProjectPermission, Role
 from .projects import get_project_by_id
 from .lookups import get_user_by_id
 from .roles import get_role_by_name
+from .keys import get_keys_for_user, delete_key
 
 async def add_user_to_project(project_id: int, user_id: int, session = None) -> None:
     if session is None:
@@ -59,6 +60,11 @@ async def remove_user_from_project(project_id: int, user_id: int, session = None
         raise ValueError("User does not have permission for this project.")
     if users_only and permission.role.name == "Project Manager":
         raise ValueError("Cannot remove a Project Manager. A Project Manager should only be removed by deleting the project. Set users_only to False to allow removing a Project Manager.")
+
+    user_keys = await get_keys_for_user(user_id=user.id, session=session)
+    for key in user_keys:
+        if key.project_id == project.id:
+            await delete_key(key_id=key.id, session=session)
 
     await session.delete(permission)
 

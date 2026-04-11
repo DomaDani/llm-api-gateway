@@ -1,12 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 
 from dashboard.backend.auth import require_current_user
-from dashboard.backend.db import create_key as db_create_key, is_user_project_member
+from dashboard.backend.db import create_key as db_create_key, is_user_project_member, is_user_administrator
 from dashboard.backend.management import (
     generate_api_key,
     key_convert_orm_to_display_info as convert_orm_to_display_info,
     project_enforce_existing_project,
-    user_enforce_existing_user,
 )
 from dashboard.backend.models import ApiKeyDisplayInformation, CreateApiKeyRequest, UserDisplayInformation
 from shared.config import FINGERPRINT_LENGTH
@@ -22,10 +21,10 @@ async def create_api_key(
 ):
     try:
         await project_enforce_existing_project(request.project_id)
-        await user_enforce_existing_user(request.user_id)
 
-        if not await is_user_project_member(request.project_id, request.user_id):
-            raise HTTPException(status_code=400, detail="User is not a member of this project.")
+        if not await is_user_project_member(request.project_id, current_user.id):
+            if not await is_user_administrator(current_user.id):
+                raise HTTPException(status_code=400, detail="User is not a member of this project.")
 
         api_key_value = generate_api_key(64)
         fingerprint = api_key_value[:FINGERPRINT_LENGTH]
@@ -43,4 +42,4 @@ async def create_api_key(
     except Exception as e:
         raise HTTPException(status_code=400, detail="Something went wrong while creating API key. Please try again later.") from e
 
-    return convert_orm_to_display_info(created_key, api_key=api_key_value)
+    return convert_orm_to_display_info(created_key, api_key=api_key_value, username=current_user.username)
