@@ -12,6 +12,7 @@ import AlertBox from "../../components/primitives/AlertBox"
 import useQuotaDeletion from "../../hooks/useQuotaDeletion"
 import useApiKeyDeletion from "../../hooks/useApiKeyDeletion"
 import useProjectUserRemoval from "../../hooks/useProjectUserRemoval"
+import useProjectUserAddition from "../../hooks/useProjectUserAddition"
 
 function mapUserRow(user) {
     return {
@@ -33,6 +34,14 @@ export default function ProjectSetings() {
     const { projectUserError, projectUserSuccess, projectUserReloadKey, handleRemoveProjectUser } = useProjectUserRemoval({
         projectUsers,
         setProjectUsers,
+        projectId: selectedProject?.id,
+    })
+    const {
+        projectUserAddError,
+        projectUserAddSuccess,
+        projectUserAddReloadKey,
+        handleAddProjectUser,
+    } = useProjectUserAddition({
         projectId: selectedProject?.id,
     })
 
@@ -95,14 +104,18 @@ export default function ProjectSetings() {
             })
 
         return () => { mounted = false }
-    }, [selectedProject, projectUserReloadKey])
+    }, [selectedProject, projectUserReloadKey, projectUserAddReloadKey])
 
     return (
         <>
             <div className="flex flex-col gap-5">
                 <h1 className="shrink-0 text-3xl font-bold text-white">Project Settings</h1>
                 <div className="border-b border-white/10">
-                    <AddUserForm />
+                    <div className="mb-3">
+                        <AlertBox message={projectUserAddError} variant="error" className="mt-0" />
+                        <AlertBox message={projectUserAddSuccess} variant="success" className="mt-0" />
+                    </div>
+                    <AddUserForm onSubmit={handleAddProjectUser} />
                 </div>
                 <div className="border-b border-white/10">
                     <CreateQuotaForm title="Create Project Quota" enableKeyTarget={true} />

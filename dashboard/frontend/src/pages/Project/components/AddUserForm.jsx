@@ -2,17 +2,9 @@ import { useState, useEffect } from "react"
 import Dropdown from "../../../components/primitives/Dropdown"
 import { fetchUserInfos } from "../../../api/management/user/Info"
 
-const PLACEHOLDER_USERS = [
-    "User 1",
-    "User 2",
-    "User 3",
-    "User 4",
-    "User 5",
-]
-
-export default function AddUserForm({ users = PLACEHOLDER_USERS, onSubmit }) {
-    const [username, setUsername] = useState("")
-    const [availableUsers, setAvailableUsers] = useState(users)
+export default function AddUserForm({ onSubmit }) {
+    const [userId, setUserId] = useState(null)
+    const [availableUsers, setAvailableUsers] = useState([])
     const [userMap, setUserMap] = useState({})
 
     useEffect(() => {
@@ -25,6 +17,9 @@ export default function AddUserForm({ users = PLACEHOLDER_USERS, onSubmit }) {
                     const map = data.reduce((acc, u) => { acc[u.username] = u.id; return acc }, {})
                     setAvailableUsers(names)
                     setUserMap(map)
+                } else {
+                    setAvailableUsers([])
+                    setUserMap({})
                 }
             })
             .catch((err) => {
@@ -37,7 +32,7 @@ export default function AddUserForm({ users = PLACEHOLDER_USERS, onSubmit }) {
     function handleSubmit(event) {
         event.preventDefault()
         onSubmit?.({
-            username
+            user_id: userId,
         })
     }
 
@@ -60,10 +55,10 @@ export default function AddUserForm({ users = PLACEHOLDER_USERS, onSubmit }) {
                                     itemName="user"
                                     onSelect={(name) => {
                                         const id = userMap[name]
-                                        setUsername(id ?? "")
+                                        setUserId(id ?? null)
                                     }}
                                     required
-                                    name="username"
+                                    name="user-id"
                                 />
                             </div>
                         </div>
