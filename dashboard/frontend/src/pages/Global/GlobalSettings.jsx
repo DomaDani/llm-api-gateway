@@ -3,6 +3,10 @@ import UsersTable from "../../components/blocks/UsersTable"
 import CreateUserForm from "./components/CreateUserForm"
 import CreateProjectForm from "./components/CreateProjectForm"
 import QuotasTable from "../../components/blocks/QuotasTable"
+import { useEffect, useState} from "react"
+import { fetchQuotaInfos } from "../../api/management/quotas/Info"
+import AlertBox from "../../components/primitives/AlertBox"
+import useQuotaDeletion from "../../hooks/useQuotaDeletion"
 
 const PLACEHOLDER_USERS = [
     {
@@ -119,95 +123,25 @@ const PLACEHOLDER_USERS = [
     },
 ]
 
-const PLACEHOLDER_QUOTAS = [
-    {
-        user: "GipszJakab",
-        period: "Daily",
-        expires_at: "n/a",
-        limit_name: "Token Limit",
-        limit_value: "500000",
-        allocated: "12354",
-        status: "Active",
-    },
-    {
-        user: "GipszJakab2",
-        period: "Daily",
-        expires_at: "n/a",
-        limit_name: "Token Limit",
-        limit_value: "500000",
-        allocated: "12354",
-        status: "Active",
-    },
-    {
-        user: "GipszJakab3",
-        period: "Daily",
-        expires_at: "n/a",
-        limit_name: "Token Limit",
-        limit_value: "500000",
-        allocated: "12354",
-        status: "Active",
-    },
-    {
-        user: "GipszJakab4",
-        period: "Daily",
-        expires_at: "n/a",
-        limit_name: "Token Limit",
-        limit_value: "500000",
-        allocated: "12354",
-        status: "Active",
-    },
-    {
-        user: "GipszJakab5",
-        period: "Daily",
-        expires_at: "n/a",
-        limit_name: "Token Limit",
-        limit_value: "500000",
-        allocated: "12354",
-        status: "Active",
-    },
-    {
-        user: "GipszJakab6",
-        period: "Daily",
-        expires_at: "n/a",
-        limit_name: "Token Limit",
-        limit_value: "500000",
-        allocated: "12354",
-        status: "Active",
-    },
-    {
-        user: "GipszJakab7",
-        period: "Daily",
-        expires_at: "n/a",
-        limit_name: "Token Limit",
-        limit_value: "500000",
-        allocated: "12354",
-        status: "Active",
-    },
-    {
-        user: "GipszJakab8",
-        period: "Daily",
-        expires_at: "n/a",
-        limit_name: "Token Limit",
-        limit_value: "500000",
-        allocated: "12354",
-        status: "Active",
-    },
-    {
-        user: "GipszJakab9",
-        period: "Daily",
-        expires_at: "n/a",
-        limit_name: "Token Limit",
-        limit_value: "500000",
-        allocated: "12354",
-        status: "Active",
-    },
-]
-
-const TEST = [
-
-]
-
 export default function GlobalSettings() {
+    const [quotas, setQuotas] = useState([])
+    const { quotaError, quotaSuccess, quotaReloadKey, handleDeleteQuota } = useQuotaDeletion({ quotas, setQuotas })
+
+    useEffect(() => {
+        let mounted = true
+
+        fetchQuotaInfos()
+        .then((data) => {
+            if (!mounted) return
+            setQuotas(data)
+        })
+        .catch((err) => {
+            console.error("Failed to load quota infos:", err)
+        })
+
+        return () => { mounted = false }
+    }, [quotaReloadKey])
+
     return (
         <>
             <div className="flex flex-col gap-5">
@@ -222,7 +156,11 @@ export default function GlobalSettings() {
                     <CreateQuotaForm title="Create Global Quota" />
                 </div>
                 <div className="border-b border-white/10 pb-5">
-                    <QuotasTable title="Global Quotas" rows={PLACEHOLDER_QUOTAS} showUser={true} onAction={() => {}} />
+                    <div className="mb-3">
+                        <AlertBox message={quotaError} variant="error" className="mt-0" />
+                        <AlertBox message={quotaSuccess} variant="success" className="mt-0" />
+                    </div>
+                    <QuotasTable title="Global Quotas" rows={quotas} showUser={true} onAction={handleDeleteQuota} />
                 </div>
                 <div className="border-b border-white/10 pb-5">
                     <UsersTable title="Global Users" rows={PLACEHOLDER_USERS} onAction={() => {}} />

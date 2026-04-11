@@ -14,18 +14,20 @@ async def get_user_information(request: QuotaInformationRequest = Depends(), _: 
             quota_orms = await get_quotas_for_project(
                 project_id=request.project_id,
                 include_targeted=True,
+                include_inherited=request.include_inherited,
                 active_only=request.active_only
             )
-        if request.user_id is not None:
+        elif request.user_id is not None:
             quota_orms = await get_quotas_for_user(
                 user_id=request.user_id,
                 include_keys=True,
+                include_inherited=request.include_inherited,
                 active_only=request.active_only
             )
-        if request.key_id is not None:
+        elif request.key_id is not None:
             quota_orms = await get_quotas_for_api_key(
                 key_id=request.key_id,
-                include_targeted=True,
+                include_inherited=request.include_inherited,
                 active_only=request.active_only
             )
         else:

@@ -20,7 +20,7 @@ export const fetchQuotaPeriods = async () => {
     }
 }
 
-export const fetchQuotaInfos = async (projectId = null, userId = null, keyId = null, activeOnly = false) => {
+export const fetchQuotaInfos = async (projectId = null, userId = null, keyId = null, activeOnly = false, includeInherited = true) => {
     try {
         const response = await api.get('quotas/info', {
             params: {
@@ -28,6 +28,7 @@ export const fetchQuotaInfos = async (projectId = null, userId = null, keyId = n
                 user_id: userId,
                 key_id: keyId,
                 active_only: activeOnly,
+                include_inherited: includeInherited,
             }
         })
         return response.data

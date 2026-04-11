@@ -1,6 +1,6 @@
 from shared.models import Quota
 from dashboard.backend.models import QuotaDisplayInformation
-from dashboard.backend.db import get_limit_by_id
+from dashboard.backend.db import get_limit_by_id, get_user_by_id, get_key_by_id
 
 async def convert_orm_to_display_info(quota_orm: Quota, add_name: bool = False) -> QuotaDisplayInformation:
     limit = await get_limit_by_id(limit_id=quota_orm.limit_id)
@@ -14,12 +14,18 @@ async def convert_orm_to_display_info(quota_orm: Quota, add_name: bool = False) 
     else:
         name = None
 
+    user = await get_user_by_id(quota_orm.user_id) if quota_orm.user_id else None
+    user_name = user.username if user else None
+
+    key = await get_key_by_id(quota_orm.key_id) if quota_orm.key_id else None
+    fingerprint = key.fingerprint if key else None
+
     return QuotaDisplayInformation(
         id=quota_orm.id,
         name=name,
         project_id=quota_orm.project_id,
-        user_id=quota_orm.user_id,
-        key_id=quota_orm.key_id,
+        user_name=user_name,
+        fingerprint=fingerprint,
         limit_id=quota_orm.limit_id,
         limit_name=limit.name if limit else None,
         limit_value=quota_orm.limit_value,

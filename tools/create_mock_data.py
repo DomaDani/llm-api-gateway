@@ -254,6 +254,7 @@ async def create_mock_data(default_only: bool = False):
         session.add_all([api_key1, api_key2, api_key3, api_key4, api_key5, api_key6])
 
         quota1 = Quota(
+            project=project1,
             api_key=api_key2,
             limit=token_limit,
             limit_value=1000,
@@ -263,6 +264,7 @@ async def create_mock_data(default_only: bool = False):
         )
 
         quota2 = Quota(
+            project=project1,
             api_key=api_key4,
             limit=request_limit,
             limit_value=50,
@@ -272,6 +274,7 @@ async def create_mock_data(default_only: bool = False):
         )
 
         quota3 = Quota(
+            project=project1,
             api_key=api_key5,
             limit=token_limit,
             limit_value=500,
@@ -281,6 +284,7 @@ async def create_mock_data(default_only: bool = False):
         )
 
         quota4 = Quota(
+            project=project1,
             api_key=api_key6,
             limit=price_limit,
             limit_value=10.0,

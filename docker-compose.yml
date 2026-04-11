@@ -11,8 +11,8 @@ services:
       context: ./
       dockerfile: postgreSQL/Dockerfile
     environment:
-      RESET_DB: "false"
-      CREATE_MOCK_DATA: "false"
+      RESET_DB: "true"
+      CREATE_MOCK_DATA: "true"
     env_file: .env
     depends_on:
       - db

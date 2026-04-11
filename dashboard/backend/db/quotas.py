@@ -1,4 +1,4 @@
-from sqlalchemy import select, and_
+from sqlalchemy import select, and_, or_
 from sqlalchemy.orm import selectinload
 from datetime import datetime, timezone, timedelta
 
@@ -93,7 +93,14 @@ async def get_quotas_for_project(
     if include_targeted:
         stmt = select(Quota).where(
             and_(
-                Quota.project_id == project_id,
+                or_(
+                    Quota.project_id == project_id,
+                    and_(
+                        Quota.project_id.is_(None),
+                        Quota.key_id.is_not(None),
+                        Quota.api_key.has(APIKey.project_id == project_id),
+                    ),
+                ),
                 active_filter
             )
         )

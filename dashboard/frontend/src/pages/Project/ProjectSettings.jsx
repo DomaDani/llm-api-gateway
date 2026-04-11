@@ -3,6 +3,11 @@ import QuotasTable from "../../components/blocks/QuotasTable"
 import ApiKeysTable from "../../components/blocks/ApiKeysTable"
 import CreateQuotaForm from "../../components/blocks/CreateQuotaForm"
 import AddUserForm from "./components/AddUserForm"
+import { useEffect, useState } from "react"
+import { useProject } from "../../context/ProjectContext"
+import { fetchQuotaInfos } from "../../api/management/quotas/Info"
+import AlertBox from "../../components/primitives/AlertBox"
+import useQuotaDeletion from "../../hooks/useQuotaDeletion"
 
 const PLACEHOLDER_USERS = [
     {
@@ -28,27 +33,6 @@ const PLACEHOLDER_USERS = [
     },
 ]
 
-const PLACEHOLDER_QUOTAS = [
-    {
-        user: "GipszJakab",
-        period: "Daily",
-        expires_at: "n/a",
-        limit_name: "Token Limit",
-        limit_value: "500000",
-        allocated: "12354",
-        status: "Active",
-    },
-    {
-        key: "GipszJakab:asdfsafd",
-        period: "Daily",
-        expires_at: "n/a",
-        limit_name: "Token Limit",
-        limit_value: "500000",
-        allocated: "12354",
-        status: "Active",
-    },
-]
-
 const PLACEHOLDER_KEYS = [
     {
         user: "GipszJakab",
@@ -60,6 +44,30 @@ const PLACEHOLDER_KEYS = [
 ]
 
 export default function ProjectSetings() {
+    const { selectedProject } = useProject()
+    const [quotas, setQuotas] = useState([])
+    const { quotaError, quotaSuccess, quotaReloadKey, handleDeleteQuota } = useQuotaDeletion({ quotas, setQuotas })
+
+    useEffect(() => {
+        let mounted = true
+
+        if (!selectedProject) {
+            setQuotas([])
+            return
+        }
+
+        fetchQuotaInfos(selectedProject.id, null, null, false, false)
+            .then((data) => {
+                if (!mounted) return
+                setQuotas(data || [])
+            })
+            .catch((err) => {
+                console.error("Failed to load project quotas:", err)
+            })
+
+        return () => { mounted = false }
+    }, [selectedProject, quotaReloadKey])
+
     return (
         <>
             <div className="flex flex-col gap-5">
@@ -71,7 +79,11 @@ export default function ProjectSetings() {
                     <CreateQuotaForm title="Create Project Quota" enableKeyTarget={true} />
                 </div>
                 <div className="border-b border-white/10 pb-5">
-                    <QuotasTable title="Project Quotas" rows={PLACEHOLDER_QUOTAS} showUser={true} showKey={true} onAction={() => { }} />
+                    <div className="mb-3">
+                        <AlertBox message={quotaError} variant="error" className="mt-0" />
+                        <AlertBox message={quotaSuccess} variant="success" className="mt-0" />
+                    </div>
+                    <QuotasTable title="Project Quotas" rows={quotas} showUser={true} showKey={true} onAction={handleDeleteQuota} />
                 </div>
                 <div className="border-b border-white/10 pb-5">
                     <UsersTable title="Project Users" rows={PLACEHOLDER_USERS} onAction={() => { }} actionLabel="Remove" />

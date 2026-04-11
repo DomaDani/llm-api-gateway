@@ -8,8 +8,8 @@ class QuotaDisplayInformation(BaseModel):
     id: int
     name: str | None = None
     project_id: int | None = None
-    user_id: int | None = None
-    key_id: int | None = None
+    user_name: str | None = None
+    fingerprint: str | None = None
     limit_id: int
     limit_name: str
     limit_value: float | None = None
@@ -42,6 +42,7 @@ class QuotaInformationRequest(BaseModel):
     user_id: int | None = None
     key_id: int | None = None
     active_only: bool = False
+    include_inherited: bool = True
 
     @model_validator(mode="after")
     def validate_request(self):

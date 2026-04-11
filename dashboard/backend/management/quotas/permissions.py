@@ -28,8 +28,10 @@ async def enforce_quota_deletion_permission(current_user_id: int, quota_id: int)
     if quota is None:
         raise HTTPException(status_code=404, detail="Quota not found.")
 
-    if quota.project_id is None:
+    effective_project_id = quota.project_id or (quota.api_key.project_id if quota.api_key is not None else None)
+
+    if effective_project_id is None:
         raise HTTPException(status_code=403, detail="Only administrators can delete global quotas.")
 
-    if not await is_user_project_manager(user_id=current_user_id, project_id=quota.project_id):
+    if not await is_user_project_manager(user_id=current_user_id, project_id=effective_project_id):
         raise HTTPException(status_code=403, detail="Project manager privileges required for deleting this quota.")
