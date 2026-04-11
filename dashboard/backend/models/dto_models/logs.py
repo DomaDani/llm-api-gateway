@@ -40,8 +40,8 @@ class UsageLogDisplayInformation(BaseModel):
 
 class UsageLogAggregateDisplayInformation(BaseModel):
     time_chunk: datetime
-    project_id: int
-    user_id: int
+    project_name: str
+    user_name: str
     request_count: int
     total_tokens: int | None = None
     total_cost: Decimal | None = None

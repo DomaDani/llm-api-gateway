@@ -1,5 +1,9 @@
 import ActiveQuotasTable from "./components/ActiveQuotasTable"
 import UsageRecordsTable from "./components/UsageRecordsTable"
+import { useEffect, useState } from "react"
+import { fetchUsageLogs } from "../../api/usageLogs/UsageLogs"
+import { useAuth } from "../../api/auth/AuthProvider"
+import { useProject } from "../../context/ProjectContext"
 
 // --- Placeholder data (replace with API calls later) ---
 const ACTIVE_QUOTAS = [
@@ -40,53 +44,44 @@ const ACTIVE_QUOTAS = [
         reset_date: "Ongoing",
     },
 ]
-
-// --- Placeholder data (replace with API calls later) ---
-const USAGE_RECORDS = [
-    {
-        id: 1,
-        project: "Project Alpha",
-        user: "GipszJakab",
-        created_at: "Apr 7, 2026 14:00",
-        requests: 12,
-        spent_tokens: 1240,
-        price: "$0.012",
-        key: "9f8a...",
-    },
-    {
-        id: 2,
-        project: "Project Beta",
-        user: "GipszJakab2",
-        created_at: "Apr 7, 2026 11:15",
-        requests: 8,
-        spent_tokens: 870,
-        price: "$0.008",
-        key: "9f8a...",
-    },
-    {
-        id: 3,
-        project: "Project Alpha",
-        user: "GipszJakab",
-        created_at: "Apr 6, 2026 19:45",
-        requests: 20,
-        spent_tokens: 2100,
-        price: "$0.021",
-        key: "9f8a...",
-    },
-    {
-        id: 4,
-        project: "Project Gamma",
-        user: "GipszJakab3",
-        created_at: "Apr 6, 2026 10:30",
-        requests: 5,
-        spent_tokens: 450,
-        price: "$0.004",
-        key: "9f8a...",
-    },
-]
 // --------------------------------------------------------
 
 export default function Usage() {
+    const { selectedProject } = useProject()
+    const { user } = useAuth()
+    const [globalLogs, setGlobalLogs] = useState([])
+    const [projectLogs, setProjectLogs] = useState([])
+    const [personalLogs, setPersonalLogs] = useState([])
+    
+    useEffect(() => {
+        let mounted = true
+
+        if (!selectedProject) {
+            setGlobalLogs([])
+            setProjectLogs([])
+            setPersonalLogs([])
+            return
+        }
+
+        fetchUsageLogs(null, null, true, 250)
+        .then((data) => {
+            if (!mounted) return
+            setGlobalLogs(data)
+        })
+        fetchUsageLogs(selectedProject.id, null, true, 250)
+        .then((data) => {
+            if (!mounted) return
+            setProjectLogs(data)
+        })
+        fetchUsageLogs(selectedProject.id, user.id, true, 250)
+        .then((data) => {
+            if (!mounted) return
+            setPersonalLogs(data)
+        })
+
+        return () => { mounted = false }
+    }, [selectedProject, user])
+
     return (
         <div className="flex flex-col gap-5">
             <h1 className="shrink-0 text-3xl font-bold text-white">Usage</h1>
@@ -94,13 +89,13 @@ export default function Usage() {
                 <ActiveQuotasTable title="Active Quotas" rows={ACTIVE_QUOTAS} />
             </div>
             <div className="border-b border-white/10 pb-5">
-                <UsageRecordsTable title="Global Usage" rows={USAGE_RECORDS} showProject={true} showUser={true} />
+                <UsageRecordsTable title="Global Usage" rows={globalLogs} showProject={true} showUser={true} />
             </div>
             <div className="border-b border-white/10 pb-5">
-                <UsageRecordsTable title="Project Usage" rows={USAGE_RECORDS} showUser={true} />
+                <UsageRecordsTable title="Project Usage" rows={projectLogs} showUser={true} />
             </div>
             <div className="border-b border-white/10 pb-5">
-                <UsageRecordsTable title="Personal Usage" rows={USAGE_RECORDS} />
+                <UsageRecordsTable title="Personal Usage" rows={personalLogs} />
             </div>
         </div>
     )

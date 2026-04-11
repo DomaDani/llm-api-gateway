@@ -50,7 +50,7 @@ export default function Home()
                 console.error("Failed to load personal usage logs:", err)
             })
 
-
+        return () => { mounted = false }
     }, [selectedProject])
 
     return (
