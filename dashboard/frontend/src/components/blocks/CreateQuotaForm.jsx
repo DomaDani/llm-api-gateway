@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import Dropdown from "../primitives/Dropdown"
 import { fetchQuotaLimitTypes, fetchQuotaPeriods } from "../../api/management/quotas/Info"
 import { fetchUserInfos } from "../../api/management/user/Info"
+import { fetchKeyInfos } from "../../api/management/keys/Info"
 import { useProject } from "../../context/ProjectContext"
 
 
@@ -79,12 +80,51 @@ export default function CreateQuotaForm({
                     const map = data.reduce((acc, u) => { acc[u.username] = u.id; return acc }, {})
                     setAvailableUsers(names)
                     setUserMap(map)
+                } else {
+                    setAvailableUsers([])
+                    setUserMap({})
                 }
             })
             .catch((err) => console.error("Failed to load users:", err))
 
+        if (isGlobal || !selectedProject?.id) {
+            setTargetKeyOptions([])
+            setKeyMap({})
+        } else {
+            fetchKeyInfos(selectedProject.id, null)
+                .then((data) => {
+                    if (!mounted) return
+
+                    if (Array.isArray(data) && data.length > 0) {
+                        const selectedProjectId = Number(selectedProject.id)
+                        const filteredKeys = data.filter((keyInfo) => Number(keyInfo.project_id) === selectedProjectId)
+                        const labels = filteredKeys.map((keyInfo) => {
+                            const owner = keyInfo.username ? `${keyInfo.username}: ` : ""
+                            return `${owner}${keyInfo.name} (${keyInfo.fingerprint})`
+                        })
+                        const map = filteredKeys.reduce((acc, keyInfo) => {
+                            const owner = keyInfo.username ? `${keyInfo.username}: ` : ""
+                            const label = `${owner}${keyInfo.name} (${keyInfo.fingerprint})`
+                            acc[label] = keyInfo.id
+                            return acc
+                        }, {})
+
+                        setTargetKeyOptions(labels)
+                        setKeyMap(map)
+                    } else {
+                        setTargetKeyOptions([])
+                        setKeyMap({})
+                    }
+                })
+                .catch((err) => {
+                    console.error("Failed to load keys:", err)
+                    setTargetKeyOptions([])
+                    setKeyMap({})
+                })
+        }
+
         return () => { mounted = false }
-    }, [selectedProject])
+    }, [isGlobal, selectedProject])
 
     return (
         <form autoComplete="off" onSubmit={handleSubmit}>
