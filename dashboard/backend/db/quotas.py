@@ -1,9 +1,10 @@
 from sqlalchemy import select, and_, or_
 from sqlalchemy.orm import selectinload
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 
 from shared.db import get_session, get_transactional_session
 from shared.models import Quota, Status, Period, User, Project, APIKey
+from shared.utils import calculate_date_after_period
 
 from .lookups import get_user_by_id
 
@@ -294,7 +295,7 @@ async def create_quota(
         expires_at=expires_at,
         status=Status.ACTIVE,
         allocated=0,
-        next_reset=datetime.now(timezone.utc) + timedelta(seconds=period.value)
+        next_reset=calculate_date_after_period(period, datetime.now(timezone.utc))
     )
     session.add(new_quota)
 

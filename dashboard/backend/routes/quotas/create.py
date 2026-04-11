@@ -34,4 +34,4 @@ async def create_quota(
     except Exception as e:
         raise HTTPException(status_code=400, detail="Something went wrong while creating quota. Please try again later.") from e
 
-    return convert_orm_to_display_info(created_quota)
+    return await convert_orm_to_display_info(created_quota)

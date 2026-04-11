@@ -10,6 +10,7 @@ import AlertBox from "../../components/primitives/AlertBox"
 import useQuotaDeletion from "../../hooks/useQuotaDeletion"
 import useUserDeletion from "../../hooks/useUserDeletion"
 import useProjectCreation from "../../hooks/useProjectCreation"
+import useQuotaCreation from "../../hooks/useQuotaCreation"
 
 function mapUserRow(user) {
     return {
@@ -25,6 +26,7 @@ export default function GlobalSettings() {
     const [quotas, setQuotas] = useState([])
     const [users, setUsers] = useState([])
     const { quotaError, quotaSuccess, quotaReloadKey, handleDeleteQuota } = useQuotaDeletion({ quotas, setQuotas })
+    const { quotaCreateError, quotaCreateSuccess, quotaCreateReloadKey, handleCreateQuota } = useQuotaCreation({ projectId: null })
     const { userError, userSuccess, userReloadKey, handleDeleteUser } = useUserDeletion({ users, setUsers })
     const { projectError, projectSuccess, projectLoading, handleCreateProject } = useProjectCreation()
 
@@ -41,7 +43,7 @@ export default function GlobalSettings() {
         })
 
         return () => { mounted = false }
-    }, [quotaReloadKey])
+    }, [quotaReloadKey, quotaCreateReloadKey])
 
     useEffect(() => {
         let mounted = true
@@ -75,7 +77,11 @@ export default function GlobalSettings() {
                     />
                 </div>
                 <div className="border-b border-white/10">
-                    <CreateQuotaForm title="Create Global Quota" />
+                    <div className="mb-3">
+                        <AlertBox message={quotaCreateError} variant="error" className="mt-0" />
+                        <AlertBox message={quotaCreateSuccess} variant="success" className="mt-0" />
+                    </div>
+                    <CreateQuotaForm title="Create Global Quota" onSubmit={handleCreateQuota} isGlobal={true} />
                 </div>
                 <div className="border-b border-white/10 pb-5">
                     <div className="mb-3">

@@ -14,6 +14,7 @@ import useQuotaDeletion from "../../hooks/useQuotaDeletion"
 import useApiKeyDeletion from "../../hooks/useApiKeyDeletion"
 import useProjectUserRemoval from "../../hooks/useProjectUserRemoval"
 import useProjectUserAddition from "../../hooks/useProjectUserAddition"
+import useQuotaCreation from "../../hooks/useQuotaCreation"
 
 function mapUserRow(user) {
     return {
@@ -31,6 +32,9 @@ export default function ProjectSetings() {
     const [apiKeys, setApiKeys] = useState([])
     const [projectUsers, setProjectUsers] = useState([])
     const { quotaError, quotaSuccess, quotaReloadKey, handleDeleteQuota } = useQuotaDeletion({ quotas, setQuotas })
+    const { quotaCreateError, quotaCreateSuccess, quotaCreateReloadKey, handleCreateQuota } = useQuotaCreation({
+        projectId: selectedProject?.id ?? null,
+    })
     const { apiKeyError, apiKeySuccess, apiKeyReloadKey, handleDeleteApiKey } = useApiKeyDeletion({ apiKeys, setApiKeys })
     const { projectUserError, projectUserSuccess, projectUserReloadKey, handleRemoveProjectUser } = useProjectUserRemoval({
         projectUsers,
@@ -64,7 +68,7 @@ export default function ProjectSetings() {
             })
 
         return () => { mounted = false }
-    }, [selectedProject, quotaReloadKey])
+    }, [selectedProject, quotaReloadKey, quotaCreateReloadKey])
 
     useEffect(() => {
         let mounted = true
@@ -119,7 +123,11 @@ export default function ProjectSetings() {
                     <AddUserForm onSubmit={handleAddProjectUser} />
                 </div>
                 <div className="border-b border-white/10">
-                    <CreateQuotaForm title="Create Project Quota" enableKeyTarget={true} />
+                    <div className="mb-3">
+                        <AlertBox message={quotaCreateError} variant="error" className="mt-0" />
+                        <AlertBox message={quotaCreateSuccess} variant="success" className="mt-0" />
+                    </div>
+                    <CreateQuotaForm title="Create Project Quota" enableKeyTarget={true} onSubmit={handleCreateQuota} />
                 </div>
                 <div className="border-b border-white/10">
                     <DeleteProjectForm />
