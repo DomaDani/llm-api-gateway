@@ -1,24 +1,50 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Dropdown from "../../../components/primitives/Dropdown"
+import { fetchUserInfos } from "../../../api/management/user/Info"
+import AlertBox from "../../../components/primitives/AlertBox"
 
-const PLACEHOLDER_USERS = [
-    "User 1",
-    "User 2",
-    "User 3",
-    "User 4",
-    "User 5",
-]
-
-export default function CreateProjectForm({ users = PLACEHOLDER_USERS, onSubmit }) {
+export default function CreateProjectForm({ onSubmit, error = "", success = "", loading = false }) {
     const [projectName, setProjectName] = useState("")
     const [projectManager, setProjectManager] = useState(null)
+    const [availableUsers, setAvailableUsers] = useState([])
+    const [userMap, setUserMap] = useState({})
 
-    function handleSubmit(event) {
+    useEffect(() => {
+        let mounted = true
+        fetchUserInfos()
+            .then((data) => {
+                if (!mounted) return
+                if (Array.isArray(data) && data.length > 0) {
+                    const names = data.map((u) => u.username)
+                    const map = data.reduce((acc, u) => { acc[u.username] = u.id; return acc }, {})
+                    setAvailableUsers(names)
+                    setUserMap(map)
+                } else {
+                    setAvailableUsers([])
+                    setUserMap({})
+                }
+            })
+            .catch((err) => {
+                console.error("Failed to load users:", err)
+                setAvailableUsers([])
+                setUserMap({})
+            })
+
+        return () => { mounted = false }
+    }, [])
+
+    async function handleSubmit(event) {
         event.preventDefault()
-        onSubmit?.({
-            projectName,
-            projectManager,
+
+        const created = await onSubmit?.({
+            name: projectName,
+            manager_id: projectManager,
         })
+
+        if (created) {
+            setProjectName("")
+            setProjectManager(null)
+        }
     }
 
     return (
@@ -28,6 +54,10 @@ export default function CreateProjectForm({ users = PLACEHOLDER_USERS, onSubmit 
                     <h2 className="text-base/7 font-semibold text-white">Create New Project</h2>
                     {/* <p className="mt-1 text-sm/6 text-gray-400">
                     </p> */}
+                    <div className="mt-3 space-y-8">
+                        <AlertBox message={error} variant="error" className="mt-0" />
+                        <AlertBox message={success} variant="success" className="mt-0" />
+                    </div>
                     <div className="mt-3 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                         <div className="sm:col-span-4">
                             <label htmlFor="project-name" className="block text-sm/6 font-medium text-white">
@@ -54,9 +84,11 @@ export default function CreateProjectForm({ users = PLACEHOLDER_USERS, onSubmit 
                             </label>
                             <div className="mt-2">
                                 <Dropdown
-                                    items={users}
+                                    items={availableUsers}
                                     itemName="user"
-                                    onSelect={setProjectManager}
+                                    onSelect={(name) => {
+                                        setProjectManager(userMap[name] ?? null)
+                                    }}
                                     required
                                     name="project-manager"
                                 />
@@ -67,9 +99,10 @@ export default function CreateProjectForm({ users = PLACEHOLDER_USERS, onSubmit 
                     <div className="sm:col-span-4 pt-6">
                         <button
                             type="submit"
-                            className="cursor-pointer rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 hover:bg-indigo-400"
+                            disabled={loading}
+                            className={`rounded-md px-3 py-2 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 ${loading ? "cursor-not-allowed bg-indigo-400" : "cursor-pointer bg-indigo-500 hover:bg-indigo-400"}`}
                         >
-                            Submit
+                            {loading ? "Creating project..." : "Submit"}
                         </button>
                     </div>
                 </div>

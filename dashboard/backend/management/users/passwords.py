@@ -1,14 +1,6 @@
 from fastapi import HTTPException
 
-from dashboard.backend.auth import verify_password
-from dashboard.backend.db import user_email_free, user_username_free
-
-async def enforce_availability(email: str, username: str, exclude_user_id: int | None = None) -> None:
-    if not await user_email_free(email, exclude_user_id):
-        raise HTTPException(status_code=409, detail="Email is already in use.")
-    
-    if not await user_username_free(username, exclude_user_id):
-        raise HTTPException(status_code=409, detail="Username is already in use.")
+from shared.utils import verify_password
 
 async def enforce_password_strength(password: str) -> None:
     if len(password) < 8:

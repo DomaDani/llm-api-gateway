@@ -1,21 +1,38 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Dropdown from "../../../components/primitives/Dropdown"
+import { fetchUserInfos } from "../../../api/management/user/Info"
 
-const PLACEHOLDER_USERS = [
-    "User 1",
-    "User 2",
-    "User 3",
-    "User 4",
-    "User 5",
-]
+export default function AddUserForm({ onSubmit }) {
+    const [userId, setUserId] = useState(null)
+    const [availableUsers, setAvailableUsers] = useState([])
+    const [userMap, setUserMap] = useState({})
 
-export default function AddUserForm({ users = PLACEHOLDER_USERS, onSubmit }) {
-    const [username, setUsername] = useState("")
+    useEffect(() => {
+        let mounted = true
+        fetchUserInfos()
+            .then((data) => {
+                if (!mounted) return
+                if (Array.isArray(data) && data.length > 0) {
+                    const names = data.map((u) => u.username)
+                    const map = data.reduce((acc, u) => { acc[u.username] = u.id; return acc }, {})
+                    setAvailableUsers(names)
+                    setUserMap(map)
+                } else {
+                    setAvailableUsers([])
+                    setUserMap({})
+                }
+            })
+            .catch((err) => {
+                console.error("Failed to load users:", err)
+            })
+
+        return () => { mounted = false }
+    }, [])
 
     function handleSubmit(event) {
         event.preventDefault()
         onSubmit?.({
-            username
+            user_id: userId,
         })
     }
 
@@ -34,11 +51,14 @@ export default function AddUserForm({ users = PLACEHOLDER_USERS, onSubmit }) {
                             </label>
                             <div className="mt-2">
                                 <Dropdown
-                                    items={users}
+                                    items={availableUsers}
                                     itemName="user"
-                                    onSelect={setUsername}
+                                    onSelect={(name) => {
+                                        const id = userMap[name]
+                                        setUserId(id ?? null)
+                                    }}
                                     required
-                                    name="username"
+                                    name="user-id"
                                 />
                             </div>
                         </div>

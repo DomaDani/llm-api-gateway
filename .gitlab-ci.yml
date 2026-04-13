@@ -112,6 +112,7 @@ compose:
       
       TARGET_URL=$TARGET_URL
       TARGET_KEY=$TARGET_KEY
+      ADMINISTRATOR_PASSWORD=$ADMINISTRATOR_PASSWORD
       ENV
 
     - |
@@ -201,7 +202,7 @@ compose:
 integration:
   stage: tests
   image:
-    name: docker:24.0.9
+    name: python:3.12.12-alpine
   services:
     - docker:24.0.9-dind
   tags:
@@ -209,6 +210,7 @@ integration:
   variables:
     DOCKER_TLS_CERTDIR: ""
     DOCKER_HOST: tcp://docker:2375
+    DOCKER_API_VERSION: "1.43"
     TARGET_URL: http://mock-upstream:8081/v1
     TARGET_KEY: anykey
     BASE_URL: http://docker:8000
@@ -222,9 +224,10 @@ integration:
       
       TARGET_URL=$TARGET_URL
       TARGET_KEY=$TARGET_KEY
+      ADMINISTRATOR_PASSWORD=$ADMINISTRATOR_PASSWORD
       ENV
 
-    - apk add --no-cache python3 py3-pip curl
+    - apk add --no-cache docker docker-compose curl
     - python -m venv .venv
     - . .venv/bin/activate
     - pip install -r tests/requirements.txt & PIP_PID=$!
@@ -234,6 +237,22 @@ integration:
 
     - docker-compose -f docker-compose.yml -f tests/docker-compose.test.yml pull
     - docker-compose -f docker-compose.yml -f tests/docker-compose.test.yml up -d --no-build
+
+    - |
+      # Wait for init-db to bootstrap db, verify success
+      INIT_ID=$(docker-compose -f docker-compose.yml -f tests/docker-compose.test.yml ps -q init-db) || true
+      if [ -n "$INIT_ID" ]; then
+        timeout=300; elapsed=0
+        while [ "$(docker inspect -f '{{.State.Running}}' "$INIT_ID")" = "true" ] && [ $elapsed -lt $timeout ]; do
+          sleep 1; elapsed=$((elapsed+1))
+        done
+        EXIT_CODE=$(docker inspect -f '{{.State.ExitCode}}' "$INIT_ID")
+        if [ "$EXIT_CODE" -ne 0 ]; then
+          docker-compose -f docker-compose.yml -f tests/docker-compose.test.yml logs init-db --tail=300
+          docker-compose -f docker-compose.yml -f tests/docker-compose.test.yml down -v
+          exit $EXIT_CODE
+        fi
+      fi
 
     - |
       # Wait for gateway to be healthy
@@ -269,6 +288,20 @@ integration:
         docker-compose -f docker-compose.yml -f tests/docker-compose.test.yml logs mock-upstream --tail=200
         exit 1
       fi
+
+    - |
+      # Debug: dump init-db logs, inspect init-db env, and verify seeded API keys
+      docker-compose -f docker-compose.yml -f tests/docker-compose.test.yml logs init-db --tail=500 || true
+
+      INIT_ID=$(docker-compose -f docker-compose.yml -f tests/docker-compose.test.yml ps -q init-db) || true
+      if [ -n "$INIT_ID" ]; then
+        docker inspect -f '{{range $k,$v := .Config.Env}}{{println $v}}{{end}}' "$INIT_ID" \
+          | grep -E 'CREATE_MOCK_DATA|DATABASE_URL|POSTGRES_USER' || true
+      fi
+
+      # Verify DB contains API keys (prints table rows)
+      docker-compose -f docker-compose.yml -f tests/docker-compose.test.yml exec -T db \
+        psql -U "$POSTGRES_USER" -d postgres -c "select fingerprint, status from api_keys order by id desc limit 20;" || true
 
     - sleep 5
 

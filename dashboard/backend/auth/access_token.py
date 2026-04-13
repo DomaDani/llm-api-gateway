@@ -3,8 +3,9 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
 from datetime import datetime, timezone, timedelta
 
-from dashboard.backend.models.dto_models import UserDisplayInfo, AccessTokenInfo
-from dashboard.backend.db.users import get_user_by_id
+from dashboard.backend.management import user_convert_orm_to_display_info as convert_orm_to_display_info
+from dashboard.backend.models.dto_models import UserDisplayInformation, AccessTokenInfo
+from dashboard.backend.db import get_user_by_id, is_user_administrator, is_user_project_manager
 
 from shared.config import LOGIN_SECRET_KEY, TOKEN_EXPIRATION_MINS, TOKEN_ENCODING_ALGORITHM
 
@@ -20,7 +21,7 @@ def create_access_token(data: AccessTokenInfo):
 
     return encoded_jwt
 
-async def get_user_from_token(token: str) -> UserDisplayInfo | None:
+async def get_user_from_token(token: str) -> UserDisplayInformation | None:
     try:
         payload = jwt.decode(token, LOGIN_SECRET_KEY, algorithms=[TOKEN_ENCODING_ALGORITHM])
         user_id: int = payload.get("user_id")
@@ -32,20 +33,12 @@ async def get_user_from_token(token: str) -> UserDisplayInfo | None:
         if user_record is None:
             return None
         
-        return UserDisplayInfo(
-            id=user_record.id,
-            email=user_record.email,
-            username=user_record.username,
-            profile_picture_url=user_record.profile_picture_url,
-            joined_date=user_record.joined_date,
-            last_login=user_record.last_login,
-            password_expires_at=user_record.password_expires_at
-        )
+        return await convert_orm_to_display_info(user_record)
 
     except JWTError:
         return None
     
-async def verify_access_token(token: str) -> bool:
+def verify_access_token(token: str) -> bool:
     try:
         _ = jwt.decode(token, LOGIN_SECRET_KEY, algorithms=[TOKEN_ENCODING_ALGORITHM])
         return True
@@ -55,23 +48,44 @@ async def verify_access_token(token: str) -> bool:
 
 async def require_valid_access_token(
     credentials: HTTPAuthorizationCredentials | None = Depends(_bearer),
-) -> bool:
+) -> None:
     if credentials is None:
         raise HTTPException(status_code=401, detail="Missing access token")
 
-    if not await verify_access_token(credentials.credentials):
+    if not verify_access_token(credentials.credentials):
         raise HTTPException(status_code=401, detail="Invalid or expired access token")
-
-    return True
 
 async def require_current_user(
     credentials: HTTPAuthorizationCredentials | None = Depends(_bearer),
-) -> UserDisplayInfo:
+) -> UserDisplayInformation:
     if credentials is None:
         raise HTTPException(status_code=401, detail="Missing access token")
 
     user = await get_user_from_token(credentials.credentials)
     if user is None:
         raise HTTPException(status_code=401, detail="Invalid or expired access token")
+
+    return user
+
+async def require_administrator_user(
+    credentials: HTTPAuthorizationCredentials | None = Depends(_bearer),
+) -> UserDisplayInformation:
+    user = await require_current_user(credentials)
+
+    if not await is_user_administrator(user.id):
+        raise HTTPException(status_code=403, detail="Administrator privileges required")
+
+    return user
+
+async def require_project_manager_user(
+    project_id: int,
+    credentials: HTTPAuthorizationCredentials | None = Depends(_bearer),
+) -> UserDisplayInformation:
+    user = await require_current_user(credentials)
+
+    if await is_user_administrator(user.id):
+        return user
+    if not await is_user_project_manager(user.id, project_id):
+        raise HTTPException(status_code=403, detail="Project manager privileges required")
 
     return user

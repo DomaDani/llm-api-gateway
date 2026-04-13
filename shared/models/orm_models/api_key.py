@@ -12,7 +12,7 @@ class APIKey(SQLAlchemyBase):
 
     id : Mapped[int] = mapped_column(primary_key=True)
     project_id : Mapped[int] = mapped_column(ForeignKey("projects.id"))
-    user_id : Mapped[int] = mapped_column(ForeignKey("users.id"))
+    user_id : Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
     name : Mapped[str] = mapped_column(String(150))
     fingerprint : Mapped[str] = mapped_column(String(16), unique=True)
     key_hash : Mapped[str] = mapped_column(String(256))

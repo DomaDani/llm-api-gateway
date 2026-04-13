@@ -1,16 +1,16 @@
 import { useMemo, useState } from "react"
 
 const SORTABLE_COLUMNS = {
-    user: "User",
-    project: "Project",
-    created_at: "Date / Time",
-    requests: "Requests",
-    spent_tokens: "Spent Tokens",
-    price: "Price",
-    key: "Key",
+    user_name: "User",
+    project_name: "Project",
+    timestamp: "Date / Time",
+    request_count: "Requests",
+    total_tokens: "Spent Tokens",
+    internal_cost_final: "Price",
+    fingerprint: "Key",
 }
 
-const HIDDEN_ON_MOBILE = new Set(["user", "project", "key"])
+const HIDDEN_ON_MOBILE = new Set(["user_name", "project_name", "fingerprint"])
 
 export default function UsageRecordsTable({
     title = "Usage Records",
@@ -18,13 +18,13 @@ export default function UsageRecordsTable({
     showUser = false,
     showProject = false,
 }) {
-    const [sortBy, setSortBy] = useState("created_at")
+    const [sortBy, setSortBy] = useState("timestamp")
     const [sortDirection, setSortDirection] = useState("desc")
 
     const visibleColumns = useMemo(() => {
         return Object.keys(SORTABLE_COLUMNS).filter((column) => {
-            if (column === "user") return showUser
-            if (column === "project") return showProject
+            if (column === "user_name") return showUser
+            if (column === "project_name") return showProject
             return true
         })
     }, [showUser, showProject])
@@ -32,16 +32,27 @@ export default function UsageRecordsTable({
     const sortedRows = useMemo(() => {
         const copy = [...rows]
 
+        const numericCols = new Set(["request_count", "total_tokens", "internal_cost_final"])
+
         copy.sort((leftRow, rightRow) => {
             const leftValue = leftRow[sortBy]
             const rightValue = rightRow[sortBy]
 
-            if (sortBy === "requests" || sortBy === "spent_tokens" || sortBy === "price") {
+            // Numeric sorting
+            if (numericCols.has(sortBy)) {
                 const left = Number(leftValue ?? 0)
                 const right = Number(rightValue ?? 0)
                 return sortDirection === "asc" ? left - right : right - left
             }
 
+            // Date sorting
+            if (sortBy === "timestamp") {
+                const left = leftValue ? new Date(leftValue).getTime() : 0
+                const right = rightValue ? new Date(rightValue).getTime() : 0
+                return sortDirection === "asc" ? left - right : right - left
+            }
+
+            // Fallback string sorting
             const left = String(leftValue ?? "").toLowerCase()
             const right = String(rightValue ?? "").toLowerCase()
 
@@ -99,35 +110,87 @@ export default function UsageRecordsTable({
 
                     <tbody className="divide-y divide-white/5">
                         {sortedRows.length > 0 ? (
-                            sortedRows.map((row) => (
-                                <tr key={row.id || `${row.created_at}-${row.key}`} className="hover:bg-white/5">
-                                    {showUser && (
-                                        <td className="max-w-0 truncate px-4 py-3 text-gray-300" title={row.user}>
-                                            {row.user}
-                                        </td>
-                                    )}
-                                    {showProject && (
-                                        <td className="max-w-0 truncate px-4 py-3 text-gray-300" title={row.project}>
-                                            {row.project}
-                                        </td>
-                                    )}
-                                    <td className="max-w-0 truncate px-4 py-3 text-gray-300" title={row.created_at}>
-                                        {row.created_at}
-                                    </td>
-                                    <td className="max-w-0 truncate px-4 py-3 text-gray-300" title={row.requests}>
-                                        {row.requests?.toLocaleString?.() ?? row.requests}
-                                    </td>
-                                    <td className="max-w-0 truncate px-4 py-3 text-gray-300" title={row.spent_tokens}>
-                                        {row.spent_tokens?.toLocaleString?.() ?? row.spent_tokens}
-                                    </td>
-                                    <td className="max-w-0 truncate px-4 py-3 text-gray-300" title={row.price}>
-                                        {row.price}
-                                    </td>
-                                    <td className="hidden max-w-0 truncate px-4 py-3 text-gray-400 sm:table-cell" title={row.key}>
-                                        {row.key}
-                                    </td>
-                                </tr>
-                            ))
+                            sortedRows.map((row) => {
+                                const key = row.id || `${row.timestamp}-${row.fingerprint}`
+
+                                function renderCell(column) {
+                                    const hiddenClass = HIDDEN_ON_MOBILE.has(column) ? " hidden sm:table-cell" : ""
+
+                                    if (column === "user_name") {
+                                        return (
+                                            <td key={column} className={`max-w-0 truncate px-4 py-3 text-gray-300${hiddenClass}`} title={row.user_name}>
+                                                {row.user_name}
+                                            </td>
+                                        )
+                                    }
+
+                                    if (column === "project_name") {
+                                        return (
+                                            <td key={column} className={`max-w-0 truncate px-4 py-3 text-gray-300${hiddenClass}`} title={row.project_name}>
+                                                {row.project_name}
+                                            </td>
+                                        )
+                                    }
+
+                                    if (column === "timestamp") {
+                                        const ts = row.timestamp
+                                        const display = ts
+                                            ? (ts instanceof Date ? ts.toLocaleString() : new Date(ts).toLocaleString())
+                                            : '-'
+
+                                        return (
+                                            <td key={column} className={`max-w-0 truncate px-4 py-3 text-gray-300${hiddenClass}`} title={String(row.timestamp)}>
+                                                {display}
+                                            </td>
+                                        )
+                                    }
+
+                                    if (column === "request_count") {
+                                        const display = row.request_count?.toLocaleString?.() ?? row.request_count ?? 0
+                                        return (
+                                            <td key={column} className={`max-w-0 truncate px-4 py-3 text-gray-300${hiddenClass}`} title={String(row.request_count)}>
+                                                {display}
+                                            </td>
+                                        )
+                                    }
+
+                                    if (column === "total_tokens") {
+                                        const display = Number(row.total_tokens ?? 0).toLocaleString()
+                                        return (
+                                            <td key={column} className={`max-w-0 truncate px-4 py-3 text-gray-300${hiddenClass}`} title={String(row.total_tokens)}>
+                                                {display}
+                                            </td>
+                                        )
+                                    }
+
+                                    if (column === "internal_cost_final") {
+                                        const display = '$' + Number(row.internal_cost_final ?? 0).toFixed(6)
+                                        return (
+                                            <td key={column} className={`max-w-0 truncate px-4 py-3 text-gray-300${hiddenClass}`} title={String(row.internal_cost_final)}>
+                                                {display}
+                                            </td>
+                                        )
+                                    }
+
+                                    if (column === "fingerprint") {
+                                        return (
+                                            <td key={column} className={`hidden max-w-0 truncate px-4 py-3 text-gray-400 sm:table-cell`} title={row.fingerprint}>
+                                                {row.fingerprint}
+                                            </td>
+                                        )
+                                    }
+
+                                    return (
+                                        <td key={column} className={`px-4 py-3 text-gray-300${hiddenClass}`}>{String(row[column] ?? '')}</td>
+                                    )
+                                }
+
+                                return (
+                                    <tr key={key} className="hover:bg-white/5">
+                                        {visibleColumns.map((column) => renderCell(column))}
+                                    </tr>
+                                )
+                            })
                         ) : (
                             <tr>
                                 <td colSpan={columnCount} className="px-4 py-6 text-center text-gray-500">

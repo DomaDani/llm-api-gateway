@@ -11,7 +11,6 @@ const SORTABLE_COLUMNS = {
     status: "Status",
 }
 
-const OPTIONAL_COLUMNS = new Set(["user", "key"])
 const HIDDEN_ON_MOBILE = new Set(["expires_at", "allocated"])
 
 export default function QuotasTable({ title = "Quotas", rows = [], showUser = false, showKey = false, onAction, actionLabel = "Delete" })
@@ -27,12 +26,47 @@ export default function QuotasTable({ title = "Quotas", rows = [], showUser = fa
         })
     }, [showUser, showKey])
 
+    const normalizedRows = useMemo(() => {
+        return rows.map((row) => {
+            const isUserScoped = row.user_id != null
+            const isKeyScoped = row.key_id != null
+
+            return {
+                ...row,
+                id: row.id,
+                user: row.user_name ?? "N/A",
+                key: row.fingerprint ?? "N/A",
+                period: row.period ?? "N/A",
+                expires_at: row.expires_at ?? null,
+                limit_name: row.limit_name ?? row.limit_type ?? "N/A",
+                limit_value: row.limit_value,
+                allocated: row.allocated,
+                status: row.status ?? "N/A",
+            }
+        })
+    }, [rows])
+
     const sortedRows = useMemo(() => {
-        const copy = [...rows]
+        const copy = [...normalizedRows]
 
         copy.sort((a, b) => {
-            const left = String(a[sortBy] ?? "").toLowerCase()
-            const right = String(b[sortBy] ?? "").toLowerCase()
+            const aVal = a[sortBy]
+            const bVal = b[sortBy]
+
+            if (sortBy === "limit_value" || sortBy === "allocated") {
+                const left = Number(aVal ?? 0)
+                const right = Number(bVal ?? 0)
+                return sortDirection === "asc" ? left - right : right - left
+            }
+
+            if (sortBy === "expires_at") {
+                const left = aVal ? new Date(aVal).getTime() : 0
+                const right = bVal ? new Date(bVal).getTime() : 0
+                return sortDirection === "asc" ? left - right : right - left
+            }
+
+            const left = String(aVal ?? "").toLowerCase()
+            const right = String(bVal ?? "").toLowerCase()
 
             if (left < right) {
                 return sortDirection === "asc" ? -1 : 1
@@ -44,7 +78,7 @@ export default function QuotasTable({ title = "Quotas", rows = [], showUser = fa
         })
 
         return copy
-    }, [rows, sortBy, sortDirection])
+    }, [normalizedRows, sortBy, sortDirection])
 
     function handleSort(column) {
         if (sortBy === column) {
@@ -97,10 +131,16 @@ export default function QuotasTable({ title = "Quotas", rows = [], showUser = fa
                                     {showUser && <td className="max-w-0 truncate px-4 py-2 text-gray-300" title={row.user}>{row.user}</td>}
                                     {showKey && <td className="max-w-0 truncate px-4 py-2 text-gray-300 sm:table-cell" title={row.key}>{row.key}</td>}
                                     <td className="max-w-0 truncate px-4 py-2 text-gray-300" title={row.period}>{row.period}</td>
-                                    <td className="hidden max-w-0 truncate px-4 py-2 text-gray-400 sm:table-cell" title={row.expires_at}>{row.expires_at}</td>
+                                    <td className="hidden max-w-0 truncate px-4 py-2 text-gray-400 sm:table-cell" title={row.expires_at ?? "N/A"}>
+                                        {row.expires_at ? new Date(row.expires_at).toLocaleString() : "N/A"}
+                                    </td>
                                     <td className="max-w-0 truncate px-4 py-2 text-gray-300" title={row.limit_name}>{row.limit_name}</td>
-                                    <td className="max-w-0 truncate px-4 py-2 text-gray-300" title={row.limit_value}>{row.limit_value}</td>
-                                    <td className="hidden max-w-0 truncate px-4 py-2 text-gray-400 sm:table-cell" title={row.allocated}>{row.allocated}</td>
+                                    <td className="max-w-0 truncate px-4 py-2 text-gray-300" title={row.limit_value}>
+                                        {row.limit_value?.toLocaleString?.() ?? row.limit_value}
+                                    </td>
+                                    <td className="hidden max-w-0 truncate px-4 py-2 text-gray-400 sm:table-cell" title={row.allocated}>
+                                        {row.allocated?.toLocaleString?.() ?? row.allocated}
+                                    </td>
                                     <td className="max-w-0 truncate px-4 py-2 text-gray-300" title={row.status}>{row.status}</td>
                                     {onAction && (
                                         <td className="px-4 py-2 text-right">

@@ -3,211 +3,64 @@ import UsersTable from "../../components/blocks/UsersTable"
 import CreateUserForm from "./components/CreateUserForm"
 import CreateProjectForm from "./components/CreateProjectForm"
 import QuotasTable from "../../components/blocks/QuotasTable"
+import { useEffect, useState} from "react"
+import { fetchQuotaInfos } from "../../api/management/quotas/Info"
+import { fetchUserInfos } from "../../api/management/user/Info"
+import AlertBox from "../../components/primitives/AlertBox"
+import useQuotaDeletion from "../../hooks/useQuotaDeletion"
+import useUserDeletion from "../../hooks/useUserDeletion"
+import useProjectCreation from "../../hooks/useProjectCreation"
+import useQuotaCreation from "../../hooks/useQuotaCreation"
 
-const PLACEHOLDER_USERS = [
-    {
-        id: "u-1",
-        username: "alice",
-        email: "alice@example.com",
-        role: "administrator",
-        createdAt: "2026-03-20",
-    },
-    {
-        id: "u-2",
-        username: "bence",
-        email: "bence@example.com",
-        role: "project manager",
-        createdAt: "2026-03-25",
-    },
-    {
-        id: "u-3",
-        username: "csilla",
-        email: "csilla@example.com",
-        role: "user",
-        createdAt: "2026-04-01",
-    },
-    {
-        id: "u-4",
-        username: "david",
-        email: "david@example.com",
-        role: "project manager",
-        createdAt: "2026-04-03",
-    },
-        {
-        id: "u-5",
-        username: "alice",
-        email: "alice@example.com",
-        role: "administrator",
-        createdAt: "2026-03-20",
-    },
-    {
-        id: "u-6",
-        username: "bence",
-        email: "bence@example.com",
-        role: "project manager",
-        createdAt: "2026-03-25",
-    },
-    {
-        id: "u-7",
-        username: "csilla",
-        email: "csilla@example.com",
-        role: "user",
-        createdAt: "2026-04-01",
-    },
-    {
-        id: "u-8",
-        username: "david",
-        email: "david@example.com",
-        role: "project manager",
-        createdAt: "2026-04-03",
-    },
-        {
-        id: "u-9",
-        username: "alice",
-        email: "alice@example.com",
-        role: "administrator",
-        createdAt: "2026-03-20",
-    },
-    {
-        id: "u-10",
-        username: "bence",
-        email: "bence@example.com",
-        role: "project manager",
-        createdAt: "2026-03-25",
-    },
-    {
-        id: "u-11",
-        username: "csilla",
-        email: "csilla@example.com",
-        role: "user",
-        createdAt: "2026-04-01",
-    },
-    {
-        id: "u-12",
-        username: "david",
-        email: "david@example.com",
-        role: "project manager",
-        createdAt: "2026-04-03",
-    },
-        {
-        id: "u-13",
-        username: "alice",
-        email: "alice@example.com",
-        role: "administrator",
-        createdAt: "2026-03-20",
-    },
-    {
-        id: "u-14",
-        username: "bence",
-        email: "bence@example.com",
-        role: "project manager",
-        createdAt: "2026-03-25",
-    },
-    {
-        id: "u-15",
-        username: "csilla",
-        email: "csilla@example.com",
-        role: "user",
-        createdAt: "2026-04-01",
-    },
-    {
-        id: "u-16",
-        username: "vmjpoqwrfsscobbgayziqdbdtnqpaqdrdxrpbapodzkuanexveiwxjhpwvofdwfxsywnbcunmbelixqvpduvkoqewdfqwngwwikwjfannacmspcguffguplfxosqlriljnatyoykaclcxjwgdydzubuywgdgbuobdneylleihizzhxfsfyfmvdrekgchcuomjxzknaxdulmwaivqkbiemhqhbepifsdxniouqeuf",
-        email: "david@example.com",
-        role: "project manager",
-        createdAt: "2026-04-03",
-    },
-]
-
-const PLACEHOLDER_QUOTAS = [
-    {
-        user: "GipszJakab",
-        period: "Daily",
-        expires_at: "n/a",
-        limit_name: "Token Limit",
-        limit_value: "500000",
-        allocated: "12354",
-        status: "Active",
-    },
-    {
-        user: "GipszJakab2",
-        period: "Daily",
-        expires_at: "n/a",
-        limit_name: "Token Limit",
-        limit_value: "500000",
-        allocated: "12354",
-        status: "Active",
-    },
-    {
-        user: "GipszJakab3",
-        period: "Daily",
-        expires_at: "n/a",
-        limit_name: "Token Limit",
-        limit_value: "500000",
-        allocated: "12354",
-        status: "Active",
-    },
-    {
-        user: "GipszJakab4",
-        period: "Daily",
-        expires_at: "n/a",
-        limit_name: "Token Limit",
-        limit_value: "500000",
-        allocated: "12354",
-        status: "Active",
-    },
-    {
-        user: "GipszJakab5",
-        period: "Daily",
-        expires_at: "n/a",
-        limit_name: "Token Limit",
-        limit_value: "500000",
-        allocated: "12354",
-        status: "Active",
-    },
-    {
-        user: "GipszJakab6",
-        period: "Daily",
-        expires_at: "n/a",
-        limit_name: "Token Limit",
-        limit_value: "500000",
-        allocated: "12354",
-        status: "Active",
-    },
-    {
-        user: "GipszJakab7",
-        period: "Daily",
-        expires_at: "n/a",
-        limit_name: "Token Limit",
-        limit_value: "500000",
-        allocated: "12354",
-        status: "Active",
-    },
-    {
-        user: "GipszJakab8",
-        period: "Daily",
-        expires_at: "n/a",
-        limit_name: "Token Limit",
-        limit_value: "500000",
-        allocated: "12354",
-        status: "Active",
-    },
-    {
-        user: "GipszJakab9",
-        period: "Daily",
-        expires_at: "n/a",
-        limit_name: "Token Limit",
-        limit_value: "500000",
-        allocated: "12354",
-        status: "Active",
-    },
-]
-
-const TEST = [
-
-]
+function mapUserRow(user) {
+    return {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        createdAt: user.joined_date,
+    }
+}
 
 export default function GlobalSettings() {
+    const [quotas, setQuotas] = useState([])
+    const [users, setUsers] = useState([])
+    const { quotaError, quotaSuccess, quotaReloadKey, handleDeleteQuota } = useQuotaDeletion({ quotas, setQuotas })
+    const { quotaCreateError, quotaCreateSuccess, quotaCreateReloadKey, handleCreateQuota } = useQuotaCreation({ projectId: null })
+    const { userError, userSuccess, userReloadKey, handleDeleteUser } = useUserDeletion({ users, setUsers })
+    const { projectError, projectSuccess, projectLoading, handleCreateProject } = useProjectCreation()
+
+    useEffect(() => {
+        let mounted = true
+
+        fetchQuotaInfos()
+        .then((data) => {
+            if (!mounted) return
+            setQuotas(data)
+        })
+        .catch((err) => {
+            console.error("Failed to load quota infos:", err)
+        })
+
+        return () => { mounted = false }
+    }, [quotaReloadKey, quotaCreateReloadKey])
+
+    useEffect(() => {
+        let mounted = true
+
+        fetchUserInfos()
+            .then((data) => {
+                if (!mounted) return
+                const mappedUsers = Array.isArray(data) ? data.map(mapUserRow) : []
+                setUsers(mappedUsers)
+            })
+            .catch((err) => {
+                console.error("Failed to load users:", err)
+            })
+
+        return () => { mounted = false }
+    }, [userReloadKey])
+
     return (
         <>
             <div className="flex flex-col gap-5">
@@ -216,16 +69,33 @@ export default function GlobalSettings() {
                     <CreateUserForm />
                 </div>
                 <div className="border-b border-white/10">
-                    <CreateProjectForm />
+                    <CreateProjectForm
+                        onSubmit={handleCreateProject}
+                        error={projectError}
+                        success={projectSuccess}
+                        loading={projectLoading}
+                    />
                 </div>
                 <div className="border-b border-white/10">
-                    <CreateQuotaForm title="Create Global Quota" />
+                    <div className="mb-3">
+                        <AlertBox message={quotaCreateError} variant="error" className="mt-0" />
+                        <AlertBox message={quotaCreateSuccess} variant="success" className="mt-0" />
+                    </div>
+                    <CreateQuotaForm title="Create Global Quota" onSubmit={handleCreateQuota} isGlobal={true} />
                 </div>
                 <div className="border-b border-white/10 pb-5">
-                    <QuotasTable title="Global Quotas" rows={PLACEHOLDER_QUOTAS} showUser={true} onAction={() => {}} />
+                    <div className="mb-3">
+                        <AlertBox message={quotaError} variant="error" className="mt-0" />
+                        <AlertBox message={quotaSuccess} variant="success" className="mt-0" />
+                    </div>
+                    <QuotasTable title="Global Quotas" rows={quotas} showUser={true} onAction={handleDeleteQuota} />
                 </div>
                 <div className="border-b border-white/10 pb-5">
-                    <UsersTable title="Global Users" rows={PLACEHOLDER_USERS} onAction={() => {}} />
+                    <div className="mb-3">
+                        <AlertBox message={userError} variant="error" className="mt-0" />
+                        <AlertBox message={userSuccess} variant="success" className="mt-0" />
+                    </div>
+                    <UsersTable title="Global Users" rows={users} onAction={handleDeleteUser} />
                 </div>
             </div>
         </>

@@ -3,81 +3,155 @@ import QuotasTable from "../../components/blocks/QuotasTable"
 import ApiKeysTable from "../../components/blocks/ApiKeysTable"
 import CreateQuotaForm from "../../components/blocks/CreateQuotaForm"
 import AddUserForm from "./components/AddUserForm"
+import DeleteProjectForm from "./components/DeleteProjectForm"
+import { useEffect, useState } from "react"
+import { useProject } from "../../context/ProjectContext"
+import { fetchQuotaInfos } from "../../api/management/quotas/Info"
+import { fetchKeyInfos } from "../../api/management/keys/Info"
+import { fetchUserInfos } from "../../api/management/user/Info"
+import AlertBox from "../../components/primitives/AlertBox"
+import useQuotaDeletion from "../../hooks/useQuotaDeletion"
+import useApiKeyDeletion from "../../hooks/useApiKeyDeletion"
+import useProjectUserRemoval from "../../hooks/useProjectUserRemoval"
+import useProjectUserAddition from "../../hooks/useProjectUserAddition"
+import useQuotaCreation from "../../hooks/useQuotaCreation"
 
-const PLACEHOLDER_USERS = [
-    {
-        id: "u-1",
-        username: "alice",
-        email: "alice@example.com",
-        role: "administrator",
-        createdAt: "2026-03-20",
-    },
-    {
-        id: "u-2",
-        username: "bence",
-        email: "bence@example.com",
-        role: "project manager",
-        createdAt: "2026-03-25",
-    },
-    {
-        id: "u-3",
-        username: "csilla",
-        email: "csilla@example.com",
-        role: "user",
-        createdAt: "2026-04-01",
-    },
-]
-
-const PLACEHOLDER_QUOTAS = [
-    {
-        user: "GipszJakab",
-        period: "Daily",
-        expires_at: "n/a",
-        limit_name: "Token Limit",
-        limit_value: "500000",
-        allocated: "12354",
-        status: "Active",
-    },
-    {
-        key: "GipszJakab:asdfsafd",
-        period: "Daily",
-        expires_at: "n/a",
-        limit_name: "Token Limit",
-        limit_value: "500000",
-        allocated: "12354",
-        status: "Active",
-    },
-]
-
-const PLACEHOLDER_KEYS = [
-    {
-        user: "GipszJakab",
-        name: "test key",
-        fingerprint: "asdfasdf",
-        created_date: "2026-03-20",
-        status: "Active"
+function mapUserRow(user) {
+    return {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        createdAt: user.joined_date,
     }
-]
+}
 
 export default function ProjectSetings() {
+    const { selectedProject } = useProject()
+    const [quotas, setQuotas] = useState([])
+    const [apiKeys, setApiKeys] = useState([])
+    const [projectUsers, setProjectUsers] = useState([])
+    const { quotaError, quotaSuccess, quotaReloadKey, handleDeleteQuota } = useQuotaDeletion({ quotas, setQuotas })
+    const { quotaCreateError, quotaCreateSuccess, quotaCreateReloadKey, handleCreateQuota } = useQuotaCreation({
+        projectId: selectedProject?.id ?? null,
+    })
+    const { apiKeyError, apiKeySuccess, apiKeyReloadKey, handleDeleteApiKey } = useApiKeyDeletion({ apiKeys, setApiKeys })
+    const { projectUserError, projectUserSuccess, projectUserReloadKey, handleRemoveProjectUser } = useProjectUserRemoval({
+        projectUsers,
+        setProjectUsers,
+        projectId: selectedProject?.id,
+    })
+    const {
+        projectUserAddError,
+        projectUserAddSuccess,
+        projectUserAddReloadKey,
+        handleAddProjectUser,
+    } = useProjectUserAddition({
+        projectId: selectedProject?.id,
+    })
+
+    useEffect(() => {
+        let mounted = true
+
+        if (!selectedProject) {
+            setQuotas([])
+            return
+        }
+
+        fetchQuotaInfos(selectedProject.id, null, null, false, false)
+            .then((data) => {
+                if (!mounted) return
+                setQuotas(data || [])
+            })
+            .catch((err) => {
+                console.error("Failed to load project quotas:", err)
+            })
+
+        return () => { mounted = false }
+    }, [selectedProject, quotaReloadKey, quotaCreateReloadKey])
+
+    useEffect(() => {
+        let mounted = true
+
+        if (!selectedProject) {
+            setApiKeys([])
+            return
+        }
+
+        fetchKeyInfos(selectedProject.id, null)
+            .then((data) => {
+                if (!mounted) return
+                setApiKeys(data || [])
+            })
+            .catch((err) => {
+                console.error("Failed to load project API keys:", err)
+            })
+
+        return () => { mounted = false }
+    }, [selectedProject, apiKeyReloadKey])
+
+    useEffect(() => {
+        let mounted = true
+
+        if (!selectedProject) {
+            setProjectUsers([])
+            return
+        }
+
+        fetchUserInfos(selectedProject.id)
+            .then((data) => {
+                if (!mounted) return
+                const mappedUsers = Array.isArray(data) ? data.map(mapUserRow) : []
+                setProjectUsers(mappedUsers)
+            })
+            .catch((err) => {
+                console.error("Failed to load project users:", err)
+            })
+
+        return () => { mounted = false }
+    }, [selectedProject, projectUserReloadKey, projectUserAddReloadKey])
+
     return (
         <>
             <div className="flex flex-col gap-5">
                 <h1 className="shrink-0 text-3xl font-bold text-white">Project Settings</h1>
                 <div className="border-b border-white/10">
-                    <AddUserForm />
+                    <div className="mb-3">
+                        <AlertBox message={projectUserAddError} variant="error" className="mt-0" />
+                        <AlertBox message={projectUserAddSuccess} variant="success" className="mt-0" />
+                    </div>
+                    <AddUserForm onSubmit={handleAddProjectUser} />
                 </div>
                 <div className="border-b border-white/10">
-                    <CreateQuotaForm title="Create Project Quota" enableKeyTarget={true} />
+                    <div className="mb-3">
+                        <AlertBox message={quotaCreateError} variant="error" className="mt-0" />
+                        <AlertBox message={quotaCreateSuccess} variant="success" className="mt-0" />
+                    </div>
+                    <CreateQuotaForm title="Create Project Quota" enableKeyTarget={true} onSubmit={handleCreateQuota} />
+                </div>
+                <div className="border-b border-white/10">
+                    <DeleteProjectForm />
                 </div>
                 <div className="border-b border-white/10 pb-5">
-                    <QuotasTable title="Project Quotas" rows={PLACEHOLDER_QUOTAS} showUser={true} showKey={true} onAction={() => { }} />
+                    <div className="mb-3">
+                        <AlertBox message={quotaError} variant="error" className="mt-0" />
+                        <AlertBox message={quotaSuccess} variant="success" className="mt-0" />
+                    </div>
+                    <QuotasTable title="Project Quotas" rows={quotas} showUser={true} showKey={true} onAction={handleDeleteQuota} />
                 </div>
                 <div className="border-b border-white/10 pb-5">
-                    <UsersTable title="Project Users" rows={PLACEHOLDER_USERS} onAction={() => { }} actionLabel="Remove" />
+                    <div className="mb-3">
+                        <AlertBox message={projectUserError} variant="error" className="mt-0" />
+                        <AlertBox message={projectUserSuccess} variant="success" className="mt-0" />
+                    </div>
+                    <UsersTable title="Project Users" rows={projectUsers} onAction={handleRemoveProjectUser} actionLabel="Remove" />
                 </div>
                 <div className="border-b border-white/10 pb-5">
-                    <ApiKeysTable title="Project API Keys" rows={PLACEHOLDER_KEYS} onAction={() => { }} />
+                    <div className="mb-3">
+                        <AlertBox message={apiKeyError} variant="error" className="mt-0" />
+                        <AlertBox message={apiKeySuccess} variant="success" className="mt-0" />
+                    </div>
+                    <ApiKeysTable title="Project API Keys" rows={apiKeys} onAction={handleDeleteApiKey} />
                 </div>
             </div>
         </>

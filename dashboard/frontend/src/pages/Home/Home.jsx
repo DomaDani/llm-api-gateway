@@ -1,64 +1,74 @@
 import ActiveQuotaCard from "./components/ActiveQuotaCard"
 import UsageTable from "../../components/blocks/UsageTable"
-
-// --- Placeholder data (replace with API calls later) ---
-
-const ACTIVE_QUOTAS = [
-    { name: "Monthly Token Quota", resetDate: "May 1, 2026",  used: 6800, limit: 10000 },
-    { name: "Daily Request Quota", resetDate: "Apr 7, 2026",  used: 45,   limit: 100   },
-    { name: "Beep", resetDate: "May 1, 2026",  used: 6800, limit: 10000 },
-    { name: "Boop", resetDate: "Apr 7, 2026",  used: 45,   limit: 100   },
-    
-]
-
-
-// limit return amount by implementing argument in backend
-const QUOTA_USAGE = [
-    { time: "Apr 6, 2026 14:32", tokens: 1240, price: "$0.012" },
-    { time: "Apr 6, 2026 11:15", tokens:  870, price: "$0.008" },
-    { time: "Apr 5, 2026 19:48", tokens: 2100, price: "$0.021" },
-    { time: "Apr 5, 2026 10:03", tokens:  450, price: "$0.004" },
-    { time: "Apr 4, 2026 16:22", tokens:  980, price: "$0.010" },
-    { time: "Apr 6, 2026 14:32", tokens: 1240, price: "$0.012" },
-    { time: "Apr 6, 2026 11:15", tokens:  870, price: "$0.008" },
-    { time: "Apr 5, 2026 19:48", tokens: 2100, price: "$0.021" },
-    { time: "Apr 5, 2026 10:03", tokens:  450, price: "$0.004" },
-    { time: "Apr 4, 2026 16:22", tokens:  980, price: "$0.010" },
-    { time: "Apr 6, 2026 14:32", tokens: 1240, price: "$0.012" },
-    { time: "Apr 6, 2026 11:15", tokens:  870, price: "$0.008" },
-    { time: "Apr 5, 2026 19:48", tokens: 2100, price: "$0.021" },
-    { time: "Apr 5, 2026 10:03", tokens:  450, price: "$0.004" },
-    { time: "Apr 4, 2026 16:22", tokens:  980, price: "$0.010" },
-]
-
-const PERSONAL_USAGE = [
-    { time: "Apr 6, 2026 14:32", tokens: 340, price: "$0.003" },
-    { time: "Apr 6, 2026 11:15", tokens: 210, price: "$0.002" },
-    { time: "Apr 5, 2026 19:48", tokens: 590, price: "$0.006" },
-    { time: "Apr 5, 2026 10:03", tokens: 120, price: "$0.001" },
-]
-
-// --------------------------------------------------------
+import { useProject } from "../../context/ProjectContext"
+import { fetchUsageLogs } from "../../api/usageLogs/UsageLogs"
+import { useEffect, useState } from "react"
+import { useAuth } from "../../api/auth/AuthProvider"
+import { fetchQuotaInfos } from "../../api/management/quotas/Info"
 
 export default function Home()
 {
+    const { selectedProject } = useProject()
+    const [projectLogs, setProjectLogs] = useState([])
+    const [personalLogs, setPersonalLogs] = useState([])
+    const { user } = useAuth()
+    const [activeQuotas, setActiveQuotas] = useState([])
+
+    useEffect(() => {
+        let mounted = true
+        
+        if (!selectedProject) {
+            setProjectLogs([])
+            setPersonalLogs([])
+            setActiveQuotas([])
+            return
+        }
+
+        fetchUsageLogs(selectedProject.id, null, false, 50)
+            .then((data) => {
+                if(!mounted) return
+                setProjectLogs(data || [])
+            })
+            .catch((err) => {
+                console.error("Failed to load usage logs:", err)
+            })
+        fetchUsageLogs(selectedProject.id, user?.id, false, 50)
+            .then((data) => {
+                if(!mounted) return
+                setPersonalLogs(data || [])
+            })
+            .catch((err) => {
+                console.error("Failed to load personal usage logs:", err)
+            })
+        fetchQuotaInfos(selectedProject.id)
+            .then((data) => {
+                if(!mounted) return
+                setActiveQuotas(data || [])
+            })
+            .catch((err) => {
+                console.error("Failed to load active quotas:", err)
+            })
+
+        return () => { mounted = false }
+    }, [selectedProject])
+
     return (
         <div className="flex h-90 flex-col gap-4">
 
             {/* Top section: project name + active quotas */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                <h1 className="shrink-0 text-3xl font-bold text-white">Project Name</h1>
+                <h1 className="shrink-0 text-3xl font-bold text-white">{selectedProject?.name || "Project Name"}</h1>
                 <div className="flex max-h-70 flex-col gap-3 overflow-y-auto sm:w-96">
-                    {ACTIVE_QUOTAS.map((quota) => (
-                        <ActiveQuotaCard key={quota.name} {...quota} />
+                    {activeQuotas.map((quota) => (
+                        <ActiveQuotaCard key={quota.name} name={quota.name} resetDate={quota.next_reset} used={quota.allocated} limit={quota.limit_value} type={quota.limit_name} />
                     ))}
                 </div>
             </div>
 
             {/* Bottom section: quota usage + personal usage */}
             <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 md:grid-cols-2">
-                <UsageTable title="Quota Usage"           rows={QUOTA_USAGE}    />
-                <UsageTable title="Recent Personal Usage" rows={PERSONAL_USAGE} />
+                <UsageTable title="Project Usage"           rows={projectLogs}    />
+                <UsageTable title="Recent Personal Usage" rows={personalLogs} />
             </div>
 
         </div>

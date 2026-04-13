@@ -19,8 +19,26 @@ export default function ActiveQuotasTable({ title = "Active Quotas", rows = [] }
         return Object.keys(SORTABLE_COLUMNS)
     }, [])
 
+    const normalizedRows = useMemo(() => {
+        return rows.map((row) => {
+            const limitValue = Number(row.limit_value ?? 0)
+            const allocated = Number(row.allocated ?? 0)
+            const percentage = limitValue > 0 ? (allocated / limitValue) * 100 : 0
+
+            return {
+                id: row.id,
+                name: row.name ?? "Unnamed quota",
+                limit_type: row.limit_name ?? row.limit_type ?? "",
+                limit_value: row.limit_value,
+                allocated: row.allocated,
+                percentage,
+                reset_date: row.next_reset ?? row.reset_date ?? null,
+            }
+        })
+    }, [rows])
+
     const sortedRows = useMemo(() => {
-        const copy = [...rows]
+        const copy = [...normalizedRows]
 
         copy.sort((a, b) => {
             const aVal = a[sortBy]
@@ -47,7 +65,7 @@ export default function ActiveQuotasTable({ title = "Active Quotas", rows = [] }
         })
 
         return copy
-    }, [rows, sortBy, sortDirection])
+    }, [normalizedRows, sortBy, sortDirection])
 
     function handleSort(column) {
         if (sortBy === column) {
@@ -134,7 +152,7 @@ export default function ActiveQuotasTable({ title = "Active Quotas", rows = [] }
                                             </div>
                                         </td>
                                         <td className="max-w-0 truncate px-4 py-3 text-gray-300" title={row.reset_date}>
-                                            {row.reset_date}
+                                            {row.reset_date ? new Date(row.reset_date).toLocaleString() : "N/A"}
                                         </td>
                                     </tr>
                                 )

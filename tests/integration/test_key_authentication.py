@@ -22,7 +22,7 @@ def test_key_authentication(completions_url: str, expired_api_key: str, completi
     headers = {"Authorization": "Bearer TooLongKeyTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"}
     resp = requests.post(url, headers=headers, json=request_data)
 
-    assert resp.status_code == 401
+    assert resp.status_code == 403
     response = resp.json()
     assert response["detail"] == "API key fingerprint invalid or not in allowed keys."
     time.sleep(0.5)
@@ -31,7 +31,7 @@ def test_key_authentication(completions_url: str, expired_api_key: str, completi
     headers = {"Authorization": "Bearer InvalidKeyTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"}
     resp = requests.post(url, headers=headers, json=request_data)
 
-    assert resp.status_code == 401
+    assert resp.status_code == 403
     response = resp.json()
     assert response["detail"] == "API key fingerprint invalid or not in allowed keys."
     time.sleep(0.5)
@@ -49,6 +49,6 @@ def test_key_authentication(completions_url: str, expired_api_key: str, completi
     headers = {"Authorization": "Bearer TTcj1lxYOY9dInvalidWithMatchingFingerprintTTTTTTTTTTTTTTTTTTTTTT"}
     resp = requests.post(url, headers=headers, json=request_data)
 
-    assert resp.status_code == 401
+    assert resp.status_code == 403
     response = resp.json()
     assert response["detail"] == "Invalid API key."

@@ -31,30 +31,31 @@ async def db_limit_check_and_allocation(api_key: APIKey, estimated_tokens: int, 
         elif strictest_price_quota and new_allocated_price > strictest_price_quota.limit_value:
             return False
         else:
-            await db_limit_change(api_key, update_req_count=True, change_by_tokens=estimated_tokens, change_by_price=estimated_price, session=session)
+            await db_limit_change(api_key, request_delta=1, change_by_tokens=estimated_tokens, change_by_price=estimated_price, session=session)
             return True
 
-async def db_limit_change(api_key: APIKey, update_req_count: bool = False, change_by_tokens: int = 0, change_by_price: int = 0, session = None):
+async def db_limit_change(api_key: APIKey, request_delta: int = 0, change_by_tokens: int = 0, change_by_price: int = 0, session = None):
     # Check if a session was provided, if not, create a new transactional session
     if session is None:
         async with get_transactional_session() as session:
-            await db_limit_change(api_key, update_req_count, change_by_tokens, change_by_price, session=session)
+            await db_limit_change(api_key, request_delta, change_by_tokens, change_by_price, session=session)
             return
-
-    request_delta = (change_by_tokens > 0) - (change_by_tokens < 0)
 
     request_quotas, token_quotas, price_quotas = await db_get_quotas_by_key(api_key, session=session)
 
-    if update_req_count:
+    if request_delta:
         for r_quota in request_quotas:
             if r_quota.limit_value is not None:
                 r_quota.allocated = min(max(r_quota.allocated + request_delta, 0), r_quota.limit_value)
+                print(f"Updated request quota {r_quota.id}: allocated {r_quota.allocated}/{r_quota.limit_value}")
     for t_quota in token_quotas:
         if t_quota.limit_value is not None:
             t_quota.allocated = min(max(t_quota.allocated + change_by_tokens, 0), t_quota.limit_value)
+            print(f"Updated token quota {t_quota.id}: allocated {t_quota.allocated}/{t_quota.limit_value}")
     for p_quota in price_quotas:
         if p_quota.limit_value is not None:
             p_quota.allocated = min(max(p_quota.allocated + change_by_price, 0), p_quota.limit_value)
+            print(f"Updated price quota {p_quota.id}: allocated {p_quota.allocated}/{p_quota.limit_value}")
 
 # Returns a tuple of the different quota types (request, token, price) for a given key.
 async def db_get_quotas_by_key(api_key: APIKey, session = None) -> Tuple[list[Quota], list[Quota], list[Quota]]:
@@ -83,9 +84,25 @@ async def db_get_quotas_by_key(api_key: APIKey, session = None) -> Tuple[list[Qu
 def _quota_filter(api_key: APIKey):
     return and_(
         or_(
-            Quota.key_id == api_key.id,
-            Quota.project_id == api_key.project_id,
-            Quota.user_id == api_key.user_id,
+            and_(
+                Quota.key_id == api_key.id,
+                or_(
+                    Quota.project_id == api_key.project_id,
+                    Quota.project_id.is_(None)
+                )
+            ),
+            and_(
+                Quota.project_id == api_key.project_id,
+                Quota.user_id.is_(None),
+                Quota.key_id.is_(None)
+            ),
+            and_(
+                Quota.user_id == api_key.user_id,
+                or_(
+                    Quota.project_id == api_key.project_id,
+                    Quota.project_id.is_(None)
+                )
+            ),
             and_(
                 Quota.key_id.is_(None),
                 Quota.project_id.is_(None),

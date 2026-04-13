@@ -21,4 +21,4 @@ class UpstreamClient:
         if self._client is None:
             raise RuntimeError("Upstream client not initialized.")
 
-        return await self._client.chat.completions.create(**payload, stream_options={"include_usage": True} if payload.get("stream", True) else None)
+        return await self._client.chat.completions.create(**payload, stream_options={"include_usage": True} if payload.get("stream", False) else None)
