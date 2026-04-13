@@ -112,6 +112,7 @@ compose:
       
       TARGET_URL=$TARGET_URL
       TARGET_KEY=$TARGET_KEY
+      ADMINISTRATOR_PASSWORD=$ADMINISTRATOR_PASSWORD
       ENV
 
     - |
@@ -223,6 +224,7 @@ integration:
       
       TARGET_URL=$TARGET_URL
       TARGET_KEY=$TARGET_KEY
+      ADMINISTRATOR_PASSWORD=$ADMINISTRATOR_PASSWORD
       ENV
 
     - apk add --no-cache docker docker-compose curl
