@@ -201,7 +201,7 @@ compose:
 integration:
   stage: tests
   image:
-    name: docker:24.0.9
+    name: python:3.12.12-alpine
   services:
     - docker:24.0.9-dind
   tags:
@@ -224,7 +224,7 @@ integration:
       TARGET_KEY=$TARGET_KEY
       ENV
 
-    - apk add --no-cache python3 py3-pip curl
+    - apk add --no-cache docker docker-compose curl
     - python -m venv .venv
     - . .venv/bin/activate
     - pip install -r tests/requirements.txt & PIP_PID=$!
