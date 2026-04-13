@@ -287,6 +287,20 @@ integration:
         exit 1
       fi
 
+    - |
+      # Debug: dump init-db logs, inspect init-db env, and verify seeded API keys
+      docker-compose -f docker-compose.yml -f tests/docker-compose.test.yml logs init-db --tail=500 || true
+
+      INIT_ID=$(docker-compose -f docker-compose.yml -f tests/docker-compose.test.yml ps -q init-db) || true
+      if [ -n "$INIT_ID" ]; then
+        docker inspect -f '{{range $k,$v := .Config.Env}}{{println $v}}{{end}}' "$INIT_ID" \
+          | grep -E 'CREATE_MOCK_DATA|DATABASE_URL|POSTGRES_USER' || true
+      fi
+
+      # Verify DB contains API keys (prints table rows)
+      docker-compose -f docker-compose.yml -f tests/docker-compose.test.yml exec -T db \
+        psql -U "$POSTGRES_USER" -d postgres -c "select fingerprint, status from api_keys order by id desc limit 20;" || true
+
     - sleep 5
 
     - wait $PIP_PID
