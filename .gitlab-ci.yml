@@ -237,6 +237,22 @@ integration:
     - docker-compose -f docker-compose.yml -f tests/docker-compose.test.yml up -d --no-build
 
     - |
+      # Wait for init-db to bootstrap db, verify success
+      INIT_ID=$(docker-compose -f docker-compose.yml -f tests/docker-compose.test.yml ps -q init-db) || true
+      if [ -n "$INIT_ID" ]; then
+        timeout=300; elapsed=0
+        while [ "$(docker inspect -f '{{.State.Running}}' "$INIT_ID")" = "true" ] && [ $elapsed -lt $timeout ]; do
+          sleep 1; elapsed=$((elapsed+1))
+        done
+        EXIT_CODE=$(docker inspect -f '{{.State.ExitCode}}' "$INIT_ID")
+        if [ "$EXIT_CODE" -ne 0 ]; then
+          docker-compose -f docker-compose.yml -f tests/docker-compose.test.yml logs init-db --tail=300
+          docker-compose -f docker-compose.yml -f tests/docker-compose.test.yml down -v
+          exit $EXIT_CODE
+        fi
+      fi
+
+    - |
       # Wait for gateway to be healthy
       SERVICE=gateway
       ID=$(docker-compose -f docker-compose.yml -f tests/docker-compose.test.yml ps -q "$SERVICE") || true
