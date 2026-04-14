@@ -49,7 +49,7 @@ export default function Usage() {
         .catch((err) => {
             console.error("Failed to load usage logs:", err)
         })
-        fetchQuotaInfos(null, user?.id)
+        fetchQuotaInfos(null, user?.id, null, true, true)
         .then((data) => {
             if (!mounted) return
             setActiveQuotas(data)
