@@ -33,18 +33,18 @@ export default function DeleteProjectForm() {
     }
 
     return (
-        <form autoComplete="off" onSubmit={handleSubmit}>
+        <form autoComplete="off" className="w-full max-w-md" onSubmit={handleSubmit}>
             <div className="space-y-12">
                 <div className="pb-5">
                     <h2 className="text-base/7 font-semibold text-white">Delete Project</h2>
                     <p className="mt-1 text-sm/6 text-gray-400">
                         Deleting a project removes its settings, quotas, keys, and users from the dashboard.
                     </p>
-                    <div className="mt-3">
+                    <div className="mt-3 space-y-8">
                         <AlertBox message={projectError} variant="error" className="mt-0" />
                         <AlertBox message={projectSuccess} variant="success" className="mt-0" />
                     </div>
-                    <div className="mt-6 flex items-center gap-4">
+                    <div className="pt-6 flex items-center gap-4">
                         <button
                             type="submit"
                             disabled={!selectedProject?.id}

@@ -48,7 +48,7 @@ export default function CreateProjectForm({ onSubmit, error = "", success = "", 
     }
 
     return (
-        <form autoComplete="off" onSubmit={handleSubmit}>
+        <form autoComplete="off" className="w-full max-w-md" onSubmit={handleSubmit}>
             <div className="space-y-12">
                 <div className="pb-5">
                     <h2 className="text-base/7 font-semibold text-white">Create New Project</h2>
@@ -96,7 +96,7 @@ export default function CreateProjectForm({ onSubmit, error = "", success = "", 
                         </div>
 
                     </div>
-                    <div className="sm:col-span-4 pt-6">
+                    <div className="pt-6">
                         <button
                             type="submit"
                             disabled={loading}

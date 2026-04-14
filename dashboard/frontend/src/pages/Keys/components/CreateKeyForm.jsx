@@ -51,7 +51,7 @@ export default function CreateKeyForm({ onCreated }) {
 
     return (
         <>
-            <form autoComplete="off" onSubmit={handleSubmit}>
+            <form autoComplete="off" className="w-full max-w-md" onSubmit={handleSubmit}>
                 <div className="space-y-12">
                     <div className="pb-5">
                         <h2 className="text-base/7 font-semibold text-white">Create New API Key</h2>
@@ -82,7 +82,7 @@ export default function CreateKeyForm({ onCreated }) {
                                 </div>
                             </div>
                         </div>
-                        <div className="sm:col-span-4 pt-6">
+                        <div className="pt-6">
                             <button
                                 type="submit"
                                 disabled={loading}
