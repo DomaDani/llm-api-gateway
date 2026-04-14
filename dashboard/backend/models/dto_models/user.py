@@ -10,6 +10,8 @@ class UserDisplayInformation(BaseModel):
     joined_date: datetime
     last_login: datetime | None = None
     password_expires_at: datetime | None = None
+    is_admin: bool = False
+    is_project_manager: bool = False
 
 class UserRegistrationRequest(BaseModel):
     email: EmailStr
