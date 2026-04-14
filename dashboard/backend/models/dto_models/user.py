@@ -25,9 +25,11 @@ class UserIdentityChangeRequest(BaseModel):
     username: str
 
 class UserPasswordChangeRequest(BaseModel):
-    current_password: str
+    current_password: str | None = None
+    user_id: int | None = None
     new_password: str
     new_password_confirm: str
+    mandate_reset: bool | None = False
 
 class UserInformationRequest(BaseModel):
     project_id: int | None = None

@@ -22,7 +22,7 @@ async def change_user_identity(user_id: int, new_email: str, new_username: str) 
 
         return user
     
-async def change_user_password(user_id: int, new_password_hash: str) -> User:
+async def change_user_password(user_id: int, new_password_hash: str, mandate_reset: bool = False) -> User:
     async with get_transactional_session() as session:
         result = await session.execute(select(User).where(User.id == user_id).with_for_update())
         user = result.scalars().first()
@@ -31,7 +31,7 @@ async def change_user_password(user_id: int, new_password_hash: str) -> User:
             raise ValueError("User not found.")
 
         user.password_hash = new_password_hash
-        user.password_expires_at = None
+        user.password_expires_at = datetime.now(timezone.utc) if mandate_reset else None
 
         return user
     

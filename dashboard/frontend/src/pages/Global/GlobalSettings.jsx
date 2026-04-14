@@ -1,6 +1,7 @@
 import CreateQuotaForm from "../../components/blocks/CreateQuotaForm"
 import UsersTable from "../../components/blocks/UsersTable"
 import CreateUserForm from "./components/CreateUserForm"
+import SetUserPasswordForm from "./components/SetUserPasswordForm"
 import CreateProjectForm from "./components/CreateProjectForm"
 import QuotasTable from "../../components/blocks/QuotasTable"
 import { useEffect, useState} from "react"
@@ -79,6 +80,9 @@ export default function GlobalSettings() {
                 <h1 className="shrink-0 text-3xl font-bold text-white">Global Settings</h1>
                 <div className="border-b border-white/10">
                     <CreateUserForm />
+                </div>
+                <div className="border-b border-white/10">
+                    <SetUserPasswordForm />
                 </div>
                 <div className="border-b border-white/10">
                     <CreateProjectForm
