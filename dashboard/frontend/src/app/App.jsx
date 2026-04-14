@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Sidebar from '../components/blocks/Sidebar';
 import { AuthProvider } from '../api/auth/AuthProvider';
 import ProtectedRoute from '../components/shared/ProtectedRoute';
+import RequirePermissions from '../components/shared/RequirePermissions';
 
 import Login from '../pages/Login/Login';
 import Home from '../pages/Home/Home'
@@ -20,8 +21,17 @@ function App() {
 
           <Route element={<ProtectedRoute />}>
             <Route path="/home" element={<Sidebar><Home /></Sidebar>} />
-            <Route path="/global"  element={<Sidebar><GlobalSettings /></Sidebar>} />
-            <Route path="/project"  element={<Sidebar><ProjectSetings /></Sidebar>} />
+
+            <Route path="/global"  element={
+              <RequirePermissions requirements={(u) => u?.is_admin}>
+                <Sidebar><GlobalSettings /></Sidebar>
+              </RequirePermissions>
+              } />
+            <Route path="/project"  element={
+              <RequirePermissions requirements={(u, p) => p && (u?.is_admin || u?.is_project_manager)}>
+                <Sidebar><ProjectSetings /></Sidebar>
+              </RequirePermissions>
+            } />
             <Route path="/keys"   element={<Sidebar><ApiKeys /></Sidebar>} />
             {/* <Route path="/statistics"   element={<Sidebar></Sidebar>} /> */}
             <Route path="/usage"   element={<Sidebar><Usage /></Sidebar>} />

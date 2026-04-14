@@ -21,7 +21,7 @@ def create_access_token(data: AccessTokenInfo):
 
     return encoded_jwt
 
-async def get_user_from_token(token: str) -> UserDisplayInformation | None:
+async def get_user_from_token(token: str, project_id: int | None = None) -> UserDisplayInformation | None:
     try:
         payload = jwt.decode(token, LOGIN_SECRET_KEY, algorithms=[TOKEN_ENCODING_ALGORITHM])
         user_id: int = payload.get("user_id")
@@ -33,7 +33,7 @@ async def get_user_from_token(token: str) -> UserDisplayInformation | None:
         if user_record is None:
             return None
         
-        return await convert_orm_to_display_info(user_record)
+        return await convert_orm_to_display_info(user_record, project_id=project_id)
 
     except JWTError:
         return None

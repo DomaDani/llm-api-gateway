@@ -1,6 +1,7 @@
 import CreateQuotaForm from "../../components/blocks/CreateQuotaForm"
 import UsersTable from "../../components/blocks/UsersTable"
 import CreateUserForm from "./components/CreateUserForm"
+import SetUserPasswordForm from "./components/SetUserPasswordForm"
 import CreateProjectForm from "./components/CreateProjectForm"
 import QuotasTable from "../../components/blocks/QuotasTable"
 import { useEffect, useState} from "react"
@@ -11,6 +12,8 @@ import useQuotaDeletion from "../../hooks/useQuotaDeletion"
 import useUserDeletion from "../../hooks/useUserDeletion"
 import useProjectCreation from "../../hooks/useProjectCreation"
 import useQuotaCreation from "../../hooks/useQuotaCreation"
+import { useAuth } from "../../api/auth/AuthProvider"
+import { useNavigate } from "react-router-dom"
 
 function mapUserRow(user) {
     return {
@@ -23,6 +26,16 @@ function mapUserRow(user) {
 }
 
 export default function GlobalSettings() {
+    const { user } = useAuth()
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        if (user === null) return
+        if (!user?.is_admin) {
+            navigate('/home', { replace: true })
+        }
+    }, [user, navigate])
+
     const [quotas, setQuotas] = useState([])
     const [users, setUsers] = useState([])
     const { quotaError, quotaSuccess, quotaReloadKey, handleDeleteQuota } = useQuotaDeletion({ quotas, setQuotas })
@@ -67,6 +80,9 @@ export default function GlobalSettings() {
                 <h1 className="shrink-0 text-3xl font-bold text-white">Global Settings</h1>
                 <div className="border-b border-white/10">
                     <CreateUserForm />
+                </div>
+                <div className="border-b border-white/10">
+                    <SetUserPasswordForm />
                 </div>
                 <div className="border-b border-white/10">
                     <CreateProjectForm

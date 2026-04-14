@@ -38,7 +38,7 @@ export default function LoginForm() {
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="w-full max-w-md space-y-6">
 
             <AlertBox message={error} variant="error" className="mt-0" />
 

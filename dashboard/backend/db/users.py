@@ -22,7 +22,7 @@ async def change_user_identity(user_id: int, new_email: str, new_username: str) 
 
         return user
     
-async def change_user_password(user_id: int, new_password_hash: str) -> User:
+async def change_user_password(user_id: int, new_password_hash: str, mandate_reset: bool = False) -> User:
     async with get_transactional_session() as session:
         result = await session.execute(select(User).where(User.id == user_id).with_for_update())
         user = result.scalars().first()
@@ -31,7 +31,7 @@ async def change_user_password(user_id: int, new_password_hash: str) -> User:
             raise ValueError("User not found.")
 
         user.password_hash = new_password_hash
-        user.password_expires_at = None
+        user.password_expires_at = datetime.now(timezone.utc) if mandate_reset else None
 
         return user
     
@@ -93,3 +93,16 @@ async def get_all_users(session = None) -> list[User]:
 
     result = await session.execute(select(User).order_by(User.username))
     return result.scalars().all()
+
+async def is_password_expired(user_id: int, session = None) -> bool:
+    if session is None:
+        async with get_session() as session:
+            return await is_password_expired(user_id=user_id, session=session)
+
+    result = await session.execute(select(User.password_expires_at).where(User.id == user_id))
+    expires_at = result.scalar_one_or_none()
+
+    if expires_at is None:
+        return False
+
+    return expires_at < datetime.now(timezone.utc)

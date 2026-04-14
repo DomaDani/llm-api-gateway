@@ -3,7 +3,7 @@ import Dropdown from "../primitives/Dropdown"
 import { fetchQuotaLimitTypes, fetchQuotaPeriods } from "../../api/management/quotas/Info"
 import { fetchUserInfos } from "../../api/management/user/Info"
 import { fetchKeyInfos } from "../../api/management/keys/Info"
-import { useProject } from "../../context/ProjectContext"
+import { useProject } from "../shared/ProjectContext"
 
 
 export default function CreateQuotaForm({
@@ -127,7 +127,7 @@ export default function CreateQuotaForm({
     }, [isGlobal, selectedProject])
 
     return (
-        <form autoComplete="off" onSubmit={handleSubmit}>
+        <form autoComplete="off" className="w-full max-w-md" onSubmit={handleSubmit}>
             <div className="space-y-12">
                 <div className="pb-5">
                     <h2 className="text-base/7 font-semibold text-white">{title}</h2>
@@ -363,7 +363,7 @@ export default function CreateQuotaForm({
                         )}
                     </div>
 
-                    <div className="sm:col-span-4 pt-6">
+                    <div className="pt-6">
                         <button
                             type="submit"
                             className="cursor-pointer rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"

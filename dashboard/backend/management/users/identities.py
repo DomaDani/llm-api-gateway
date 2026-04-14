@@ -1,5 +1,6 @@
 from fastapi import HTTPException
 
+from dashboard.backend.db.users import is_password_expired
 from shared.models import User
 from dashboard.backend.models import UserDisplayInformation
 from dashboard.backend.db import user_email_free, user_username_free, get_user_permissions_for_project, is_user_administrator, is_user_project_manager, get_user_by_id
@@ -33,7 +34,10 @@ async def convert_orm_to_display_info(user_orm: User, include_role: bool = False
         joined_date=user_orm.joined_date,
         last_login=user_orm.last_login,
         password_expires_at=user_orm.password_expires_at,
-        role=role if include_role else None
+        role=role if include_role else None,
+        is_admin=await is_user_administrator(user_orm.id),
+        is_project_manager=await is_user_project_manager(user_orm.id, project_id) if project_id is not None else False,
+        is_password_expired=await is_password_expired(user_orm.id)
     )
 
 async def enforce_existing_user(user_id: int) -> User:

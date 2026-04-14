@@ -2,12 +2,12 @@ import { createContext, useState, useContext, useEffect, useCallback } from "rea
 import api from '../axios'
 import { useNavigate } from "react-router-dom";
 import { getTokenExpiryMs, isTokenExpired } from './token'
-import { useProject } from "../../context/ProjectContext";
+import { useProject } from "../../components/shared/ProjectContext";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const { clearSelectedProject } = useProject()
+    const { selectedProject, clearSelectedProject } = useProject()
 
     const [token, setToken] = useState(() => {
         const storedToken = localStorage.getItem('token')
@@ -33,14 +33,15 @@ export const AuthProvider = ({ children }) => {
 
     const fetchMe = useCallback(async () => {
         try {
-            const response = await api.get('/users/me');
+            const params = selectedProject ? { project_id: selectedProject.id } : {}
+            const response = await api.get('/users/me', { params });
             setUser(response.data);
         } catch (error) {
             logout();
         } finally {
             setLoading(false);
         }
-    }, [logout]);
+    }, [logout, selectedProject]);
 
     useEffect(() => {
         if(token) {

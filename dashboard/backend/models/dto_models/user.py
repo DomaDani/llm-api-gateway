@@ -10,6 +10,9 @@ class UserDisplayInformation(BaseModel):
     joined_date: datetime
     last_login: datetime | None = None
     password_expires_at: datetime | None = None
+    is_admin: bool = False
+    is_project_manager: bool = False
+    is_password_expired: bool = False
 
 class UserRegistrationRequest(BaseModel):
     email: EmailStr
@@ -22,9 +25,11 @@ class UserIdentityChangeRequest(BaseModel):
     username: str
 
 class UserPasswordChangeRequest(BaseModel):
-    current_password: str
+    current_password: str | None = None
+    user_id: int | None = None
     new_password: str
     new_password_confirm: str
+    mandate_reset: bool | None = False
 
 class UserInformationRequest(BaseModel):
     project_id: int | None = None

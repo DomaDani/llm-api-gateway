@@ -5,12 +5,12 @@ import { NavLink } from "react-router-dom"
 import { useAuth } from "../../api/auth/AuthProvider"
 import Dropdown from "../primitives/Dropdown"
 import { fetchProjectInfosForUser } from "../../api/management/project/Info"
-import { useProject } from "../../context/ProjectContext"
+import { useProject } from "../shared/ProjectContext"
 
 export default function Sidebar({ children })
 {
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
-    const { logout } = useAuth()
+    const { logout, user } = useAuth()
     const { selectedProject, selectProject } = useProject()
     const [projects, setProjects] = useState([])
 
@@ -70,33 +70,37 @@ export default function Sidebar({ children })
                         Home
                     </NavLink>
 
-                    <NavLink
-                        to="/global"
-                        className={({ isActive }) =>
-                            `mt-1 flex items-center rounded-md px-4 py-2 text-sm font-medium transition-colors ${
-                                isActive
-                                    ? "bg-indigo-500/20 text-white"
-                                    : "text-gray-400 hover:bg-white/5 hover:text-white"
-                            }`
-                        }
-                        onClick={() => setIsMobileSidebarOpen(false)}
-                    >
-                        Global Settings
-                    </NavLink>
+                    {user?.is_admin && (
+                        <NavLink
+                            to="/global"
+                            className={({ isActive }) =>
+                                `mt-1 flex items-center rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+                                    isActive
+                                        ? "bg-indigo-500/20 text-white"
+                                        : "text-gray-400 hover:bg-white/5 hover:text-white"
+                                }`
+                            }
+                            onClick={() => setIsMobileSidebarOpen(false)}
+                        >
+                            Global Settings
+                        </NavLink>
+                    )}
 
-                    <NavLink
-                        to="/project"
-                        className={({ isActive }) =>
-                            `mt-1 flex items-center rounded-md px-4 py-2 text-sm font-medium transition-colors ${
-                                isActive
-                                    ? "bg-indigo-500/20 text-white"
-                                    : "text-gray-400 hover:bg-white/5 hover:text-white"
-                            }`
-                        }
-                        onClick={() => setIsMobileSidebarOpen(false)}
-                    >
-                        Project settings
-                    </NavLink>
+                    {selectedProject && (user?.is_admin || user?.is_project_manager) && (
+                        <NavLink
+                            to="/project"
+                            className={({ isActive }) =>
+                                `mt-1 flex items-center rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+                                    isActive
+                                        ? "bg-indigo-500/20 text-white"
+                                        : "text-gray-400 hover:bg-white/5 hover:text-white"
+                                }`
+                            }
+                            onClick={() => setIsMobileSidebarOpen(false)}
+                        >
+                            Project settings
+                        </NavLink>
+                    )}
 
                     <NavLink
                         to="/keys"
