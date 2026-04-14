@@ -6,7 +6,7 @@ export async function registerUser({ username, email, password, mandateReset }) 
 			username,
 			email,
 			password,
-            mandateReset
+			mandate_reset: mandateReset
 		})
 
 		return response.data?.message || 'User created successfully.'
