@@ -26,7 +26,7 @@ async def refresh_quotas_by_batch(session=None, batch_size: int = 100):
             break
         for q in rows:
             q.allocated = 0
-            q.next_reset = calculate_date_after_period(q.period, q.next_reset)
+            q.next_reset = calculate_date_after_period(q.period, q.next_reset, fast_forward=True)
             total += 1
 
     return total
