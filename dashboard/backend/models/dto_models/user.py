@@ -12,6 +12,7 @@ class UserDisplayInformation(BaseModel):
     password_expires_at: datetime | None = None
     is_admin: bool = False
     is_project_manager: bool = False
+    is_password_expired: bool = False
 
 class UserRegistrationRequest(BaseModel):
     email: EmailStr
