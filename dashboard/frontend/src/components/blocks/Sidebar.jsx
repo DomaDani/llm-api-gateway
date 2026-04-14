@@ -86,7 +86,7 @@ export default function Sidebar({ children })
                         </NavLink>
                     )}
 
-                    {selectedProject && user?.is_project_manager && (
+                    {selectedProject && (user?.is_admin || user?.is_project_manager) && (
                         <NavLink
                             to="/project"
                             className={({ isActive }) =>

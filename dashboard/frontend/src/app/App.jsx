@@ -28,7 +28,7 @@ function App() {
               </RequirePermissions>
               } />
             <Route path="/project"  element={
-              <RequirePermissions requirements={(u, p) => u?.is_admin || (p && u?.is_project_manager)}>
+              <RequirePermissions requirements={(u, p) => p && (u?.is_admin || u?.is_project_manager)}>
                 <Sidebar><ProjectSetings /></Sidebar>
               </RequirePermissions>
             } />
