@@ -5,7 +5,7 @@ import CreateQuotaForm from "../../components/blocks/CreateQuotaForm"
 import AddUserForm from "./components/AddUserForm"
 import DeleteProjectForm from "./components/DeleteProjectForm"
 import { useEffect, useState } from "react"
-import { useProject } from "../../context/ProjectContext"
+import { useProject } from "../../components/shared/ProjectContext"
 import { fetchQuotaInfos } from "../../api/management/quotas/Info"
 import { fetchKeyInfos } from "../../api/management/keys/Info"
 import { fetchUserInfos } from "../../api/management/user/Info"
@@ -15,6 +15,8 @@ import useApiKeyDeletion from "../../hooks/useApiKeyDeletion"
 import useProjectUserRemoval from "../../hooks/useProjectUserRemoval"
 import useProjectUserAddition from "../../hooks/useProjectUserAddition"
 import useQuotaCreation from "../../hooks/useQuotaCreation"
+import { useAuth } from "../../api/auth/AuthProvider"
+import { useNavigate } from "react-router-dom"
 
 function mapUserRow(user) {
     return {
@@ -28,6 +30,16 @@ function mapUserRow(user) {
 
 export default function ProjectSetings() {
     const { selectedProject } = useProject()
+    const { user } = useAuth()
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        if (user === null) return
+        const allowed = user?.is_admin || user?.is_project_manager
+        if (!allowed) {
+            navigate('/home', { replace: true })
+        }
+    }, [user, navigate])
     const [quotas, setQuotas] = useState([])
     const [apiKeys, setApiKeys] = useState([])
     const [projectUsers, setProjectUsers] = useState([])

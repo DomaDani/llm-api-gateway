@@ -1,6 +1,6 @@
 import ActiveQuotaCard from "./components/ActiveQuotaCard"
 import UsageTable from "../../components/blocks/UsageTable"
-import { useProject } from "../../context/ProjectContext"
+import { useProject } from "../../components/shared/ProjectContext"
 import { fetchUsageLogs } from "../../api/usageLogs/UsageLogs"
 import { useEffect, useState } from "react"
 import { useAuth } from "../../api/auth/AuthProvider"

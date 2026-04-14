@@ -3,7 +3,7 @@ import Dropdown from "../primitives/Dropdown"
 import { fetchQuotaLimitTypes, fetchQuotaPeriods } from "../../api/management/quotas/Info"
 import { fetchUserInfos } from "../../api/management/user/Info"
 import { fetchKeyInfos } from "../../api/management/keys/Info"
-import { useProject } from "../../context/ProjectContext"
+import { useProject } from "../shared/ProjectContext"
 
 
 export default function CreateQuotaForm({

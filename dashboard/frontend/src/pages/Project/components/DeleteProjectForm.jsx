@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom"
 
 import AlertBox from "../../../components/primitives/AlertBox"
-import { useProject } from "../../../context/ProjectContext"
+import { useProject } from "../../../components/shared/ProjectContext"
 import useProjectDeletion from "../../../hooks/useProjectDeletion"
 
 export default function DeleteProjectForm() {

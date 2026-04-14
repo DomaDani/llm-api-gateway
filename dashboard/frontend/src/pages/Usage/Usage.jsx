@@ -3,7 +3,7 @@ import UsageRecordsTable from "./components/UsageRecordsTable"
 import { useEffect, useState } from "react"
 import { fetchUsageLogs } from "../../api/usageLogs/UsageLogs"
 import { useAuth } from "../../api/auth/AuthProvider"
-import { useProject } from "../../context/ProjectContext"
+import { useProject } from "../../components/shared/ProjectContext"
 import { fetchQuotaInfos } from "../../api/management/quotas/Info"
 
 export default function Usage() {

@@ -2,7 +2,7 @@ import { createContext, useState, useContext, useEffect, useCallback } from "rea
 import api from '../axios'
 import { useNavigate } from "react-router-dom";
 import { getTokenExpiryMs, isTokenExpired } from './token'
-import { useProject } from "../../context/ProjectContext";
+import { useProject } from "../../components/shared/ProjectContext";
 
 const AuthContext = createContext();
 

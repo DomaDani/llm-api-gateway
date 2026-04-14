@@ -11,6 +11,8 @@ import useQuotaDeletion from "../../hooks/useQuotaDeletion"
 import useUserDeletion from "../../hooks/useUserDeletion"
 import useProjectCreation from "../../hooks/useProjectCreation"
 import useQuotaCreation from "../../hooks/useQuotaCreation"
+import { useAuth } from "../../api/auth/AuthProvider"
+import { useNavigate } from "react-router-dom"
 
 function mapUserRow(user) {
     return {
@@ -23,6 +25,16 @@ function mapUserRow(user) {
 }
 
 export default function GlobalSettings() {
+    const { user } = useAuth()
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        if (user === null) return
+        if (!user?.is_admin) {
+            navigate('/home', { replace: true })
+        }
+    }, [user, navigate])
+
     const [quotas, setQuotas] = useState([])
     const [users, setUsers] = useState([])
     const { quotaError, quotaSuccess, quotaReloadKey, handleDeleteQuota } = useQuotaDeletion({ quotas, setQuotas })

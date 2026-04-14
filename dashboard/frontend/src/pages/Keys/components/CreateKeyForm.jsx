@@ -2,7 +2,7 @@ import { useState } from "react"
 
 import { createApiKey } from "../../../api/management/keys/Create"
 import { useAuth } from "../../../api/auth/AuthProvider"
-import { useProject } from "../../../context/ProjectContext"
+import { useProject } from "../../../components/shared/ProjectContext"
 import AlertBox from "../../../components/primitives/AlertBox"
 import InfoBox from "../../../components/primitives/InfoBox"
 
