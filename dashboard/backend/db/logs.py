@@ -1,4 +1,4 @@
-from sqlalchemy import Integer, func, literal_column, select, Row
+from sqlalchemy import Row, func, literal_column, select
 
 from shared.db import get_session
 
@@ -10,6 +10,7 @@ async def get_usage_logs(
     project_id: int | None = None,
     aggregate_by_fifteen_minutes: bool = False,
     limit: int | None = None,
+    offset: int = 0,
     session = None
 ) -> list[UsageLog] | list[Row]:
 
@@ -20,6 +21,7 @@ async def get_usage_logs(
                 project_id=project_id,
                 aggregate_by_fifteen_minutes=aggregate_by_fifteen_minutes,
                 limit=limit,
+                offset=offset,
                 session=session
             )
 
@@ -40,12 +42,16 @@ async def get_usage_logs(
             .group_by(literal_column("time_chunk"), UsageLog.project_id, UsageLog.user_id, UsageLog.key_id)
             .order_by(literal_column("time_chunk").desc())
         )
+        if offset:
+            query = query.offset(offset)
         if limit is not None:
             query = query.limit(limit)
         result = await session.execute(query)
         return result.all()
     else:
         query = select(UsageLog).where(*filters).order_by(UsageLog.timestamp.desc())
+        if offset:
+            query = query.offset(offset)
         if limit is not None:
             query = query.limit(limit)
         result = await session.execute(query)

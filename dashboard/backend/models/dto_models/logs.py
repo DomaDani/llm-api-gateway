@@ -9,6 +9,7 @@ class UsageLogInformationRequest(BaseModel):
     user_id: int | None = None
     aggregate: bool = False
     limit: int | None = None
+    offset: int = 0
 
 
 class UsageLogDisplayInformation(BaseModel):

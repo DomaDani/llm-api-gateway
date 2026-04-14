@@ -1,4 +1,6 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
+
+import { fetchUsageLogs } from "../../../api/usageLogs/UsageLogs"
 
 const SORTABLE_COLUMNS = {
     user_name: "User",
@@ -14,12 +16,20 @@ const HIDDEN_ON_MOBILE = new Set(["user_name", "project_name", "fingerprint"])
 
 export default function UsageRecordsTable({
     title = "Usage Records",
-    rows = [],
     showUser = false,
     showProject = false,
+    projectId = null,
+    userId = null,
+    aggregate = true,
+    pageSize = 50,
+    enabled = true,
 }) {
     const [sortBy, setSortBy] = useState("timestamp")
     const [sortDirection, setSortDirection] = useState("desc")
+    const [rows, setRows] = useState([])
+    const [page, setPage] = useState(0)
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState("")
 
     const visibleColumns = useMemo(() => {
         return Object.keys(SORTABLE_COLUMNS).filter((column) => {
@@ -28,6 +38,47 @@ export default function UsageRecordsTable({
             return true
         })
     }, [showUser, showProject])
+
+    useEffect(() => {
+        if (!enabled) {
+            setPage(0)
+        }
+    }, [enabled, projectId, userId, aggregate, pageSize])
+
+    useEffect(() => {
+        let mounted = true
+
+        if (!enabled) {
+            setRows([])
+            setLoading(false)
+            setError("")
+            return () => {
+                mounted = false
+            }
+        }
+
+        setLoading(true)
+        setError("")
+        setRows([])
+
+        fetchUsageLogs(projectId, userId, aggregate, pageSize, page * pageSize)
+            .then((data) => {
+                if (!mounted) return
+                setRows(Array.isArray(data) ? data : [])
+            })
+            .catch((err) => {
+                if (!mounted) return
+                setError(err.message || "Failed to load usage logs.")
+            })
+            .finally(() => {
+                if (!mounted) return
+                setLoading(false)
+            })
+
+        return () => {
+            mounted = false
+        }
+    }, [enabled, projectId, userId, aggregate, pageSize, page])
 
     const sortedRows = useMemo(() => {
         const copy = [...rows]
@@ -75,6 +126,10 @@ export default function UsageRecordsTable({
     }
 
     const columnCount = visibleColumns.length
+    const requestStart = rows.length > 0 ? page * pageSize + 1 : 0
+    const requestEnd = page * pageSize + rows.length
+    const canGoPrevious = enabled && page > 0 && !loading
+    const canGoNext = enabled && !loading && rows.length === pageSize
 
     return (
         <div className="flex min-w-0 flex-col rounded-md bg-white/5 outline outline-1 outline-white/10">
@@ -109,7 +164,19 @@ export default function UsageRecordsTable({
                     </thead>
 
                     <tbody className="divide-y divide-white/5">
-                        {sortedRows.length > 0 ? (
+                        {error ? (
+                            <tr>
+                                <td colSpan={columnCount} className="px-4 py-6 text-center text-red-300">
+                                    {error}
+                                </td>
+                            </tr>
+                        ) : loading && sortedRows.length === 0 ? (
+                            <tr>
+                                <td colSpan={columnCount} className="px-4 py-6 text-center text-gray-500">
+                                    Loading usage records...
+                                </td>
+                            </tr>
+                        ) : sortedRows.length > 0 ? (
                             sortedRows.map((row) => {
                                 const key = row.id || `${row.timestamp}-${row.fingerprint}`
 
@@ -200,6 +267,36 @@ export default function UsageRecordsTable({
                         )}
                     </tbody>
                 </table>
+            </div>
+
+            <div className="flex flex-col gap-3 border-t border-white/10 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-sm text-gray-400">
+                    {!enabled
+                        ? "Select a project to view requests"
+                        : rows.length > 0
+                            ? `Showing requests ${requestStart}-${requestEnd}`
+                            : loading
+                                ? "Loading requests..."
+                                : "No requests to show"}
+                </p>
+                <div className="flex gap-3">
+                    <button
+                        type="button"
+                        disabled={!canGoPrevious}
+                        onClick={() => setPage((current) => Math.max(0, current - 1))}
+                        className={`rounded-md px-3 py-2 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 ${canGoPrevious ? "cursor-pointer bg-indigo-500 hover:bg-indigo-400" : "cursor-not-allowed bg-indigo-400"}`}
+                    >
+                        Previous
+                    </button>
+                    <button
+                        type="button"
+                        disabled={!canGoNext}
+                        onClick={() => setPage((current) => current + 1)}
+                        className={`rounded-md px-3 py-2 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 ${canGoNext ? "cursor-pointer bg-indigo-500 hover:bg-indigo-400" : "cursor-not-allowed bg-indigo-400"}`}
+                    >
+                        Next
+                    </button>
+                </div>
             </div>
         </div>
     )
