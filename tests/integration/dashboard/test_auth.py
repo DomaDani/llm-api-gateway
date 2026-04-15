@@ -1,5 +1,7 @@
 import requests
 
+from tests.integration.helpers import login
+
 
 def test_dashboard_login_returns_bearer_token(
     dashboard_base_url: str,
@@ -7,11 +9,11 @@ def test_dashboard_login_returns_bearer_token(
     administrator_password: str,
     dashboard_request_headers: dict[str, str],
 ):
-    resp = requests.post(
-        f"{dashboard_base_url}/auth/login",
-        headers=dashboard_request_headers,
-        json={"email": administrator_email, "password": administrator_password},
-        timeout=10,
+    resp = login(
+        dashboard_base_url,
+        dashboard_request_headers,
+        email=administrator_email,
+        password=administrator_password,
     )
 
     assert resp.status_code == 200
@@ -45,11 +47,12 @@ def test_dashboard_login_rejects_wrong_password(
     administrator_email: str,
     dashboard_request_headers: dict[str, str],
 ):
-    resp = requests.post(
-        f"{dashboard_base_url}/auth/login",
-        headers=dashboard_request_headers,
-        json={"email": administrator_email, "password": "wrong-password"},
-        timeout=10,
+    resp = login(
+        dashboard_base_url,
+        dashboard_request_headers,
+        email=administrator_email,
+        password="wrong-password",
+        expected_status=400,
     )
 
     assert resp.status_code == 400

@@ -1,15 +1,14 @@
 import requests
-import time
 from pathlib import Path
-from tests.tools.load_mappings import load_mappings_from_dir
+from tests.integration.helpers import build_chat_url, load_mapping
 
 def _build_chat_url(completions_url: str) -> str:
-    return f"{completions_url}/chat/completions"
+    return build_chat_url(completions_url)
 
 
 def _load_request_data(completions_dir: Path) -> dict:
-    mappings = load_mappings_from_dir(completions_dir, "mock_completion1")
-    return mappings.get("mock_completion1", {}).get("request")
+    mapping = load_mapping(completions_dir, "mock_completion1")
+    return mapping.get("request")
 
 
 def test_key_authentication_rejects_too_short_key(completions_url: str, completions_dir: Path):

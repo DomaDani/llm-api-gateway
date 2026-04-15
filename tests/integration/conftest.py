@@ -3,7 +3,7 @@ from pathlib import Path
 import time
 
 import pytest
-import requests
+from tests.integration.helpers import login, wait_for_health
 
 
 @pytest.fixture(scope="session")
@@ -45,20 +45,6 @@ def dashboard_request_headers(frontend_origin: str) -> dict[str, str]:
         "Referer": f"{frontend_origin}/",
     }
 
-
-def _wait_for_health(url: str, timeout: int = 30, interval: float = 1.0) -> requests.Response:
-    end = time.time() + timeout
-    while time.time() < end:
-        try:
-            resp = requests.get(url, timeout=5)
-            if resp.status_code == 200:
-                return resp
-        except requests.RequestException:
-            pass
-        time.sleep(interval)
-    raise AssertionError(f"Timed out waiting for {url}")
-
-
 @pytest.fixture(scope="session")
 def admin_token(
     dashboard_base_url: str,
@@ -66,14 +52,13 @@ def admin_token(
     administrator_password: str,
     dashboard_request_headers: dict[str, str],
 ) -> str:
-    _wait_for_health(f"{dashboard_base_url}/health")
-    resp = requests.post(
-        f"{dashboard_base_url}/auth/login",
-        headers=dashboard_request_headers,
-        json={"email": administrator_email, "password": administrator_password},
-        timeout=10,
+    wait_for_health(f"{dashboard_base_url}/health")
+    resp = login(
+        dashboard_base_url,
+        dashboard_request_headers,
+        email=administrator_email,
+        password=administrator_password,
     )
-    assert resp.status_code == 200, f"Admin login failed: {resp.status_code} {resp.text}"
 
     payload = resp.json()
     token = payload.get("access_token")

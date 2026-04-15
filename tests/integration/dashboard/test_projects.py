@@ -1,6 +1,6 @@
 import requests
 
-from tests.integration.dashboard.helpers import (
+from tests.integration.helpers import (
     SEEDED_MEMBER_USERNAME,
     SEEDED_MANAGER_USERNAME,
     SEEDED_PROJECT_NAMES,

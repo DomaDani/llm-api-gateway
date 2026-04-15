@@ -1,17 +1,14 @@
-from tests.tools.load_mappings import load_mappings_from_dir
-import requests
 from pathlib import Path
 
+from tests.integration.helpers import load_mapping, post_chat_completion
+
 def test_upstream_error(completions_url: str, unlimited_api_key: str, completions_dir: Path):
-    mappings = load_mappings_from_dir(completions_dir, "mock_completion2")
-    request_data = mappings.get("mock_completion2", {}).get("request")
-    expected_response = mappings.get("mock_completion2", {}).get("upstream_error", {}).get("response")
-    expected_status = mappings.get("mock_completion2", {}).get("upstream_error", {}).get("status", 200)
+    mapping = load_mapping(completions_dir, "mock_completion2")
+    request_data = mapping.get("request")
+    expected_response = mapping.get("upstream_error", {}).get("response")
+    expected_status = mapping.get("upstream_error", {}).get("status", 200)
 
-    url = f"{completions_url}/chat/completions"
-    headers = {"Authorization": f"Bearer {unlimited_api_key}"}
-
-    resp = requests.post(url, headers=headers, json=request_data)
+    resp = post_chat_completion(completions_url, unlimited_api_key, request_data)
     assert resp.status_code == expected_status
 
     response = resp.json()

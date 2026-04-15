@@ -1,21 +1,20 @@
-from tests.tools.load_mappings import load_mappings_from_dir
 import requests
 from pathlib import Path
-import time
+from tests.integration.helpers import bearer_headers, build_chat_url, load_mapping
 
 def _load_request_and_expected(completions_dir: Path) -> tuple[dict, dict]:
-    mappings = load_mappings_from_dir(completions_dir, "mock_completion1")
-    request_data = mappings.get("mock_completion1", {}).get("request")
-    expected_response = mappings.get("mock_completion1", {}).get("completion")
+    mapping = load_mapping(completions_dir, "mock_completion1")
+    request_data = mapping.get("request")
+    expected_response = mapping.get("completion")
     return request_data, expected_response
 
 
 def _build_chat_url(completions_url: str) -> str:
-    return f"{completions_url}/chat/completions"
+    return build_chat_url(completions_url)
 
 
 def _limited_headers(limited_api_key: str) -> dict[str, str]:
-    return {"Authorization": f"Bearer {limited_api_key}"}
+    return bearer_headers(limited_api_key)
 
 
 def test_quota_immediate_over_limit_returns_429(completions_url: str, limited_api_key: str, completions_dir: Path):
