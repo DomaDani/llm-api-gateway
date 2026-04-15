@@ -3,6 +3,7 @@ from pathlib import Path
 import time
 
 import pytest
+from tests.integration.helpers import login, wait_for_health
 
 
 @pytest.fixture(scope="session")
@@ -11,6 +12,58 @@ def base_url() -> str:
         "BASE_URL",
         "http://docker:8000" if (os.environ.get("CI") or os.environ.get("GITLAB_CI")) else "http://localhost:8000",
     )
+
+
+@pytest.fixture(scope="session")
+def dashboard_base_url() -> str:
+    return os.environ.get(
+        "DASHBOARD_BASE_URL",
+        "http://docker:8080" if (os.environ.get("CI") or os.environ.get("GITLAB_CI")) else "http://localhost:8080",
+    )
+
+
+@pytest.fixture(scope="session")
+def administrator_email() -> str:
+    return os.environ.get("ADMINISTRATOR_EMAIL", "admin@example.com")
+
+
+@pytest.fixture(scope="session")
+def administrator_password() -> str:
+    return os.environ.get("ADMINISTRATOR_PASSWORD", "password123")
+
+
+@pytest.fixture(scope="session")
+def frontend_origin() -> str:
+    frontend_address = os.environ.get("FRONTEND_ADDRESS", "http://localhost")
+    return f"{frontend_address}:5173"
+
+
+@pytest.fixture(scope="session")
+def dashboard_request_headers(frontend_origin: str) -> dict[str, str]:
+    return {
+        "Origin": frontend_origin,
+        "Referer": f"{frontend_origin}/",
+    }
+
+@pytest.fixture(scope="session")
+def admin_token(
+    dashboard_base_url: str,
+    administrator_email: str,
+    administrator_password: str,
+    dashboard_request_headers: dict[str, str],
+) -> str:
+    wait_for_health(f"{dashboard_base_url}/health")
+    resp = login(
+        dashboard_base_url,
+        dashboard_request_headers,
+        email=administrator_email,
+        password=administrator_password,
+    )
+
+    payload = resp.json()
+    token = payload.get("access_token")
+    assert token, "Missing access_token in login response"
+    return token
 
 @pytest.fixture(scope="session")
 def completions_url(base_url: str) -> str:
