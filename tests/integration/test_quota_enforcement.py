@@ -3,15 +3,27 @@ import requests
 from pathlib import Path
 import time
 
-def test_quota_enforcement(completions_url: str, limited_api_key: str, completions_dir: Path):
+def _load_request_and_expected(completions_dir: Path) -> tuple[dict, dict]:
     mappings = load_mappings_from_dir(completions_dir, "mock_completion1")
     request_data = mappings.get("mock_completion1", {}).get("request")
     expected_response = mappings.get("mock_completion1", {}).get("completion")
+    return request_data, expected_response
 
-    url = f"{completions_url}/chat/completions"
-    headers = {"Authorization": f"Bearer {limited_api_key}"}
 
-    # Test with a request that immediately exceeds the quota
+def _build_chat_url(completions_url: str) -> str:
+    return f"{completions_url}/chat/completions"
+
+
+def _limited_headers(limited_api_key: str) -> dict[str, str]:
+    return {"Authorization": f"Bearer {limited_api_key}"}
+
+
+def test_quota_immediate_over_limit_returns_429(completions_url: str, limited_api_key: str, completions_dir: Path):
+    request_data, _ = _load_request_and_expected(completions_dir)
+
+    url = _build_chat_url(completions_url)
+    headers = _limited_headers(limited_api_key)
+
     body = {
         "model": request_data["model"],
         "messages": request_data["messages"],
@@ -23,18 +35,25 @@ def test_quota_enforcement(completions_url: str, limited_api_key: str, completio
     assert resp.status_code == 429
     response = resp.json()
     assert response["detail"] == "Quota exceeded."
-    time.sleep(0.5)
 
-    # Test with a request that is within the quota
+
+def test_quota_within_limit_then_next_request_exceeds_remaining_quota(
+    completions_url: str,
+    limited_api_key: str,
+    completions_dir: Path,
+):
+    request_data, expected_response = _load_request_and_expected(completions_dir)
+
+    url = f"{completions_url}/chat/completions"
+    headers = _limited_headers(limited_api_key)
+    # First request is expected to be within the remaining quota.
     resp = requests.post(url, headers=headers, json=request_data)
     assert resp.status_code == 200
 
     response = resp.json()
     response["id"] = expected_response["id"]
     assert response == expected_response
-    time.sleep(0.5)
-
-    # Test with another request that now exceeds the quota
+    # The immediate next request should exceed the remaining quota.
     resp = requests.post(url, headers=headers, json=request_data)
     assert resp.status_code == 429
     response = resp.json()
