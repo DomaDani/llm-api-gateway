@@ -10,6 +10,21 @@ from fastapi import Request
 
 
 async def stream_generator(raw_stream: AsyncStream[ChatCompletionChunk], request: Request, validated_request: ValidatedRequest):
+    """
+    Convert an AsyncStream of ChatCompletionChunk objects into a Server-Sent Events (SSE) stream.
+
+    This function processes each chunk from the upstream stream, extracts relevant metadata, and yields it in a format suitable for SSE. It also handles errors gracefully by yielding an error message in the SSE format if any exceptions occur during streaming.
+
+    Parameters
+    ----------
+    - raw_stream: An AsyncStream of ChatCompletionChunk objects from the OpenAI package.
+    - request: The FastAPI request object.
+    - validated_request: The validated request DTO containing information about the request for logging and usage tracking purposes.
+
+    Yields
+    ------
+    - A string formatted as an SSE event, containing either the chunk data or an error message.
+    """
     upstream_start = time.perf_counter()
     failed_upstream = False
     ttft = None
