@@ -3,6 +3,13 @@ from typing import Optional
 from datetime import datetime
 
 class UsageLogEntry(BaseModel):
+    """
+    A class representing an entry in the usage log. Shares the fields with the UsageEntry model used for database storage.
+
+    See Also
+    --------
+    - UsageEntry: The model used for storing usage data in the database.
+    """
     key_id : int
     project_id : int
     user_id : int
