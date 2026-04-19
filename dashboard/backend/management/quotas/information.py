@@ -3,6 +3,18 @@ from dashboard.backend.models import QuotaDisplayInformation
 from dashboard.backend.db import get_limit_by_id, get_user_by_id, get_key_by_id
 
 async def convert_orm_to_display_info(quota_orm: Quota, add_name: bool = False) -> QuotaDisplayInformation:
+    """
+    Convert a quota ORM entity to a quota display DTO.
+
+    Parameters
+    ----------
+    - quota_orm: Source quota ORM model.
+    - add_name: Whether a generated human-readable name should be included.
+
+    Returns
+    -------
+    - QuotaDisplayInformation mapped from ORM data.
+    """
     limit = await get_limit_by_id(limit_id=quota_orm.limit_id)
 
     if add_name:

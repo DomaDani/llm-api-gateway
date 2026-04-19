@@ -9,6 +9,20 @@ async def enforce_quota_creation_permission(
     user_id: int | None,
     key_id: int | None,
 ) -> None:
+    """
+    Ensure the current user can create a quota for the requested scope.
+
+    Parameters
+    ----------
+    - current_user_id: Identifier of the requesting user.
+    - project_id: Optional project identifier for scoped quotas.
+    - user_id: Optional user identifier target.
+    - key_id: Optional API key identifier target.
+
+    Returns
+    -------
+    - None.
+    """
     is_admin = await is_user_administrator(current_user_id)
 
     if project_id is None:
@@ -21,6 +35,18 @@ async def enforce_quota_creation_permission(
 
 
 async def enforce_quota_deletion_permission(current_user_id: int, quota_id: int) -> None:
+    """
+    Ensure the current user can delete the target quota.
+
+    Parameters
+    ----------
+    - current_user_id: Identifier of the requesting user.
+    - quota_id: Identifier of the quota to delete.
+
+    Returns
+    -------
+    - None.
+    """
     if await is_user_administrator(current_user_id):
         return
 
