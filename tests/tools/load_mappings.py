@@ -2,6 +2,18 @@ from pathlib import Path
 import json
 
 def load_mappings_from_dir(directory: str|Path, file: str = None) -> dict:
+    """
+    Load JSON mapping fixtures from a directory.
+
+    Parameters
+    ----------
+    - directory: Directory path containing mapping JSON files.
+    - file: Optional single file stem to load.
+
+    Returns
+    -------
+    - A dictionary keyed by file stem with parsed JSON content.
+    """
     mappings = {}
     if isinstance(directory, str):
         directory = Path(directory)

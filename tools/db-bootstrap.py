@@ -20,6 +20,10 @@ parser.add_argument("--empty", action="store_true", help="Do not create default 
 args = parser.parse_args()
 
 async def main() -> None:
+    """
+    Connects to the database using the shared engine and checks for existing tables.
+    If tables exist and --reset is not specified, it will print a message and exit. If --reset is specified, it will drop all existing tables before recreating them. After ensuring the tables are created, if --empty is not specified, it will call create_mock_data to populate the database with default roles and limits.
+    """
     print("Starting database bootstrap...")
     async with engine.begin() as conn:
         tables = await conn.run_sync(lambda sync_conn: inspect(sync_conn).get_table_names())

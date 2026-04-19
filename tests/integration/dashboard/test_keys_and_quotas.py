@@ -17,6 +17,8 @@ from tests.integration.helpers import (
 
 
 def _load_chat_request(completions_dir: Path) -> dict:
+    """Load the standard chat request fixture used in dashboard quota tests."""
+
     mapping = load_mapping(completions_dir, "mock_completion1")
     request_data = mapping.get("request")
     assert request_data is not None, "Missing mock_completion1 request payload"
@@ -30,6 +32,8 @@ def test_keys_and_quotas_key_access_then_quota_limit_enforced(
     dashboard_request_headers: dict[str, str],
     completions_dir: Path,
 ):
+    """Verify a created key works first, then a strict quota eventually blocks further requests."""
+
     headers = auth_headers(admin_token, dashboard_request_headers)
     request_data = _load_chat_request(completions_dir)
 

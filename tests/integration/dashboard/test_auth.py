@@ -9,6 +9,8 @@ def test_dashboard_login_returns_bearer_token(
     administrator_password: str,
     dashboard_request_headers: dict[str, str],
 ):
+    """Verify dashboard login returns a usable bearer access token for admin credentials."""
+
     resp = login(
         dashboard_base_url,
         dashboard_request_headers,
@@ -29,6 +31,8 @@ def test_dashboard_me_returns_admin_user(
     administrator_email: str,
     dashboard_request_headers: dict[str, str],
 ):
+    """Verify the authenticated /users/me endpoint returns administrator identity fields."""
+
     headers = {**dashboard_request_headers, "Authorization": f"Bearer {admin_token}"}
     resp = requests.get(
         f"{dashboard_base_url}/users/me",
@@ -47,6 +51,8 @@ def test_dashboard_login_rejects_wrong_password(
     administrator_email: str,
     dashboard_request_headers: dict[str, str],
 ):
+    """Verify login fails with a clear error when an incorrect password is provided."""
+
     resp = login(
         dashboard_base_url,
         dashboard_request_headers,

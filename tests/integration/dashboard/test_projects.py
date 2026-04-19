@@ -19,6 +19,8 @@ def test_projects_seeded_projects_are_listed(
     admin_token: str,
     dashboard_request_headers: dict[str, str],
 ):
+    """Verify seeded projects are visible through the dashboard project listing endpoint."""
+
     headers = auth_headers(admin_token, dashboard_request_headers)
 
     projects = get_all_projects(dashboard_base_url, headers)
@@ -32,6 +34,8 @@ def test_projects_create_project_then_list_contains_it(
     admin_token: str,
     dashboard_request_headers: dict[str, str],
 ):
+    """Verify creating a project makes it retrievable from subsequent list calls."""
+
     headers = auth_headers(admin_token, dashboard_request_headers)
     users = get_users(dashboard_base_url, headers)
     manager_id = find_user_id_by_username(users, SEEDED_MANAGER_USERNAME)
@@ -53,6 +57,8 @@ def test_projects_add_user_to_project(
     admin_token: str,
     dashboard_request_headers: dict[str, str],
 ):
+    """Verify adding a user to a project updates the project's user membership view."""
+
     headers = auth_headers(admin_token, dashboard_request_headers)
     users = get_users(dashboard_base_url, headers)
     manager_id = find_user_id_by_username(users, SEEDED_MANAGER_USERNAME)
@@ -91,6 +97,8 @@ def test_projects_remove_user_from_project(
     admin_token: str,
     dashboard_request_headers: dict[str, str],
 ):
+    """Verify removing a user from a project removes them from project membership results."""
+
     headers = auth_headers(admin_token, dashboard_request_headers)
     users = get_users(dashboard_base_url, headers)
     manager_id = find_user_id_by_username(users, SEEDED_MANAGER_USERNAME)
@@ -137,6 +145,8 @@ def test_projects_delete_project_then_second_delete_fails(
     admin_token: str,
     dashboard_request_headers: dict[str, str],
 ):
+    """Verify deleting a project succeeds once and then fails on repeated deletion."""
+
     headers = auth_headers(admin_token, dashboard_request_headers)
     users = get_users(dashboard_base_url, headers)
     manager_id = find_user_id_by_username(users, SEEDED_MANAGER_USERNAME)

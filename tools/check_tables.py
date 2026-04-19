@@ -11,6 +11,9 @@ from sqlalchemy import inspect, text
 
 
 async def main() -> None:
+    """
+    Connect to the database using the shared engine, retrieve all table names, and print each table name along with the count of records in that table. If any errors occur during counting, it will print a question mark instead of the count.
+    """
     async with engine.connect() as conn:
         tables = await conn.run_sync(lambda sync_conn: inspect(sync_conn).get_table_names())
 
