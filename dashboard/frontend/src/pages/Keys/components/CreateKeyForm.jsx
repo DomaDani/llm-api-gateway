@@ -6,6 +6,13 @@ import { useProject } from "../../../components/shared/ProjectContext"
 import AlertBox from "../../../components/primitives/AlertBox"
 import InfoBox from "../../../components/primitives/InfoBox"
 
+/**
+ * Form for creating a new API key for the selected project.
+ *
+ * @param {object} props - Component props.
+ * @param {Function} props.onCreated - Callback fired when an API key is successfully created.
+ * @returns {JSX.Element} The rendered form.
+ */
 export default function CreateKeyForm({ onCreated }) {
     const { user } = useAuth()
     const { selectedProject } = useProject()

@@ -5,6 +5,11 @@ import { useAuth, } from "../../../api/auth/AuthProvider";
 import { isTokenExpired } from "../../../api/auth/token";
 import AlertBox from "../../../components/primitives/AlertBox";
 
+/**
+ * Form for updating user profile identity (username and email).
+ *
+ * @returns {JSX.Element} The rendered form.
+ */
 export default function ProfileIdentityForm() {
     const { user, token } = useAuth();
 

@@ -1,5 +1,13 @@
 import { useMemo, useState } from "react"
 
+/**
+ * Table displaying active quotas with sortable columns and visual progress indicators.
+ *
+ * @param {object} props - Component props.
+ * @param {string} props.title - Table header title.
+ * @param {Array} props.rows - Quota data rows to display.
+ * @returns {JSX.Element} The rendered table component.
+ */
 const SORTABLE_COLUMNS = {
     name: "Quota Name",
     limit_type: "Limit Type",

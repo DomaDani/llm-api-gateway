@@ -15,6 +15,11 @@ import useQuotaCreation from "../../hooks/useQuotaCreation"
 import { useAuth } from "../../api/auth/AuthProvider"
 import { useNavigate } from "react-router-dom"
 
+/**
+ * Global settings page for admin users to manage system-wide quotas, users, and projects.
+ *
+ * @returns {JSX.Element} The rendered global settings page.
+ */
 function mapUserRow(user) {
     return {
         id: user.id,

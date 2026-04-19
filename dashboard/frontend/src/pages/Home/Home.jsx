@@ -6,6 +6,11 @@ import { useEffect, useState } from "react"
 import { useAuth } from "../../api/auth/AuthProvider"
 import { fetchQuotaInfos } from "../../api/management/quotas/Info"
 
+/**
+ * Dashboard home page showing selected project overview with active quotas and usage logs.
+ *
+ * @returns {JSX.Element} The rendered home page.
+ */
 export default function Home()
 {
     const { selectedProject } = useProject()

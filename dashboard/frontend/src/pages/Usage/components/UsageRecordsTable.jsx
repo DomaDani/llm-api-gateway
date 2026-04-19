@@ -2,6 +2,20 @@ import { useEffect, useMemo, useState } from "react"
 
 import { fetchUsageLogs } from "../../../api/usageLogs/UsageLogs"
 
+/**
+ * Table displaying usage records with pagination, filtering, and sorting.
+ *
+ * @param {object} props - Component props.
+ * @param {string} props.title - Table header title.
+ * @param {boolean} props.showUser - Whether to display the user column.
+ * @param {boolean} props.showProject - Whether to display the project column.
+ * @param {number} props.projectId - Project identifier for filtering.
+ * @param {number} props.userId - User identifier for filtering.
+ * @param {boolean} props.aggregate - Whether to aggregate records.
+ * @param {number} props.pageSize - Number of records per page.
+ * @param {boolean} props.enabled - Whether the table should fetch and display data.
+ * @returns {JSX.Element} The rendered table component.
+ */
 const SORTABLE_COLUMNS = {
     user_name: "User",
     project_name: "Project",

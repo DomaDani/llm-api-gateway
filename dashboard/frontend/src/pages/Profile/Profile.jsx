@@ -3,6 +3,11 @@ import ProfilePasswordForm from "./components/ProfilePasswordForm"
 import { useAuth } from "../../api/auth/AuthProvider"
 import AlertBox from "../../components/primitives/AlertBox"
 
+/**
+ * User profile page for managing account identity, password, and settings.
+ *
+ * @returns {JSX.Element} The rendered profile page.
+ */
 export default function Profile() {
     const { user } = useAuth()
     return (

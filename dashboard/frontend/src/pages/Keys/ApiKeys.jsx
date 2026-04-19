@@ -6,6 +6,11 @@ import { fetchKeyInfos } from "../../api/management/keys/Info"
 import { useAuth } from "../../api/auth/AuthProvider"
 import useApiKeyDeletion from "../../hooks/useApiKeyDeletion"
 
+/**
+ * API keys management page for creating and managing user API keys.
+ *
+ * @returns {JSX.Element} The rendered API keys page.
+ */
 export default function ApiKeys() {
     const { user } = useAuth()
     const [apiKeys, setApiKeys] = useState([])

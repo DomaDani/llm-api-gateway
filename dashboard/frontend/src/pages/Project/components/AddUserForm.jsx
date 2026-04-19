@@ -2,6 +2,13 @@ import { useState, useEffect } from "react"
 import Dropdown from "../../../components/primitives/Dropdown"
 import { fetchUserInfos } from "../../../api/management/user/Info"
 
+/**
+ * Form for adding a user to the current project.
+ *
+ * @param {object} props - Component props.
+ * @param {Function} props.onSubmit - Callback fired with user_id when form is submitted.
+ * @returns {JSX.Element} The rendered form.
+ */
 export default function AddUserForm({ onSubmit }) {
     const [userId, setUserId] = useState(null)
     const [availableUsers, setAvailableUsers] = useState([])

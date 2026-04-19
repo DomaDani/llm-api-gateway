@@ -7,6 +7,11 @@ import { useAuth } from '../../../api/auth/AuthProvider'
 import { isTokenExpired } from '../../../api/auth/token'
 import AlertBox from '../../../components/primitives/AlertBox'
 
+/**
+ * Form for admin users to set another user's password and optionally mark it as expired.
+ *
+ * @returns {JSX.Element} The rendered form.
+ */
 export default function SetUserPasswordForm() {
     const { token } = useAuth()
 

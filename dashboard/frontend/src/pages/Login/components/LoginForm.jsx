@@ -2,6 +2,11 @@ import { useState } from 'react';
 import {useAuth} from '../../../api/auth/AuthProvider';
 import AlertBox from '../../../components/primitives/AlertBox';
 
+/**
+ * Login form for user authentication.
+ *
+ * @returns {JSX.Element} The rendered login form.
+ */
 export default function LoginForm() {
   const { login } = useAuth();
 
