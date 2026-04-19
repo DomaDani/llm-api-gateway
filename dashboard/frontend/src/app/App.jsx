@@ -12,6 +12,10 @@ import ApiKeys from '../pages/Keys/ApiKeys';
 import Usage from '../pages/Usage/Usage';
 import Profile from '../pages/Profile/Profile';
 
+/**
+ * The main application component that sets up routing and authentication context for the dashboard.
+ * @returns {JSX.Element} The rendered application component.
+ */
 function App() {
   return (
     <AuthProvider>
