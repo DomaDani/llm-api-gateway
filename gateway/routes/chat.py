@@ -37,7 +37,7 @@ async def forward_request(request: Request, validated_request: ValidatedRequest 
     Parameters
     ----------
     - request: The FastAPI request object, which contains information about the incoming request and the application state.
-    - validated_request: A DTO containing the validated request data, including authentication and authorization information. This is provided by the check_limits_costs dependency, which also enforces quotas and limits.
+    - validated_request: A DTO containing the validated request data, including authentication, authorization and estimated usage information. This is provided by the check_limits_costs dependency, which also enforces quotas and limits.
 
     Returns
     -------

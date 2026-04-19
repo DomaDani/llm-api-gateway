@@ -9,7 +9,7 @@ from shared.models import Status
 
 class ValidatedRequest(BaseModel):
     """
-    A class representing a request made to the gateway that has been validated for authentication and authorization.
+    A class representing a request made to the gateway that has been validated for authentication, authorization and limits.
     """
     key_id: int
     project_id: int
