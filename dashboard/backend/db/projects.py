@@ -11,6 +11,20 @@ from .keys import delete_key
 from .quotas import delete_quota
 
 async def get_project_by_id(project_id: int, session = None, options = None, active_only: bool = True) -> Project | None:
+    """
+    Retrieve a project by identifier.
+
+    Parameters
+    ----------
+    - project_id: Identifier of the project.
+    - session: Optional SQLAlchemy session.
+    - options: Optional relationship loading options.
+    - active_only: Whether to restrict results to active projects.
+
+    Returns
+    -------
+    - The matching Project ORM object, or None.
+    """
     if session is None:
         async with get_session() as session:
             return await get_project_by_id(project_id=project_id, session=session, options=options, active_only=active_only)
@@ -26,6 +40,20 @@ async def get_project_by_id(project_id: int, session = None, options = None, act
     return result.scalars().first()
 
 async def get_project_by_name(project_name: str, session = None, options = None, active_only: bool = True) -> Project | None:
+    """
+    Retrieve a project by name.
+
+    Parameters
+    ----------
+    - project_name: Name of the project.
+    - session: Optional SQLAlchemy session.
+    - options: Optional relationship loading options.
+    - active_only: Whether to restrict results to active projects.
+
+    Returns
+    -------
+    - The matching Project ORM object, or None.
+    """
     if session is None:
         async with get_session() as session:
             return await get_project_by_name(project_name=project_name, session=session, options=options, active_only=active_only)
@@ -41,6 +69,18 @@ async def get_project_by_name(project_name: str, session = None, options = None,
     return result.scalars().first()
 
 async def get_projects_for_user(user_id: int, session = None) -> list[Project]:
+    """
+    Retrieve all active non-global projects assigned to a user.
+
+    Parameters
+    ----------
+    - user_id: Identifier of the user.
+    - session: Optional SQLAlchemy session.
+
+    Returns
+    -------
+    - A list of Project ORM objects.
+    """
     if session is None:
         async with get_session() as session:
             return await get_projects_for_user(user_id=user_id, session=session)
@@ -56,6 +96,19 @@ async def get_projects_for_user(user_id: int, session = None) -> list[Project]:
     ]
 
 async def create_project(name: str, manager_id: int, session = None) -> Project:
+    """
+    Create a project and assign its project manager permission.
+
+    Parameters
+    ----------
+    - name: Name for the project.
+    - manager_id: Identifier of the initial project manager.
+    - session: Optional transactional SQLAlchemy session.
+
+    Returns
+    -------
+    - The created Project ORM object.
+    """
     if session is None:
         async with get_transactional_session() as session:
             return await create_project(name=name, manager_id=manager_id, session=session)
@@ -77,6 +130,18 @@ async def create_project(name: str, manager_id: int, session = None) -> Project:
     return project
 
 async def delete_project(project_id: int, session = None) -> None:
+    """
+    Archive a project and clean related permissions, keys, and quotas.
+
+    Parameters
+    ----------
+    - project_id: Identifier of the project to archive.
+    - session: Optional transactional SQLAlchemy session.
+
+    Returns
+    -------
+    - None.
+    """
     if session is None:
         async with get_transactional_session() as session:
             return await delete_project(project_id=project_id, session=session)
@@ -107,6 +172,17 @@ async def delete_project(project_id: int, session = None) -> None:
     project.status = Status.ARCHIVED
 
 async def get_all_projects(session = None) -> list[Project]:
+    """
+    Retrieve all active projects except the Global project.
+
+    Parameters
+    ----------
+    - session: Optional SQLAlchemy session.
+
+    Returns
+    -------
+    - A list of Project ORM objects.
+    """
     if session is None:
         async with get_session() as session:
             return await get_all_projects(session=session)
@@ -119,6 +195,8 @@ async def get_all_projects(session = None) -> list[Project]:
     return result.scalars().all()
 
 def _get_project_relationship_options():
+    """Return default relationship loading options for project queries."""
+
     return (
         selectinload(Project.permissions),
         selectinload(Project.api_keys),

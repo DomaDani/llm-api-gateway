@@ -9,8 +9,22 @@ from .projects import get_project_by_id
 from .lookups import get_user_by_id
 from .roles import get_role_by_name
 from .keys import get_keys_for_user, delete_key
+from .quotas import delete_quota
 
 async def add_user_to_project(project_id: int, user_id: int, session = None) -> None:
+    """
+    Add a user to a project with the default user role.
+
+    Parameters
+    ----------
+    - project_id: Identifier of the project.
+    - user_id: Identifier of the user to add.
+    - session: Optional transactional SQLAlchemy session.
+
+    Returns
+    -------
+    - None.
+    """
     if session is None:
         async with get_transactional_session() as session:
             return await add_user_to_project(project_id=project_id, user_id=user_id, session=session)
@@ -31,6 +45,20 @@ async def add_user_to_project(project_id: int, user_id: int, session = None) -> 
     session.add(permission)
 
 async def remove_user_from_project(project_id: int, user_id: int, session = None, users_only: bool = True) -> None:
+    """
+    Remove a user from a project and clean related project keys and quotas.
+
+    Parameters
+    ----------
+    - project_id: Identifier of the project.
+    - user_id: Identifier of the user to remove.
+    - session: Optional transactional SQLAlchemy session.
+    - users_only: Whether project managers are protected from removal.
+
+    Returns
+    -------
+    - None.
+    """
     if session is None:
         async with get_transactional_session() as session:
             return await remove_user_from_project(project_id=project_id, user_id=user_id, session=session, users_only=users_only)
@@ -66,9 +94,26 @@ async def remove_user_from_project(project_id: int, user_id: int, session = None
         if key.project_id == project.id:
             await delete_key(key_id=key.id, session=session)
 
+    for quota in user.quotas:
+        if quota.project_id == project.id and quota.key_id is None:
+            await delete_quota(quota_id=quota.id, session=session)
+
     await session.delete(permission)
 
 async def get_user_permissions_for_project(project_id: int, user_id: int, session = None) -> ProjectPermission | None:
+    """
+    Retrieve a user's permission record for a project.
+
+    Parameters
+    ----------
+    - project_id: Identifier of the project.
+    - user_id: Identifier of the user.
+    - session: Optional SQLAlchemy session.
+
+    Returns
+    -------
+    - ProjectPermission ORM object if found, otherwise None.
+    """
     if session is None:
         async with get_session() as session:
             return await get_user_permissions_for_project(project_id=project_id, user_id=user_id, session=session)
@@ -100,6 +145,19 @@ async def get_user_permissions_for_project(project_id: int, user_id: int, sessio
     return permissions[0] if permissions else None
 
 async def is_user_project_member(project_id: int, user_id: int, session = None) -> bool:
+    """
+    Check whether a user is a member of a project.
+
+    Parameters
+    ----------
+    - project_id: Identifier of the project.
+    - user_id: Identifier of the user.
+    - session: Optional SQLAlchemy session.
+
+    Returns
+    -------
+    - True if membership exists, otherwise False.
+    """
     if session is None:
         async with get_session() as session:
             return await is_user_project_member(project_id=project_id, user_id=user_id, session=session)
@@ -108,6 +166,19 @@ async def is_user_project_member(project_id: int, user_id: int, session = None) 
     return permission is not None
 
 async def is_user_project_manager(user_id: int, project_id: int | None = None, session = None) -> bool:
+    """
+    Check whether a user has project manager role.
+
+    Parameters
+    ----------
+    - user_id: Identifier of the user.
+    - project_id: Optional project identifier for project-scoped check.
+    - session: Optional SQLAlchemy session.
+
+    Returns
+    -------
+    - True if the user is a project manager in the requested scope.
+    """
     if session is None:
         async with get_session() as session:
             return await is_user_project_manager(project_id=project_id, user_id=user_id, session=session)
@@ -127,6 +198,18 @@ async def is_user_project_manager(user_id: int, project_id: int | None = None, s
         return False
 
 async def is_user_administrator(user_id: int, session = None) -> bool:
+    """
+    Check whether a user has global administrator role.
+
+    Parameters
+    ----------
+    - user_id: Identifier of the user.
+    - session: Optional SQLAlchemy session.
+
+    Returns
+    -------
+    - True if the user is a global administrator, otherwise False.
+    """
     if session is None:
         async with get_session() as session:
             return await is_user_administrator(user_id=user_id, session=session)

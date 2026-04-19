@@ -9,6 +9,19 @@ from shared.utils import calculate_date_after_period
 from .lookups import get_user_by_id
 
 async def get_quota_by_id(quota_id: int, session = None, options = None) -> Quota | None:
+    """
+    Retrieve a quota by identifier.
+
+    Parameters
+    ----------
+    - quota_id: Identifier of the quota.
+    - session: Optional SQLAlchemy session.
+    - options: Optional relationship loading options.
+
+    Returns
+    -------
+    - The matching Quota ORM object, or None.
+    """
     if session is None:
         async with get_session() as session:
             return await get_quota_by_id(quota_id=quota_id, session=session, options=options)
@@ -28,6 +41,20 @@ async def get_global_quotas(
     active_only: bool = False,
     options = None
 ) -> list[Quota]:
+    """
+    Retrieve global quotas, optionally including targeted variants.
+
+    Parameters
+    ----------
+    - session: Optional SQLAlchemy session.
+    - include_targeted: Whether targeted global quotas are included.
+    - active_only: Whether to restrict results to active quotas.
+    - options: Optional relationship loading options.
+
+    Returns
+    -------
+    - A list of Quota ORM objects.
+    """
 
     if session is None:
         async with get_session() as session:
@@ -75,6 +102,22 @@ async def get_quotas_for_project(
     active_only: bool = False,
     options = None
 ) -> list[Quota]:
+    """
+    Retrieve quotas for a project with optional inherited global quotas.
+
+    Parameters
+    ----------
+    - project_id: Identifier of the project.
+    - session: Optional SQLAlchemy session.
+    - include_targeted: Whether targeted project quotas are included.
+    - include_inherited: Whether global quotas are appended.
+    - active_only: Whether to restrict results to active quotas.
+    - options: Optional relationship loading options.
+
+    Returns
+    -------
+    - A list of Quota ORM objects.
+    """
     
     if session is None:
         async with get_session() as session:
@@ -138,6 +181,22 @@ async def get_quotas_for_user(
     active_only: bool = False,
     options = None
 ) -> list[Quota]:
+    """
+    Retrieve quotas for a user with optional inherited and key-level quotas.
+
+    Parameters
+    ----------
+    - user_id: Identifier of the user.
+    - session: Optional SQLAlchemy session.
+    - include_inherited: Whether global and project quotas are included.
+    - include_keys: Whether key-level quotas are included.
+    - active_only: Whether to restrict results to active quotas.
+    - options: Optional relationship loading options.
+
+    Returns
+    -------
+    - A list of Quota ORM objects.
+    """
     
     if session is None:
         async with get_session() as session:
@@ -210,6 +269,21 @@ async def get_quotas_for_api_key(
     active_only: bool = False,
     options = None
 ) -> list[Quota]:
+    """
+    Retrieve quotas for an API key with optional inherited user quotas.
+
+    Parameters
+    ----------
+    - key_id: Identifier of the API key.
+    - session: Optional SQLAlchemy session.
+    - include_inherited: Whether inherited user quotas are included.
+    - active_only: Whether to restrict results to active quotas.
+    - options: Optional relationship loading options.
+
+    Returns
+    -------
+    - A list of Quota ORM objects.
+    """
 
     if session is None:
         async with get_session() as session:
@@ -271,6 +345,24 @@ async def create_quota(
         expires_at: datetime | None,
         session = None
 ):
+    """
+    Create and persist a new quota record.
+
+    Parameters
+    ----------
+    - project_id: Optional project identifier target.
+    - user_id: Optional user identifier target.
+    - key_id: Optional API key identifier target.
+    - limit_id: Limit type identifier.
+    - limit_value: Optional numeric quota limit.
+    - period: Quota period enum value.
+    - expires_at: Optional quota expiration timestamp.
+    - session: Optional transactional SQLAlchemy session.
+
+    Returns
+    -------
+    - The created Quota ORM object.
+    """
     
     if session is None:
         async with get_transactional_session() as session:
@@ -302,6 +394,18 @@ async def create_quota(
     return new_quota
 
 async def delete_quota(quota_id: int, session = None) -> None:
+    """
+    Delete a quota by identifier.
+
+    Parameters
+    ----------
+    - quota_id: Identifier of the quota to delete.
+    - session: Optional transactional SQLAlchemy session.
+
+    Returns
+    -------
+    - None.
+    """
     if session is None:
         async with get_transactional_session() as session:
             return await delete_quota(quota_id=quota_id, session=session)
@@ -314,6 +418,8 @@ async def delete_quota(quota_id: int, session = None) -> None:
     await session.delete(quota)
 
 def _get_quotas_relationship_options():
+    """Return default relationship loading options for quota queries."""
+
     return (
         selectinload(Quota.project),
         selectinload(Quota.user),
