@@ -13,6 +13,18 @@ from shared.models import Status
 security = HTTPBearer()
 
 async def validate_api_key(auth: HTTPAuthorizationCredentials = Security(security)) -> APIKey:
+    """
+    Validates the provided API key from the request headers.
+    It checks for the presence of the API key, verifies its length, checks it against the database for validity and active status, and returns the corresponding APIKey record if valid.
+
+    Parameters
+    ----------
+    - auth: The HTTPAuthorizationCredentials object provided by the HTTPBearer security scheme, containing the API key from the request headers.
+    
+    Returns
+    -------
+    - APIKey: The APIKey ORM object corresponding to the valid API key provided in the request.
+    """
     api_key = auth.credentials
 
     if not api_key:

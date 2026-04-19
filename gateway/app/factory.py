@@ -1,10 +1,8 @@
 from contextlib import asynccontextmanager
 import logging
-from pathlib import Path
 import asyncio
 
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 from genai_prices import UpdatePrices, data as data_module, data_snapshot
 from genai_prices.data_snapshot import DataSnapshot
 
@@ -21,6 +19,15 @@ logger = logging.getLogger("uvicorn.error")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+	"""
+	Defines the lifespan of the FastAPI application, handling startup and shutdown events.
+	On startup, it initializes the upstream client, merges any custom providers, and starts background tasks for refreshing and expiring quotas and updating prices.
+	On shutdown, it cancels the background tasks and shuts down the upstream client gracefully.
+
+	Parameters
+	----------
+	- app: The FastAPI application instance for which the lifespan is being defined.
+	"""
 	await app.state.upstream_client.startup()
 	_merge_custom_providers()
 	app.state.reset_task = asyncio.create_task(_quota_refresh_job())
@@ -41,6 +48,9 @@ async def lifespan(app: FastAPI):
 		await app.state.upstream_client.shutdown()
 
 def create_app() -> FastAPI:
+	"""
+	Creates the fastapi application instance, sets up the lifespan context, initializes middleware, and includes the API routers for chat and health endpoints.
+	"""
 	app = FastAPI(title="LLM API Gateway", lifespan=lifespan)
 
 	logger.info("TARGET_URL=%s", TARGET_URL)
@@ -53,6 +63,9 @@ def create_app() -> FastAPI:
 	return app
 
 async def _quota_refresh_job():
+	"""
+	Helper async function that runs in the background to periodically refresh quotas by calling the refresh_quotas_by_batch function in batches until there are no more quotas to refresh, and then sleeps for a specified interval before checking again.
+	"""
 	while True:
 		try:
 			total_count = await get_quota_count()
@@ -68,6 +81,9 @@ async def _quota_refresh_job():
 		await asyncio.sleep(60)
 
 async def _quota_expire_job():
+	"""
+	Helper async function that runs in the background to periodically expire quotas by calling the expire_quotas_by_batch function in batches until there are no more quotas to expire, and then sleeps for a specified interval before checking again.
+	"""
 	while True:
 		try:
 			total_count = await get_quota_count()
@@ -83,6 +99,9 @@ async def _quota_expire_job():
 		await asyncio.sleep(60)
 
 async def _price_update_job():
+	"""
+	Helper async function that runs in the background to periodically update prices.
+	"""
 	while True:
 		try:
 			with UpdatePrices() as updater:
@@ -94,6 +113,9 @@ async def _price_update_job():
 		await asyncio.sleep(3600)
 
 def _merge_custom_providers(verbose: bool = False):
+	"""
+	Helper function to load custom providers from a JSON file located at "shared/config/providers.json", validate and merge them with the existing providers from the genai_prices data module, and update the data snapshot with the merged list of providers. If the file does not exist, it logs that no custom providers were found.
+	"""
 	providers_file = find_project_root() / "shared/config/providers.json"
 
 	if providers_file.exists():
