@@ -9,6 +9,17 @@ router = APIRouter(prefix="/projects", tags=["projects"])
 
 @router.get("/all", description="Get information about all projects")
 async def get_all_projects(_: None = Depends(require_valid_access_token)) -> list[ProjectDisplayInfo]:
+    """
+    Retrieve all visible projects in the system.
+
+    Parameters
+    ----------
+    - _: Token validation dependency output, unused in function body.
+
+    Returns
+    -------
+    - A list of project display models.
+    """
     try:
         project_orms = await db_get_all_projects()
     except Exception as e:

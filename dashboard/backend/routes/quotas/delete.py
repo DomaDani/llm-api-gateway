@@ -13,6 +13,18 @@ async def delete_quota(
     request: QuotaDeleteRequest,
     current_user: UserDisplayInformation = Depends(require_current_user),
 ):
+    """
+    Delete a quota after validating the current user's permission.
+
+    Parameters
+    ----------
+    - request: Quota deletion payload containing the quota identifier.
+    - current_user: Authenticated user requesting the deletion.
+
+    Returns
+    -------
+    - A success message dictionary when deletion completes.
+    """
     try:
         await quota_enforce_deletion_permission(current_user_id=current_user.id, quota_id=request.id)
         await db_delete_quota(quota_id=request.id)

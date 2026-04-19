@@ -13,6 +13,18 @@ async def delete_project(
     request: ProjectDeleteRequest,
     credentials: HTTPAuthorizationCredentials | None = Depends(_bearer),
 ):
+    """
+    Archive an existing project after verifying manager permissions.
+
+    Parameters
+    ----------
+    - request: Payload containing the project identifier to archive.
+    - credentials: Optional bearer credentials used for permission validation.
+
+    Returns
+    -------
+    - A success message dictionary when archival completes.
+    """
     await require_project_manager_user(request.project_id, credentials)
 
     try:

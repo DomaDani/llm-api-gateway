@@ -13,6 +13,19 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/register", description="Register a new user.")
 async def register(request: UserRegistrationRequest, _: UserDisplayInformation = Depends(require_administrator_user)):
+    """
+    Registers a new user with the provided information.
+    This endpoint is protected and requires the requester to be an authenticated administrator user.
+
+    Parameters
+    ----------
+    - request: A UserRegistrationRequest object containing the new user's email, username, password, and mandate_reset flag.
+    - _: An unused UserDisplayInformation object injected by the require_administrator_user dependency to enforce admin permissions.
+
+    Returns
+    -------
+    - A dictionary containing a success message with the new user's username if registration is successful.
+    """
     await user_enforce_availability(email=request.email, username=request.username)
 
     await enforce_password_strength(request.password)

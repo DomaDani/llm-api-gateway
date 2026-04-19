@@ -10,6 +10,17 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/login", response_model=TokenResponse, description="Authenticate user and return access token")
 async def login(request: LoginRequest):
+    """
+    Authenticates a user based on email and password, and returns a JWT access token if the credentials are valid.
+
+    Parameters
+    ----------
+    - request: A LoginRequest object containing the user's email and password.
+
+    Returns
+    -------
+    - TokenResponse: An object containing the access token and token type if authentication is successful.
+    """
     try:
         user = await get_user_by_email(request.email)
     except Exception as e:

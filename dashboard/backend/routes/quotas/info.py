@@ -9,6 +9,18 @@ router = APIRouter(prefix="/quotas", tags=["quotas"])
 
 @router.get("/info", response_model=list[QuotaDisplayInformation], description="Get specific information about quotas either globally, per project, per user or per API key")
 async def get_user_information(request: QuotaInformationRequest = Depends(), _: None = Depends(require_valid_access_token)) -> list[QuotaDisplayInformation]:
+    """
+    Retrieve quotas globally or filtered by project, user, or API key.
+
+    Parameters
+    ----------
+    - request: Query payload selecting scope and inclusion flags.
+    - _: Token validation dependency output, unused in function body.
+
+    Returns
+    -------
+    - A list of quota display models matching the requested scope.
+    """
     try:
         if request.project_id is not None:
             quota_orms = await get_quotas_for_project(

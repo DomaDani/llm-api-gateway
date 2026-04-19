@@ -13,6 +13,18 @@ async def create_quota(
     request: QuotaCreateRequest,
     current_user: UserDisplayInformation = Depends(require_current_user),
 ) -> QuotaDisplayInformation:
+    """
+    Create a quota for a valid project, user, or API key target.
+
+    Parameters
+    ----------
+    - request: Quota creation payload with target, limit, period, and optional expiry.
+    - current_user: Authenticated user used for permission enforcement.
+
+    Returns
+    -------
+    - QuotaDisplayInformation for the newly created quota.
+    """
     try:
         await quota_enforce_existing_limit(request.limit_id)
         await quota_enforce_existing_quota_target(request.project_id, request.user_id, request.key_id)

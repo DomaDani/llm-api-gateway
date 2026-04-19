@@ -9,6 +9,17 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 @router.get("/everyone", response_model=list[UserDisplayInformation], description="Get information about all users")
 async def get_all_users(_: None = Depends(require_valid_access_token)) -> list[UserDisplayInformation]:
+    """
+    Retrieve all users available in the dashboard scope.
+
+    Parameters
+    ----------
+    - _: Token validation dependency output, unused in function body.
+
+    Returns
+    -------
+    - A list of user display models.
+    """
     try:
         user_orms = await db_get_all_users()
     except Exception as e:

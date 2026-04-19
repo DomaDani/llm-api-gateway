@@ -10,6 +10,17 @@ router = APIRouter(prefix="/quotas", tags=["quotas"])
 
 @router.get("/limit-types", response_model=list[LimitTypeDisplayInformation], description="Get all available limit types.")
 async def get_limit_types(_: None = Depends(require_valid_access_token)) -> list[LimitTypeDisplayInformation]:
+    """
+    Retrieve all configured quota limit types.
+
+    Parameters
+    ----------
+    - _: Token validation dependency output, unused in function body.
+
+    Returns
+    -------
+    - A list of limit type display models.
+    """
     try:
         limit_orms = await get_all_limits()
     except Exception as e:

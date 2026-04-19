@@ -15,6 +15,17 @@ router = APIRouter(prefix="/projects", tags=["projects"])
 async def get_project_information(
     current_user: UserDisplayInformation = Depends(require_current_user),
 ) -> list[ProjectDisplayInfo]:
+    """
+    Retrieve project information scoped to the current user role.
+
+    Parameters
+    ----------
+    - current_user: Authenticated user used to determine visibility scope.
+
+    Returns
+    -------
+    - A list of project display models for all projects (admin) or memberships (non-admin).
+    """
     try:
         if await db_is_user_administrator(current_user.id):
             project_orms = await db_get_all_projects()

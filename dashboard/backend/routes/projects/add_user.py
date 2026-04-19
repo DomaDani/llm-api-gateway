@@ -14,6 +14,18 @@ async def add_user_to_project(
     request: AddUserToProjectRequest,
     credentials: HTTPAuthorizationCredentials | None = Depends(_bearer),
 ):
+    """
+    Add a user to a project after verifying manager permissions.
+
+    Parameters
+    ----------
+    - request: Payload containing project and user identifiers.
+    - credentials: Optional bearer credentials used for permission validation.
+
+    Returns
+    -------
+    - A success message dictionary when membership is created.
+    """
     await require_project_manager_user(request.project_id, credentials)
     await project_enforce_user_not_in_project(request.user_id, request.project_id)
 

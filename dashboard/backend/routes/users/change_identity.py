@@ -12,6 +12,18 @@ async def change_identity(
     request: UserIdentityChangeRequest,
     current_user: UserDisplayInformation = Depends(require_current_user)
 ):
+    """
+    Update the authenticated user's email and or username.
+
+    Parameters
+    ----------
+    - request: Identity update payload containing new email and or username values.
+    - current_user: Authenticated user whose profile is being updated.
+
+    Returns
+    -------
+    - A success message dictionary when profile data is updated.
+    """
     await enforce_availability(email=request.email, username=request.username, exclude_user_id=current_user.id)
 
     try:
