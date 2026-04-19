@@ -2,6 +2,9 @@ import axios from 'axios';
 import { isTokenExpired } from './auth/token'
 
 
+/**
+ * Shared Axios client configured for the dashboard frontend API.
+ */
 const api = axios.create({
     baseURL: `${import.meta.env.FRONTEND_ADDRESS}:8080`,
     headers: {
@@ -9,6 +12,9 @@ const api = axios.create({
     }
 });
 
+/**
+ * Axios interceptor for handling requests.
+ */
 api.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('token');
@@ -28,6 +34,10 @@ api.interceptors.request.use(
     }
 );
 
+/**
+ * Axios interceptor for handling responses, specifically to catch 401 Unauthorized errors that indicate an expired or invalid token.
+ * Upon catching a 401 error with an Authorization header, it removes the token and dispatches a custom 'auth:expired' event to notify the application of the authentication expiration, prompting a logout across all tabs or windows.
+ */
 api.interceptors.response.use(
     (response) => response,
     (error) => {

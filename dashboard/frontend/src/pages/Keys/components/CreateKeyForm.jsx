@@ -62,7 +62,7 @@ export default function CreateKeyForm({ onCreated }) {
                             <AlertBox message={success} variant="success" className="mt-0" />
                         </div>
                         <div className="mt-3 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                            <InfoBox value={apiKeyValue} className="sm:col-span-4" />
+                            <InfoBox value={apiKeyValue} className="sm:col-span-10" />
                             <div className="sm:col-span-4">
                                 <label htmlFor="key-name" className="block text-sm/6 font-medium text-white">
                                     Key Name
