@@ -6,7 +6,21 @@ from shared.db import get_transactional_session, get_session
 
 MAX_VALUE = 1 << 60
 
-async def db_limit_check_and_allocation(api_key: APIKey, estimated_tokens: int, estimated_price: int) -> bool:
+async def db_limit_check_and_allocation(api_key: APIKey, estimated_tokens: int, estimated_price: float) -> bool:
+    """
+    Checks if the quotas for a given API key allow for the estimated tokens/price, if so, allocates them.
+    The function is designed to be atomic by using a transactional session and row-level locks on the relevant quotas.
+
+    Parameters
+    ----------
+    - api_key: The APIKey ORM object for which the quotas should be checked and allocated.
+    - estimated_tokens: The estimated number of tokens that the request will consume, used for token quota checking.
+    - estimated_price: The estimated price of the request, used for price quota checking.
+
+    Returns
+    -------
+    - bool: True if the request is within the quotas and the estimated tokens/price have been allocated, False if any quota would be exceeded.
+    """
     async with get_transactional_session() as session:
         
         request_quotas, token_quotas, price_quotas = await db_get_quotas_by_key(api_key, session=session)
@@ -14,14 +28,20 @@ async def db_limit_check_and_allocation(api_key: APIKey, estimated_tokens: int, 
         if not request_quotas and not token_quotas and not price_quotas:
             return True # There is no active quota for the key.
         
+        # Find the strictest quota for each type (the one closest to being exceeded) to check against.
         strictest_request_quota = min(request_quotas, key=lambda q: (q.limit_value or MAX_VALUE) - q.allocated, default=None)
         strictest_token_quota = min(token_quotas, key=lambda q: (q.limit_value or MAX_VALUE) - q.allocated, default=None)
         strictest_price_quota = min(price_quotas, key=lambda q: (q.limit_value or MAX_VALUE) - q.allocated, default=None)
 
+        # Calculate the new allocated values if this request were to be allowed
         new_allocated_request = strictest_request_quota.allocated + 1 if strictest_request_quota else 0
         new_allocated_token = strictest_token_quota.allocated + estimated_tokens if strictest_token_quota else 0
         new_allocated_price = strictest_price_quota.allocated + estimated_price if strictest_price_quota else 0
 
+        # Check if any of the strictest quotas would be exceeded by the new allocated values
+        # If a quota has no limit (limit_value is None), it is considered unlimited and will not block the request.
+        # The order of checks gives priority to request count, then tokens, then price, but all must be within limits for the request to be allowed.
+        # Finally, the quotas are updated atomically within the same transaction.
         if strictest_request_quota and strictest_request_quota.limit_value is None:
             return True
         elif strictest_request_quota and new_allocated_request > strictest_request_quota.limit_value:
@@ -34,7 +54,19 @@ async def db_limit_check_and_allocation(api_key: APIKey, estimated_tokens: int, 
             await db_limit_change(api_key, request_delta=1, change_by_tokens=estimated_tokens, change_by_price=estimated_price, session=session)
             return True
 
-async def db_limit_change(api_key: APIKey, request_delta: int = 0, change_by_tokens: int = 0, change_by_price: int = 0, session = None):
+async def db_limit_change(api_key: APIKey, request_delta: int = 0, change_by_tokens: int = 0, change_by_price: float = 0, session = None):
+    """
+    Update all relevant quotas for a given API key by the specified values. 
+    The function is designed to be atomic by using a transactional session and row-level locks on the relevant quotas.
+
+    Parameters
+    ----------
+    - api_key: The APIKey ORM object for which the quotas should be updated.
+    - request_delta: The change in the number of requests to allocate (positive to allocate, negative to deallocate).
+    - change_by_tokens: The change in the number of tokens to allocate (positive to allocate, negative to deallocate).
+    - change_by_price: The change in the price to allocate (positive to allocate, negative to deallocate).
+    - session: An optional SQLAlchemy session to use for the database operations. If None, a new transactional session will be created for this operation.
+    """
     # Check if a session was provided, if not, create a new transactional session
     if session is None:
         async with get_transactional_session() as session:
@@ -57,8 +89,21 @@ async def db_limit_change(api_key: APIKey, request_delta: int = 0, change_by_tok
             p_quota.allocated = min(max(p_quota.allocated + change_by_price, 0), p_quota.limit_value)
             print(f"Updated price quota {p_quota.id}: allocated {p_quota.allocated}/{p_quota.limit_value}")
 
-# Returns a tuple of the different quota types (request, token, price) for a given key.
+
 async def db_get_quotas_by_key(api_key: APIKey, session = None) -> Tuple[list[Quota], list[Quota], list[Quota]]:
+    """
+    Returns a tuple of the different quota types (request, token, price) for a given key.
+    The function is designed to be atomic by using a transactional session and row-level locks on the relevant quotas.
+
+    Parameters
+    ----------
+    - api_key: The APIKey ORM object for which the quotas should be retrieved.
+    - session: An optional SQLAlchemy session to use for the database operations. If None, a new transactional session will be created for this operation.
+
+    Returns
+    -------
+    - Tuple[list[Quota], list[Quota], list[Quota]]: A tuple containing three lists of Quota objects: (request_quotas, token_quotas, price_quotas) that are relevant to the given API key.
+    """
     # Check if a session was provided, if not, create a new transactional session
     if session is None:
         # Session is transactional to use locks.
@@ -82,7 +127,17 @@ async def db_get_quotas_by_key(api_key: APIKey, session = None) -> Tuple[list[Qu
     return request_quotas, token_quotas, price_quotas
 
 def _quota_filter(api_key: APIKey):
+    """
+    Creates an SQLAlchemy filter condition to retrieve relevant quotas for a given API Key.
+    A Quota is considered relevant if:
+    - It is active (Quota.status == Status.ACTIVE), **AND**
+    - It is directly targeting the API Key (i.e., the quota's key_id matches the API Key's id) and is either global (has no project_id) or matches the API Key's project_id, **OR**
+    - It is targeting the API Key's project (i.e., the quota's project_id matches the API Key's project_id) and isn't specifically targeting a user or key (i.e., has no user_id and no key_id), **OR**
+    - It is targeting the API Key's user (i.e., the quota's user_id matches the API Key's user_id) and is either global (has no project_id) or matches the API Key's project_id, **OR**
+    - It is a global quota (i.e., has no key_id, no project_id, and no user_id).
+    """
     return and_(
+        Quota.status == Status.ACTIVE,
         or_(
             and_(
                 Quota.key_id == api_key.id,
@@ -108,12 +163,21 @@ def _quota_filter(api_key: APIKey):
                 Quota.project_id.is_(None),
                 Quota.user_id.is_(None)
             )
-        ),
-        Quota.status == Status.ACTIVE
+        )
     )
 
-# Returns a tuple of the different limit IDs (request, token, price).
 async def _get_limit_ids(session = None) -> Tuple[int, int, int]:
+    """
+    Helper function that returns a tuple of the different limit IDs (request, token, price).
+
+    Parameters
+    ----------
+    - session: An optional SQLAlchemy session to use for the database operations. If None, a new session will be created for this operation.
+
+    Returns
+    -------
+    - Tuple[int, int, int]: A tuple containing the IDs of the request limit, token limit, and price limit in the database. If a limit type is not found, its corresponding ID will be None.
+    """
     if session is None:
         async with get_session() as session:
             return await _get_limit_ids(session=session)
