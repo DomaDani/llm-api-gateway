@@ -2,6 +2,15 @@ import { useCallback, useState } from "react"
 
 import { deleteProject } from "../api/management/project/Delete"
 
+/**
+ * Hook for managing project deletion with error and success states.
+ *
+ * @returns {object} Hook return value.
+ * @returns {string} return.projectError - Error message if deletion failed.
+ * @returns {string} return.projectSuccess - Success message if deletion succeeded.
+ * @returns {number} return.projectReloadKey - Key for triggering table refreshes.
+ * @returns {Function} return.handleDeleteProject - Function to delete a project by ID.
+ */
 export default function useProjectDeletion() {
     const [projectError, setProjectError] = useState("")
     const [projectSuccess, setProjectSuccess] = useState("")

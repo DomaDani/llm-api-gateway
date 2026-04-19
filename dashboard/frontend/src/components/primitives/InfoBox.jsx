@@ -1,5 +1,16 @@
 import { useState } from "react"
 
+/**
+ * Displays sensitive information (like API keys) in a warning box with copy capability.
+ *
+ * @param {object} props - Component props.
+ * @param {string} props.value - The sensitive content to display in the textarea.
+ * @param {string} props.title - Box title.
+ * @param {string} props.warning - Warning message shown above the content.
+ * @param {number} props.rows - Number of textarea rows.
+ * @param {string} props.className - Additional CSS classes.
+ * @returns {JSX.Element | null} The rendered info box or null if value is falsy.
+ */
 export default function InfoBox({
     value,
     title = "Created API Key",

@@ -5,7 +5,16 @@ import { fetchUserInfos } from "../../api/management/user/Info"
 import { fetchKeyInfos } from "../../api/management/keys/Info"
 import { useProject } from "../shared/ProjectContext"
 
-
+/**
+ * Form for creating a new quota with limit type, period, value, and optional targeting.
+ *
+ * @param {object} props - Component props.
+ * @param {string} props.title - Form title.
+ * @param {boolean} props.enableKeyTarget - Whether to allow targeting by API key.
+ * @param {Function} props.onSubmit - Callback fired with form data on submission.
+ * @param {boolean} props.isGlobal - Whether the quota is global or project-specific.
+ * @returns {JSX.Element} The rendered form component.
+ */
 export default function CreateQuotaForm({
     title,
     enableKeyTarget = false,

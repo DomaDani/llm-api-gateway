@@ -1,5 +1,16 @@
 import { useMemo, useState } from "react"
 
+/**
+ * Displays a sortable table of API keys with optional delete action.
+ *
+ * @param {object} props - Component props.
+ * @param {string} props.title - Table header title.
+ * @param {Array} props.rows - API key data rows to display.
+ * @param {Function} props.onAction - Callback fired when the action button is clicked for a row.
+ * @param {string} props.actionLabel - Label for the action button.
+ * @param {boolean} props.showUser - Whether to display the user column.
+ * @returns {JSX.Element} The rendered table component.
+ */
 const SORTABLE_COLUMNS = {
     user: "User",
     name: "Name",

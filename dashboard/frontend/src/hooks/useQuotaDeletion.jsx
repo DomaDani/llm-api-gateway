@@ -2,6 +2,18 @@ import { useCallback, useState } from "react"
 
 import { deleteQuota } from "../api/management/quotas/Delete"
 
+/**
+ * Hook for managing quota deletion with error and success states.
+ *
+ * @param {object} params - Hook parameters.
+ * @param {Array} params.quotas - Current array of quotas.
+ * @param {Function} params.setQuotas - State setter for the quotas array.
+ * @returns {object} Hook return value.
+ * @returns {string} return.quotaError - Error message if deletion failed.
+ * @returns {string} return.quotaSuccess - Success message if deletion succeeded.
+ * @returns {number} return.quotaReloadKey - Key for triggering table refreshes.
+ * @returns {Function} return.handleDeleteQuota - Function to delete a quota by row.
+ */
 export default function useQuotaDeletion({ quotas, setQuotas }) {
     const [quotaError, setQuotaError] = useState("")
     const [quotaSuccess, setQuotaSuccess] = useState("")

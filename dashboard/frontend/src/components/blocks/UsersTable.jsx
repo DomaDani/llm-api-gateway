@@ -1,5 +1,15 @@
 import { useMemo, useState } from "react"
 
+/**
+ * Displays a sortable table of users with optional delete action.
+ *
+ * @param {object} props - Component props.
+ * @param {string} props.title - Table header title.
+ * @param {Array} props.rows - User data rows to display.
+ * @param {Function} props.onAction - Callback fired when the action button is clicked for a row.
+ * @param {string} props.actionLabel - Label for the action button.
+ * @returns {JSX.Element} The rendered table component.
+ */
 const SORTABLE_COLUMNS = {
     username: "Username",
     email: "Email",

@@ -2,6 +2,18 @@ import { useCallback, useState } from "react"
 
 import { deleteUser } from "../api/management/user/Delete"
 
+/**
+ * Hook for managing user deletion with error and success states.
+ *
+ * @param {object} params - Hook parameters.
+ * @param {Array} params.users - Current array of users.
+ * @param {Function} params.setUsers - State setter for the users array.
+ * @returns {object} Hook return value.
+ * @returns {string} return.userError - Error message if deletion failed.
+ * @returns {string} return.userSuccess - Success message if deletion succeeded.
+ * @returns {number} return.userReloadKey - Key for triggering table refreshes.
+ * @returns {Function} return.handleDeleteUser - Function to delete a user by row.
+ */
 export default function useUserDeletion({ users, setUsers }) {
     const [userError, setUserError] = useState("")
     const [userSuccess, setUserSuccess] = useState("")

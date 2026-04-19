@@ -1,5 +1,17 @@
 import { useMemo, useState } from "react"
 
+/**
+ * Displays a sortable table of quotas with optional delete action.
+ *
+ * @param {object} props - Component props.
+ * @param {string} props.title - Table header title.
+ * @param {Array} props.rows - Quota data rows to display.
+ * @param {boolean} props.showUser - Whether to display the user column.
+ * @param {boolean} props.showKey - Whether to display the API key column.
+ * @param {Function} props.onAction - Callback fired when the action button is clicked for a row.
+ * @param {string} props.actionLabel - Label for the action button.
+ * @returns {JSX.Element} The rendered table component.
+ */
 const SORTABLE_COLUMNS = {
     user: "User",
     key: "Key",
