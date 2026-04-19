@@ -1,3 +1,9 @@
+/**
+ * Decode the payload section of a JWT.
+ *
+ * @param {string} token - JWT string.
+ * @returns {object | null} The decoded payload or null if decoding fails.
+ */
 function decodeJwtPayload(token) {
     try {
         const [, payload] = token.split('.')
@@ -14,6 +20,12 @@ function decodeJwtPayload(token) {
     }
 }
 
+/**
+ * Get the expiration time of a JWT in milliseconds since epoch.
+ *
+ * @param {string} token - JWT string.
+ * @returns {number | null} The expiration timestamp in milliseconds, or null if unavailable.
+ */
 export function getTokenExpiryMs(token) {
     const payload = decodeJwtPayload(token)
 
@@ -24,6 +36,12 @@ export function getTokenExpiryMs(token) {
     return payload.exp * 1000
 }
 
+/**
+ * Check whether a JWT is expired.
+ *
+ * @param {string} token - JWT string.
+ * @returns {boolean} True if the token is expired or invalid.
+ */
 export function isTokenExpired(token) {
     const expiryMs = getTokenExpiryMs(token)
 

@@ -7,6 +7,13 @@ import Dropdown from "../primitives/Dropdown"
 import { fetchProjectInfosForUser } from "../../api/management/project/Info"
 import { useProject } from "../shared/ProjectContext"
 
+/**
+ * Main layout sidebar with navigation menu and project selector.
+ *
+ * @param {object} props - Component props.
+ * @param {JSX.Element} props.children - Page content to render in the main area.
+ * @returns {JSX.Element} The rendered sidebar layout component.
+ */
 export default function Sidebar({ children })
 {
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)

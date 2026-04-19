@@ -1,3 +1,11 @@
+/**
+ * Displays a table of usage logs with time, tokens, and price information.
+ *
+ * @param {object} props - Component props.
+ * @param {string} props.title - Table header title.
+ * @param {Array} props.rows - Usage log data rows to display.
+ * @returns {JSX.Element} The rendered table component.
+ */
 export default function UsageTable({ title, rows = [] }) {
     return (
         <div className="flex flex-col rounded-md bg-white/5 outline outline-1 outline-white/10">

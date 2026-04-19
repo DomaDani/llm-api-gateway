@@ -5,6 +5,11 @@ import { useAuth, } from "../../../api/auth/AuthProvider";
 import { isTokenExpired } from "../../../api/auth/token";
 import AlertBox from "../../../components/primitives/AlertBox";
 
+/**
+ * Form for updating user password with validation and expiry checks.
+ *
+ * @returns {JSX.Element} The rendered form.
+ */
 export default function ProfilePasswordForm() {
     const { user, token } = useAuth();
 

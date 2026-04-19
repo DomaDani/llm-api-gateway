@@ -3,6 +3,16 @@ import Dropdown from "../../../components/primitives/Dropdown"
 import { fetchUserInfos } from "../../../api/management/user/Info"
 import AlertBox from "../../../components/primitives/AlertBox"
 
+/**
+ * Form for creating a new project with name and manager selection.
+ *
+ * @param {object} props - Component props.
+ * @param {Function} props.onSubmit - Callback fired with project data on successful submission.
+ * @param {string} props.error - Error message to display.
+ * @param {string} props.success - Success message to display.
+ * @param {boolean} props.loading - Whether the form is in a loading state.
+ * @returns {JSX.Element} The rendered form.
+ */
 export default function CreateProjectForm({ onSubmit, error = "", success = "", loading = false }) {
     const [projectName, setProjectName] = useState("")
     const [projectManager, setProjectManager] = useState(null)

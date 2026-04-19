@@ -5,6 +5,11 @@ import { useAuth } from "../../api/auth/AuthProvider"
 import { useProject } from "../../components/shared/ProjectContext"
 import { fetchQuotaInfos } from "../../api/management/quotas/Info"
 
+/**
+ * Usage page for viewing active quotas and usage records across different scopes.
+ *
+ * @returns {JSX.Element} The rendered usage page.
+ */
 export default function Usage() {
     const { selectedProject } = useProject()
     const { user } = useAuth()

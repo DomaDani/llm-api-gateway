@@ -5,6 +5,8 @@ from pydantic_core import PydanticCustomError
 from shared.models import Status, Period
 
 class QuotaDisplayInformation(BaseModel):
+    """DTO representing quota information returned by dashboard endpoints."""
+
     id: int
     name: str | None = None
     project_id: int | None = None
@@ -20,6 +22,8 @@ class QuotaDisplayInformation(BaseModel):
     next_reset: datetime
 
 class QuotaCreateRequest(BaseModel):
+    """DTO for creating a quota for a project, user, or API key."""
+
     project_id: int | None = None
     user_id: int | None = None
     key_id: int | None = None
@@ -38,6 +42,8 @@ class QuotaCreateRequest(BaseModel):
         return self
 
 class QuotaInformationRequest(BaseModel):
+    """DTO for querying quotas by optional scope and filter flags."""
+
     project_id: int | None = None
     user_id: int | None = None
     key_id: int | None = None
@@ -54,15 +60,21 @@ class QuotaInformationRequest(BaseModel):
         return self
 
 class QuotaDeleteRequest(BaseModel):
+    """DTO for deleting a quota by identifier."""
+
     id: int
 
 
 class LimitTypeDisplayInformation(BaseModel):
+    """DTO representing an available quota limit type."""
+
     id: int
     name: str
     description: str
 
 
 class PeriodDisplayInformation(BaseModel):
+    """DTO representing a supported quota period value."""
+
     name: str
 

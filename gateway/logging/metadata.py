@@ -8,6 +8,14 @@ from gateway.models.dto_models import UsageLogEntry
 from shared.db import get_transactional_session
 
 async def usage_logger(entry: UsageLogEntry, failed_upstream: bool = False):
+    """
+    Logs the usage information to the database and updates the API key limits accordingly.
+
+    Parameters
+    ----------
+    - entry: The UsageLogEntry DTO containing all the relevant usage information to be logged.
+    - failed_upstream: Boolean indicating if the failure was due to an upstream provider issue, which affects how limits are adjusted.
+    """
     async with get_transactional_session() as session:
 
         result = await session.execute(select(APIKey).where(APIKey.id == entry.key_id).limit(1))

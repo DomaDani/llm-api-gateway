@@ -2,6 +2,18 @@ import { useCallback, useState } from "react"
 
 import { deleteApiKey } from "../api/management/keys/Delete"
 
+/**
+ * Hook for managing API key deletion with error and success states.
+ *
+ * @param {object} params - Hook parameters.
+ * @param {Array} params.apiKeys - Current array of API keys.
+ * @param {Function} params.setApiKeys - State setter for the API keys array.
+ * @returns {object} Hook return value.
+ * @returns {string} return.apiKeyError - Error message if deletion failed.
+ * @returns {string} return.apiKeySuccess - Success message if deletion succeeded.
+ * @returns {number} return.apiKeyReloadKey - Key for triggering table refreshes.
+ * @returns {Function} return.handleDeleteApiKey - Function to delete an API key by row.
+ */
 export default function useApiKeyDeletion({ apiKeys, setApiKeys }) {
     const [apiKeyError, setApiKeyError] = useState("")
     const [apiKeySuccess, setApiKeySuccess] = useState("")

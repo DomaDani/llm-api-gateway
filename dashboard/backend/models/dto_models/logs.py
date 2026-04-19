@@ -5,6 +5,8 @@ from pydantic_core import PydanticCustomError
 
 
 class UsageLogInformationRequest(BaseModel):
+    """DTO for querying usage logs by scope, pagination, and aggregation mode."""
+
     project_id: int | None = None
     user_id: int | None = None
     aggregate: bool = False
@@ -13,6 +15,8 @@ class UsageLogInformationRequest(BaseModel):
 
 
 class UsageLogDisplayInformation(BaseModel):
+    """DTO representing a single usage log entry returned to clients."""
+
     id: int
     fingerprint: str
     project_name: str
@@ -40,6 +44,8 @@ class UsageLogDisplayInformation(BaseModel):
 
 
 class UsageLogAggregateDisplayInformation(BaseModel):
+    """DTO representing aggregated usage metrics for a time window."""
+
     timestamp: datetime
     project_name: str
     user_name: str

@@ -13,6 +13,18 @@ async def remove_user_from_project(
     request: AddUserToProjectRequest,
     credentials: HTTPAuthorizationCredentials | None = Depends(_bearer),
 ):
+    """
+    Remove a user from a project after verifying manager permissions.
+
+    Parameters
+    ----------
+    - request: Payload containing project and user identifiers.
+    - credentials: Optional bearer credentials used for permission validation.
+
+    Returns
+    -------
+    - A success message dictionary when membership removal completes.
+    """
     await require_project_manager_user(request.project_id, credentials)
 
     try:

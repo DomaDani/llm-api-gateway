@@ -18,6 +18,11 @@ import useQuotaCreation from "../../hooks/useQuotaCreation"
 import { useAuth } from "../../api/auth/AuthProvider"
 import { useNavigate } from "react-router-dom"
 
+/**
+ * Project settings page for managing project quotas, API keys, and users.
+ *
+ * @returns {JSX.Element} The rendered project settings page.
+ */
 function mapUserRow(user) {
     return {
         id: user.id,

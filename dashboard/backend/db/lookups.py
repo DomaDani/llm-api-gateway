@@ -6,6 +6,19 @@ from shared.models import User, ProjectPermission, Limit
 
 
 async def get_user_by_id(user_id: int, session = None, options = None) -> User | None:
+    """
+    Retrieve a user by identifier.
+
+    Parameters
+    ----------
+    - user_id: Identifier of the user.
+    - session: Optional SQLAlchemy session.
+    - options: Optional relationship loading options.
+
+    Returns
+    -------
+    - The matching User ORM object, or None.
+    """
     if session is None:
         async with get_session() as session:
             return await get_user_by_id(user_id=user_id, session=session, options=options)
@@ -21,6 +34,19 @@ async def get_user_by_id(user_id: int, session = None, options = None) -> User |
 
 
 async def get_user_by_email(email: str, session = None, options = None) -> User | None:
+    """
+    Retrieve a user by email address.
+
+    Parameters
+    ----------
+    - email: Email address to search for.
+    - session: Optional SQLAlchemy session.
+    - options: Optional relationship loading options.
+
+    Returns
+    -------
+    - The matching User ORM object, or None.
+    """
     if session is None:
         async with get_session() as session:
             return await get_user_by_email(email=email, session=session, options=options)
@@ -36,6 +62,19 @@ async def get_user_by_email(email: str, session = None, options = None) -> User 
 
 
 async def get_user_by_username(username: str, session = None, options = None) -> User | None:
+    """
+    Retrieve a user by username.
+
+    Parameters
+    ----------
+    - username: Username to search for.
+    - session: Optional SQLAlchemy session.
+    - options: Optional relationship loading options.
+
+    Returns
+    -------
+    - The matching User ORM object, or None.
+    """
     if session is None:
         async with get_session() as session:
             return await get_user_by_username(username=username, session=session, options=options)
@@ -51,15 +90,51 @@ async def get_user_by_username(username: str, session = None, options = None) ->
 
 
 async def user_email_free(email: str, exclude_user_id: int | None = None) -> bool:
+    """
+    Check whether an email address is available.
+
+    Parameters
+    ----------
+    - email: Email address to validate.
+    - exclude_user_id: Optional user id to ignore in uniqueness checks.
+
+    Returns
+    -------
+    - True if the email can be used, otherwise False.
+    """
     user = await get_user_by_email(email)
     return user is None or (exclude_user_id is not None and user.id == exclude_user_id)
 
 
 async def user_username_free(username: str, exclude_user_id: int | None = None) -> bool:
+    """
+    Check whether a username is available.
+
+    Parameters
+    ----------
+    - username: Username to validate.
+    - exclude_user_id: Optional user id to ignore in uniqueness checks.
+
+    Returns
+    -------
+    - True if the username can be used, otherwise False.
+    """
     user = await get_user_by_username(username)
     return user is None or (exclude_user_id is not None and user.id == exclude_user_id)
 
 async def get_users_by_project(project_id: int, session = None) -> list[User]:
+    """
+    Retrieve users assigned to a project.
+
+    Parameters
+    ----------
+    - project_id: Identifier of the project.
+    - session: Optional SQLAlchemy session.
+
+    Returns
+    -------
+    - A list of User ORM objects.
+    """
     if session is None:
         async with get_session() as session:
             return await get_users_by_project(project_id=project_id, session=session)
@@ -74,6 +149,18 @@ async def get_users_by_project(project_id: int, session = None) -> list[User]:
     return result.scalars().all()
 
 async def get_limit_by_id(limit_id: int, session = None) -> Limit | None:
+    """
+    Retrieve a quota limit type by identifier.
+
+    Parameters
+    ----------
+    - limit_id: Identifier of the limit type.
+    - session: Optional SQLAlchemy session.
+
+    Returns
+    -------
+    - The matching Limit ORM object, or None.
+    """
     if session is None:
         async with get_session() as session:
             return await get_limit_by_id(limit_id=limit_id, session=session)
@@ -83,6 +170,17 @@ async def get_limit_by_id(limit_id: int, session = None) -> Limit | None:
 
 
 async def get_all_limits(session = None) -> list[Limit]:
+    """
+    Retrieve all quota limit types.
+
+    Parameters
+    ----------
+    - session: Optional SQLAlchemy session.
+
+    Returns
+    -------
+    - A list of Limit ORM objects.
+    """
     if session is None:
         async with get_session() as session:
             return await get_all_limits(session=session)
@@ -91,6 +189,8 @@ async def get_all_limits(session = None) -> list[Limit]:
     return result.scalars().all()
 
 def get_user_relationship_options():
+    """Return default relationship loading options for user queries."""
+
     return (
         selectinload(User.permissions).selectinload(ProjectPermission.project),
         selectinload(User.permissions).selectinload(ProjectPermission.role),

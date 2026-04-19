@@ -11,6 +11,21 @@ async def get_key_by_id(
     options = None,
     active_only: bool = True,
 ) -> APIKey | None:
+    """
+    Retrieve an API key by identifier.
+    If a session is provided, it uses that session; otherwise, it creates a new session for the query.
+
+    Parameters
+    ----------
+    - key_id: Identifier of the API key.
+    - session: Optional SQLAlchemy session.
+    - options: Optional relationship loading options.
+    - active_only: Whether to restrict results to active keys and active projects.
+
+    Returns
+    -------
+    - The matching APIKey ORM object, or None if not found.
+    """
     if session is None:
         async with get_session() as session:
             return await get_key_by_id(key_id=key_id, session=session, options=options, active_only=active_only)
@@ -30,6 +45,20 @@ async def get_key_by_id(
     return result.scalars().first()
 
 async def get_keys_for_user(user_id: int, session = None, active_only: bool = True) -> list[APIKey]:
+    """
+    Retrieve all API keys belonging to a user.
+    If a session is provided, it uses that session; otherwise, it creates a new session for the query.
+
+    Parameters
+    ----------
+    - user_id: Identifier of the user.
+    - session: Optional SQLAlchemy session.
+    - active_only: Whether to restrict results to active keys and active projects.
+
+    Returns
+    -------
+    - A list of APIKey ORM objects.
+    """
     if session is None:
         async with get_session() as session:
             return await get_keys_for_user(user_id=user_id, session=session, active_only=active_only)
@@ -45,6 +74,19 @@ async def get_keys_for_user(user_id: int, session = None, active_only: bool = Tr
     return result.scalars().all()
 
 async def get_keys_for_project(project_id: int, session = None, active_only: bool = True) -> list[APIKey]:
+    """
+    Retrieve all API keys for a project.
+
+    Parameters
+    ----------
+    - project_id: Identifier of the project.
+    - session: Optional SQLAlchemy session.
+    - active_only: Whether to restrict results to active keys and active projects.
+
+    Returns
+    -------
+    - A list of APIKey ORM objects.
+    """
     if session is None:
         async with get_session() as session:
             return await get_keys_for_project(project_id=project_id, session=session, active_only=active_only)
@@ -60,6 +102,18 @@ async def get_keys_for_project(project_id: int, session = None, active_only: boo
     return result.scalars().all()
 
 async def get_all_keys(session = None, active_only: bool = True) -> list[APIKey]:
+    """
+    Retrieve all API keys across projects.
+
+    Parameters
+    ----------
+    - session: Optional SQLAlchemy session.
+    - active_only: Whether to restrict results to active keys and active projects.
+
+    Returns
+    -------
+    - A list of APIKey ORM objects.
+    """
     if session is None:
         async with get_session() as session:
             return await get_all_keys(session=session, active_only=active_only)
@@ -81,6 +135,22 @@ async def create_key(
         key_hash: str,
         session = None
 ) -> APIKey:
+    """
+    Create a new API key record in the database.
+
+    Parameters
+    ----------
+    - project_id: Project identifier for the key.
+    - user_id: Owner user identifier.
+    - name: Human-readable key name.
+    - fingerprint: Key fingerprint value.
+    - key_hash: Hashed key value.
+    - session: Optional transactional SQLAlchemy session.
+
+    Returns
+    -------
+    - The created APIKey ORM object.
+    """
     if session is None:
         async with get_transactional_session() as session:
             return await create_key(
@@ -107,6 +177,18 @@ async def create_key(
     return key
 
 async def delete_key(key_id: int, session = None) -> None:
+    """
+    Archive an API key and delete quotas targeting it.
+
+    Parameters
+    ----------
+    - key_id: Identifier of the API key to archive.
+    - session: Optional transactional SQLAlchemy session.
+
+    Returns
+    -------
+    - None.
+    """
     if session is None:
         async with get_transactional_session() as session:
             return await delete_key(key_id=key_id, session=session)
@@ -127,6 +209,18 @@ async def delete_key(key_id: int, session = None) -> None:
     key.status = Status.ARCHIVED
 
 async def get_key_ownership(key_id: int, session = None) -> tuple[Project, User]:
+    """
+    Retrieve the project and user owning an API key.
+
+    Parameters
+    ----------
+    - key_id: Identifier of the API key.
+    - session: Optional SQLAlchemy session.
+
+    Returns
+    -------
+    - A tuple of project and user ORM objects.
+    """
     if session is None:
         async with get_session() as session:
             return await get_key_ownership(key_id=key_id, session=session)
@@ -153,6 +247,8 @@ async def get_key_ownership(key_id: int, session = None) -> tuple[Project, User]
     return (key.project, key.user)
 
 def get_key_relationship_options():
+    """Return default relationship loading options for API key queries."""
+
     return (
         selectinload(APIKey.quotas),
         selectinload(APIKey.project),

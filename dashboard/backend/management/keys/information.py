@@ -7,6 +7,19 @@ def convert_orm_to_display_info(
     api_key: str | None = None,
     username: str | None = None,
 ) -> ApiKeyDisplayInformation:
+    """
+    Convert an API key ORM entity to its dashboard DTO representation.
+
+    Parameters
+    ----------
+    - key_orm: Source API key ORM model.
+    - api_key: Optional raw API key value to include in the DTO.
+    - username: Optional username override for display.
+
+    Returns
+    -------
+    - ApiKeyDisplayInformation built from ORM data.
+    """
     return ApiKeyDisplayInformation(
         id=key_orm.id,
         project_id=key_orm.project_id,

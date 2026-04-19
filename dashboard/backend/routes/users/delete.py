@@ -12,6 +12,18 @@ async def delete_user_route(
     request: UserDeleteRequest,
     _: UserDisplayInformation = Depends(require_administrator_user),
 ):
+    """
+    Delete a user account by identifier.
+
+    Parameters
+    ----------
+    - request: User deletion payload containing the target user identifier.
+    - _: Administrator authorization dependency output, unused in function body.
+
+    Returns
+    -------
+    - A success message dictionary when deletion completes.
+    """
     await user_enforce_existing_user(request.user_id)
 
     try:

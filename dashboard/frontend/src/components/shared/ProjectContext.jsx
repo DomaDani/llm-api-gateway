@@ -4,6 +4,14 @@ const STORAGE_KEY = "selectedProject"
 
 const ProjectContext = createContext(null)
 
+/**
+ * @typedef {object} ProjectContextValue
+ * @property {object | null} selectedProject - Currently selected project object.
+ * @property {number | null} selectedProjectId - ID of the selected project.
+ * @property {Function} selectProject - Set the selected project.
+ * @property {Function} clearSelectedProject - Clear the selected project.
+ */
+
 function readStoredProject() {
     if (typeof window === "undefined") {
         return null
@@ -22,6 +30,13 @@ function readStoredProject() {
     }
 }
 
+/**
+ * Provides project selection context with localStorage persistence.
+ *
+ * @param {object} props - Component props.
+ * @param {JSX.Element} props.children - Child components.
+ * @returns {JSX.Element} The rendered provider.
+ */
 export function ProjectProvider({ children }) {
     const [selectedProject, setSelectedProject] = useState(() => readStoredProject())
 
@@ -60,6 +75,12 @@ export function ProjectProvider({ children }) {
     )
 }
 
+/**
+ * Hook to access the project context.
+ *
+ * @returns {ProjectContextValue} The project context value with selection methods.
+ * @throws {Error} If used outside of ProjectProvider.
+ */
 export function useProject() {
     const context = useContext(ProjectContext)
 

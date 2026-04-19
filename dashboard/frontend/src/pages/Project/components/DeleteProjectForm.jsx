@@ -4,6 +4,11 @@ import AlertBox from "../../../components/primitives/AlertBox"
 import { useProject } from "../../../components/shared/ProjectContext"
 import useProjectDeletion from "../../../hooks/useProjectDeletion"
 
+/**
+ * Form for deleting the currently selected project with confirmation.
+ *
+ * @returns {JSX.Element} The rendered form.
+ */
 export default function DeleteProjectForm() {
     const navigate = useNavigate()
     const { selectedProject, clearSelectedProject } = useProject()

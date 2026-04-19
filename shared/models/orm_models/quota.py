@@ -9,6 +9,30 @@ from .status_enum import Status
 from .period_enum import Period
 
 class Quota(SQLAlchemyBase):
+    """
+    ORM model representing quota allocation and reset state.
+
+    Attributes
+    ----------
+    - id: The unique identifier for the quota entry (primary key).
+    - project_id: Optional foreign key to the project targeted by this quota.
+    - user_id: Optional foreign key to the user targeted by this quota.
+    - key_id: Optional foreign key to the API key targeted by this quota.
+    - limit_id: The foreign key to the limit type being constrained.
+    - limit_value: The allocated maximum value for the configured limit and period.
+    - period: The reset period for the quota.
+    - expires_at: Optional timestamp when this quota definition expires.
+    - status: The current lifecycle state of the quota.
+    - allocated: The currently consumed amount within the active period.
+    - next_reset: The timestamp when allocated usage resets.
+
+    Relationships
+    -------------
+    - project: The relationship to the Project this quota directly applies to.
+    - api_key: The relationship to the APIKey this quota directly applies to.
+    - user: The relationship to the User this quota directly applies to.
+    - limit: The relationship to the Limit definition for this quota.
+    """
     __tablename__ = "quotas"
 
     id : Mapped[int] = mapped_column(primary_key=True)

@@ -6,6 +6,19 @@ from dashboard.backend.models import UserDisplayInformation
 from dashboard.backend.db import user_email_free, user_username_free, get_user_permissions_for_project, is_user_administrator, is_user_project_manager, get_user_by_id
 
 async def enforce_availability(email: str, username: str, exclude_user_id: int | None = None) -> None:
+    """
+    Ensure email and username values are available for use.
+
+    Parameters
+    ----------
+    - email: Email value to validate.
+    - username: Username value to validate.
+    - exclude_user_id: Optional user identifier to exclude from uniqueness checks.
+
+    Returns
+    -------
+    - None.
+    """
     if not await user_email_free(email, exclude_user_id):
         raise HTTPException(status_code=409, detail="Email is already in use.")
     
@@ -13,6 +26,19 @@ async def enforce_availability(email: str, username: str, exclude_user_id: int |
         raise HTTPException(status_code=409, detail="Username is already in use.")
     
 async def convert_orm_to_display_info(user_orm: User, include_role: bool = False, project_id: int | None = None) -> UserDisplayInformation:
+    """
+    Convert a user ORM entity to a user display DTO.
+
+    Parameters
+    ----------
+    - user_orm: Source user ORM model.
+    - include_role: Whether role information should be resolved and included.
+    - project_id: Optional project scope for role resolution.
+
+    Returns
+    -------
+    - UserDisplayInformation mapped from ORM data.
+    """
 
     if include_role:
         role = "User"
@@ -41,6 +67,17 @@ async def convert_orm_to_display_info(user_orm: User, include_role: bool = False
     )
 
 async def enforce_existing_user(user_id: int) -> User:
+    """
+    Ensure a user exists and return it.
+
+    Parameters
+    ----------
+    - user_id: Identifier of the user to fetch.
+
+    Returns
+    -------
+    - The found User ORM entity.
+    """
     user = await get_user_by_id(user_id)
     if user is None:
         raise HTTPException(status_code=404, detail="User not found.")

@@ -13,6 +13,18 @@ async def get_key_information(
     request: KeyInformationRequest = Depends(),
     _: None = Depends(require_valid_access_token),
 ) -> list[ApiKeyDisplayInformation]:
+    """
+    Retrieve API keys scoped either to a project or to a specific user.
+
+    Parameters
+    ----------
+    - request: Query parameters selecting project or user scope.
+    - _: Token validation dependency output, unused in function body.
+
+    Returns
+    -------
+    - A list of API key display models matching the requested scope.
+    """
     try:
         if request.project_id is not None:
             key_orms = await get_keys_for_project(request.project_id)

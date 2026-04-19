@@ -19,6 +19,18 @@ async def create_api_key(
     request: CreateApiKeyRequest,
     current_user: UserDisplayInformation = Depends(require_current_user),
 ):
+    """
+    Create a new API key for a project accessible by the current user.
+
+    Parameters
+    ----------
+    - request: API key creation payload including project identifier and key name.
+    - current_user: Authenticated user resolved from access token.
+
+    Returns
+    -------
+    - ApiKeyDisplayInformation containing metadata and the generated raw API key value.
+    """
     try:
         await project_enforce_existing_project(request.project_id)
 

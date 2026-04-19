@@ -12,6 +12,18 @@ from gateway.db import db_limit_check_and_allocation
 from shared.config import DEFAULT_MAX_COMPLETION_TOKENS, QUOTA_STRICTNESS, PROVIDER_ID
 
 async def check_limits_costs(body: OpenAIRequest, key_info: APIKey = Depends(validate_api_key)) -> ValidatedRequest:
+    """
+    Check if the request is expected to exceed the user's quota limits based on token and cost estimates. If the request is within limits, it allocates the estimated tokens and cost against the user's quota.
+
+    Parameters
+    ----------
+    - body: The OpenAIRequest DTO containing the details of the incoming request.
+    - key_info: The APIKey ORM object for the authenticated API key, injected by the validate_api_key dependency.
+
+    Returns
+    -------
+    - ValidatedRequest: A DTO containing the validated request information along with the estimated tokens and cost.
+    """
     # est_input_tokens = await run_in_threadpool(get_token_count, body.messages)
     est_input_tokens = get_token_count(body.messages)
     est_completion_tokens = int(math.ceil((body.max_completion_tokens or DEFAULT_MAX_COMPLETION_TOKENS) * QUOTA_STRICTNESS))
@@ -29,8 +41,6 @@ async def check_limits_costs(body: OpenAIRequest, key_info: APIKey = Depends(val
     if not await db_limit_check_and_allocation(key_info, estimated_total_tokens, estimated_cost):
         raise HTTPException(status_code=429, detail="Quota exceeded.")
     
-
-
     return ValidatedRequest(
         key_id=key_info.id,
         project_id=key_info.project_id,

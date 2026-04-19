@@ -19,6 +19,17 @@ _mappings = {}
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """
+    Manage startup and shutdown lifecycle logging for the mock upstream app.
+
+    Parameters
+    ----------
+    - app: The FastAPI application instance.
+
+    Returns
+    -------
+    - An async context manager controlling app lifespan events.
+    """
     log.info(f"Mock upstream starting; {len(_mappings)} mappings available")
     yield
     log.info("Mock upstream shutting down")
@@ -28,6 +39,17 @@ app = FastAPI(title="Mock Upstream", docs_url=None, redoc_url=None, lifespan=lif
 
 
 async def _choose_mapping(request: Request) -> Dict[str, Any]:
+    """
+    Select the configured response mapping that matches an incoming request.
+
+    Parameters
+    ----------
+    - request: Incoming FastAPI request containing chat-completion JSON payload.
+
+    Returns
+    -------
+    - A tuple of HTTP status code and response payload dictionary.
+    """
     incoming = await request.json()
 
     for _, data in _mappings.items():
@@ -61,6 +83,18 @@ async def _choose_mapping(request: Request) -> Dict[str, Any]:
     return 200, {"detail": "no mapping found"}
 
 def _matches(expected, actual):
+    """
+    Recursively compare nested mapping structures for partial request matching.
+
+    Parameters
+    ----------
+    - expected: Expected structure from mapping fixture.
+    - actual: Actual value from incoming request payload.
+
+    Returns
+    -------
+    - True if the actual payload satisfies the expected structure, else False.
+    """
     if isinstance(expected, dict) and isinstance(actual, dict):
         for k, v in expected.items():
             if k not in actual:
@@ -79,6 +113,17 @@ def _matches(expected, actual):
 
 @app.post("/v1/chat/completions")
 async def chat_completions(request: Request):
+    """
+    Handle chat completion requests using mapping-driven mocked responses.
+
+    Parameters
+    ----------
+    - request: Incoming FastAPI request.
+
+    Returns
+    -------
+    - A JSONResponse containing mocked completion or upstream-error payload.
+    """
     status, response = await _choose_mapping(request)
     if status == 200:
         response = dict(response)
@@ -87,10 +132,23 @@ async def chat_completions(request: Request):
 
 @app.get("/health")
 async def health():
+    """Return a simple health-check response for test orchestration."""
+
     return JSONResponse(content={"status": "ok"}, status_code=200)
 
 
 def main(argv=None):
+    """
+    Start the mock upstream server with mappings loaded from fixture files.
+
+    Parameters
+    ----------
+    - argv: Optional CLI argument list.
+
+    Returns
+    -------
+    - None.
+    """
     p = argparse.ArgumentParser()
     p.add_argument("--port", type=int, default=8081)
     p.add_argument("--host", default="0.0.0.0")

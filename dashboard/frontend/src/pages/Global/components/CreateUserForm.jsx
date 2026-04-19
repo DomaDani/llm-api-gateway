@@ -5,6 +5,11 @@ import { useAuth } from '../../../api/auth/AuthProvider'
 import { isTokenExpired } from '../../../api/auth/token'
 import AlertBox from '../../../components/primitives/AlertBox'
 
+/**
+ * Form for admin users to create new dashboard user accounts.
+ *
+ * @returns {JSX.Element} The rendered form.
+ */
 export default function CreateUserForm() {
     const { token } = useAuth()
 

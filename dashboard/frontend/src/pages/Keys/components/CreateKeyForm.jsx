@@ -6,6 +6,13 @@ import { useProject } from "../../../components/shared/ProjectContext"
 import AlertBox from "../../../components/primitives/AlertBox"
 import InfoBox from "../../../components/primitives/InfoBox"
 
+/**
+ * Form for creating a new API key for the selected project.
+ *
+ * @param {object} props - Component props.
+ * @param {Function} props.onCreated - Callback fired when an API key is successfully created.
+ * @returns {JSX.Element} The rendered form.
+ */
 export default function CreateKeyForm({ onCreated }) {
     const { user } = useAuth()
     const { selectedProject } = useProject()
@@ -62,7 +69,7 @@ export default function CreateKeyForm({ onCreated }) {
                             <AlertBox message={success} variant="success" className="mt-0" />
                         </div>
                         <div className="mt-3 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                            <InfoBox value={apiKeyValue} className="sm:col-span-4" />
+                            <InfoBox value={apiKeyValue} className="sm:col-span-10" />
                             <div className="sm:col-span-4">
                                 <label htmlFor="key-name" className="block text-sm/6 font-medium text-white">
                                     Key Name

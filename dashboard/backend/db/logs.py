@@ -13,6 +13,22 @@ async def get_usage_logs(
     offset: int = 0,
     session = None
 ) -> list[UsageLog] | list[Row]:
+    """
+    Retrieve usage logs with optional filtering, pagination, and aggregation.
+
+    Parameters
+    ----------
+    - user_id: Optional user identifier filter.
+    - project_id: Optional project identifier filter.
+    - aggregate_by_fifteen_minutes: Whether to return 15-minute aggregate rows.
+    - limit: Optional maximum number of rows to return.
+    - offset: Number of rows to skip.
+    - session: Optional SQLAlchemy session.
+
+    Returns
+    -------
+    - A list of UsageLog ORM objects or aggregated SQL rows.
+    """
 
     if session is None:
         async with get_session() as session:
@@ -61,6 +77,18 @@ def _get_filter(
     user_id: int | None = None,
     project_id: int | None = None,
 ) -> list:
+    """
+    Build SQL filters for usage log queries.
+
+    Parameters
+    ----------
+    - user_id: Optional user identifier filter.
+    - project_id: Optional project identifier filter.
+
+    Returns
+    -------
+    - A list of SQLAlchemy filter expressions.
+    """
     
     filters = []
     if user_id is not None:
@@ -71,6 +99,17 @@ def _get_filter(
     return filters
 
 def _get_time_chunk(interval : int = 15*60):
+    """
+    Build SQL expression for fixed-width timestamp buckets.
+
+    Parameters
+    ----------
+    - interval: Bucket width in seconds.
+
+    Returns
+    -------
+    - A labeled SQLAlchemy expression for grouped time chunks.
+    """
     return (
         func.to_timestamp(
             (

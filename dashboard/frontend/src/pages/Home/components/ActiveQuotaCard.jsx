@@ -1,3 +1,14 @@
+/**
+ * Card displaying a single active quota with usage progress bar and reset date.
+ *
+ * @param {object} props - Component props.
+ * @param {string} props.name - Quota name.
+ * @param {string} props.resetDate - Date/time when the quota resets.
+ * @param {number} props.used - Current usage amount.
+ * @param {number} props.limit - Maximum limit value.
+ * @param {string} props.type - Quota type (e.g., 'Request Limit', 'Token Limit').
+ * @returns {JSX.Element} The rendered quota card.
+ */
 export default function ActiveQuotaCard({ name, resetDate, used, limit, type })
 {
     let typeName = ""

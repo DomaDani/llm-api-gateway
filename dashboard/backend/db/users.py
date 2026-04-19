@@ -10,6 +10,19 @@ from .keys import delete_key
 from .quotas import delete_quota
 
 async def change_user_identity(user_id: int, new_email: str, new_username: str) -> User:
+    """
+    Update a user's email and username.
+
+    Parameters
+    ----------
+    - user_id: Identifier of the user.
+    - new_email: New email value.
+    - new_username: New username value.
+
+    Returns
+    -------
+    - The updated User ORM object.
+    """
     async with get_transactional_session() as session:
         result = await session.execute(select(User).where(User.id == user_id).with_for_update())
         user = result.scalars().first()
@@ -23,6 +36,19 @@ async def change_user_identity(user_id: int, new_email: str, new_username: str) 
         return user
     
 async def change_user_password(user_id: int, new_password_hash: str, mandate_reset: bool = False) -> User:
+    """
+    Update a user's password hash and optional reset flag timestamp.
+
+    Parameters
+    ----------
+    - user_id: Identifier of the user.
+    - new_password_hash: New hashed password value.
+    - mandate_reset: Whether password expiration should be set immediately.
+
+    Returns
+    -------
+    - The updated User ORM object.
+    """
     async with get_transactional_session() as session:
         result = await session.execute(select(User).where(User.id == user_id).with_for_update())
         user = result.scalars().first()
@@ -36,6 +62,21 @@ async def change_user_password(user_id: int, new_password_hash: str, mandate_res
         return user
     
 async def create_user(email: str, username: str, password_hash: str, mandate_reset: bool = False, session = None) -> User:
+    """
+    Create and persist a new user record.
+
+    Parameters
+    ----------
+    - email: User email address.
+    - username: User username.
+    - password_hash: Hashed password value.
+    - mandate_reset: Whether password expiration is set at creation.
+    - session: Optional transactional SQLAlchemy session.
+
+    Returns
+    -------
+    - The created User ORM object.
+    """
     if session is None:
         async with get_transactional_session() as session:
             return await create_user(email=email, username=username, password_hash=password_hash, mandate_reset=mandate_reset, session=session)
@@ -52,6 +93,18 @@ async def create_user(email: str, username: str, password_hash: str, mandate_res
     return new_user
     
 async def delete_user(user_id: int, session = None) -> None:
+    """
+    Delete a user and cleanup related permissions, keys, and quotas.
+
+    Parameters
+    ----------
+    - user_id: Identifier of the user to delete.
+    - session: Optional transactional SQLAlchemy session.
+
+    Returns
+    -------
+    - None.
+    """
     if session is None:
         async with get_transactional_session() as session:
             return await delete_user(user_id=user_id, session=session)
@@ -87,6 +140,17 @@ async def delete_user(user_id: int, session = None) -> None:
     await session.delete(user)
 
 async def get_all_users(session = None) -> list[User]:
+    """
+    Retrieve all users ordered by username.
+
+    Parameters
+    ----------
+    - session: Optional SQLAlchemy session.
+
+    Returns
+    -------
+    - A list of User ORM objects.
+    """
     if session is None:
         async with get_session() as session:
             return await get_all_users(session=session)
@@ -95,6 +159,18 @@ async def get_all_users(session = None) -> list[User]:
     return result.scalars().all()
 
 async def is_password_expired(user_id: int, session = None) -> bool:
+    """
+    Check whether a user's password expiration timestamp has passed.
+
+    Parameters
+    ----------
+    - user_id: Identifier of the user.
+    - session: Optional SQLAlchemy session.
+
+    Returns
+    -------
+    - True if password is expired, otherwise False.
+    """
     if session is None:
         async with get_session() as session:
             return await is_password_expired(user_id=user_id, session=session)

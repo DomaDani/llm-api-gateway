@@ -2,6 +2,17 @@ import { useCallback, useState } from "react"
 
 import { addUserToProject } from "../api/management/project/AddUser"
 
+/**
+ * Hook for managing addition of users to a project with error and success states.
+ *
+ * @param {object} params - Hook parameters.
+ * @param {number} params.projectId - Project identifier.
+ * @returns {object} Hook return value.
+ * @returns {string} return.projectUserAddError - Error message if addition failed.
+ * @returns {string} return.projectUserAddSuccess - Success message if addition succeeded.
+ * @returns {number} return.projectUserAddReloadKey - Key for triggering table refreshes.
+ * @returns {Function} return.handleAddProjectUser - Function to add a user to the project.
+ */
 export default function useProjectUserAddition({ projectId }) {
     const [projectUserAddError, setProjectUserAddError] = useState("")
     const [projectUserAddSuccess, setProjectUserAddSuccess] = useState("")

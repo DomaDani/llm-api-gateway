@@ -6,6 +6,13 @@ import { useProject } from "../../components/shared/ProjectContext";
 
 const AuthContext = createContext();
 
+/**
+ * Provides authentication state and actions to the component tree.
+ *
+ * @param {object} props - Component props.
+ * @param {React.ReactNode} props.children - Child elements rendered inside the provider.
+ * @returns {JSX.Element} The auth context provider.
+ */
 export const AuthProvider = ({ children }) => {
     const { selectedProject, clearSelectedProject } = useProject()
 
@@ -23,6 +30,11 @@ export const AuthProvider = ({ children }) => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
 
+    /**
+     * Clear the current auth state and redirect to the home page.
+     *
+     * @returns {void}
+     */
     const logout = useCallback(() => {
         setToken(null);
         setUser(null);
@@ -31,6 +43,11 @@ export const AuthProvider = ({ children }) => {
         navigate('/');
     }, [navigate]);
 
+    /**
+     * Load the current authenticated user and store it in state.
+     *
+     * @returns {Promise<void>}
+     */
     const fetchMe = useCallback(async () => {
         try {
             const params = selectedProject ? { project_id: selectedProject.id } : {}
@@ -43,6 +60,9 @@ export const AuthProvider = ({ children }) => {
         }
     }, [logout, selectedProject]);
 
+    /**
+     * Check for an existing token and load the user if valid. If the token is expired, clear it from storage.
+     */
     useEffect(() => {
         if(token) {
             if (isTokenExpired(token)) {
@@ -57,6 +77,9 @@ export const AuthProvider = ({ children }) => {
         }
     }, [fetchMe, logout, token]);
 
+    /**
+     * Automatically log out the user when the token expires by calculating the remaining time until expiration and setting a timeout to trigger the logout action. Also listens for a custom 'auth:expired' event to handle token expiration across multiple tabs or windows.
+     */
     useEffect(() => {
         if (!token) {
             return
@@ -78,6 +101,9 @@ export const AuthProvider = ({ children }) => {
         }
     }, [logout, token])
 
+    /**
+     * Listen for a custom 'auth:expired' event to handle token expiration across multiple tabs or windows. When the event is triggered, the user will be logged out in all open instances of the application.
+     */
     useEffect(() => {
         const onAuthExpired = () => {
             logout()
@@ -90,6 +116,13 @@ export const AuthProvider = ({ children }) => {
         }
     }, [logout])
 
+    /**
+     * Authenticate a user and store the returned token.
+     *
+     * @param {string} email - User email address.
+     * @param {string} password - User password.
+     * @returns {Promise<void>}
+     */
     const login = async (email, password) => {
         try {
             const response = await api.post('/auth/login', { email, password });
@@ -119,4 +152,17 @@ export const AuthProvider = ({ children }) => {
     );
 };
 
-export const useAuth = () => useContext(AuthContext);
+/**
+ * Access the current authentication context.
+ *
+ * @returns {AuthContextValue} The auth context value.
+ */
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+
+    if (!context) {
+        throw new Error("useAuth must be used within an AuthProvider.");
+    }
+
+    return context;
+};

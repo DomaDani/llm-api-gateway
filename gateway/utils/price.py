@@ -1,7 +1,23 @@
 from genai_prices import Usage, calc_price
 from shared.config import PROVIDER_ID, DEFAULT_INPUT_MTOKEN_PRICE, DEFAULT_OUTPUT_MTOKEN_PRICE
 
+
 def calculate_cost(usage: Usage, model_ref: str, provider_id: str) -> float:
+    """
+    Calculate the estimated cost of a request.
+
+    This function attempts to calculate the cost using the Pydantic genai_prices library. If it encounters any issues (e.g., missing model information, API errors), it falls back to a default pricing strategy based on token count and default values.
+
+    Parameters
+    ----------
+    - usage: A genai_prices.Usage object containing the input and output token counts.
+    - model_ref: A string reference to the model being used (e.g., "zai-org/GLM-4.5-Air-FP8").
+    - provider_id: A string identifying the provider (e.g., "zai-org").
+
+    Returns
+    -------
+    - A float representing the estimated cost of the request in USD.
+    """
     try:
         cost = calc_price(
             usage=usage,

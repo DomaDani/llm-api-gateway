@@ -6,6 +6,8 @@ def test_dashboard_health_endpoint_returns_200(
     dashboard_request_headers: dict[str, str],
     frontend_origin: str,
 ):
+    """Verify dashboard health endpoint returns 200 and expected CORS headers."""
+
     resp = wait_for_health(f"{dashboard_base_url}/health", headers=dashboard_request_headers)
     assert resp.status_code == 200
     assert resp.json().get("status") == "ok"

@@ -2,6 +2,19 @@ import { useCallback, useState } from "react"
 
 import { removeUserFromProject } from "../api/management/project/RemoveUser"
 
+/**
+ * Hook for managing removal of users from a project with error and success states.
+ *
+ * @param {object} params - Hook parameters.
+ * @param {Array} params.projectUsers - Current array of project users.
+ * @param {Function} params.setProjectUsers - State setter for the project users array.
+ * @param {number} params.projectId - Project identifier.
+ * @returns {object} Hook return value.
+ * @returns {string} return.projectUserError - Error message if removal failed.
+ * @returns {string} return.projectUserSuccess - Success message if removal succeeded.
+ * @returns {number} return.projectUserReloadKey - Key for triggering table refreshes.
+ * @returns {Function} return.handleRemoveProjectUser - Function to remove a user from the project.
+ */
 export default function useProjectUserRemoval({ projectUsers, setProjectUsers, projectId }) {
     const [projectUserError, setProjectUserError] = useState("")
     const [projectUserSuccess, setProjectUserSuccess] = useState("")

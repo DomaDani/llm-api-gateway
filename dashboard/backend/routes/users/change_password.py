@@ -15,6 +15,18 @@ async def change_password(
     request: UserPasswordChangeRequest,
     current_user: UserDisplayInformation = Depends(require_current_user)
 ):
+    """
+    Change a password for the current user or, for admins, another user.
+
+    Parameters
+    ----------
+    - request: Password change payload with current and new password fields.
+    - current_user: Authenticated user requesting the password change.
+
+    Returns
+    -------
+    - A success message dictionary when password update completes.
+    """
     user_record = await get_user_by_id(current_user.id)
     if user_record is None:
         raise HTTPException(status_code=401, detail="Invalid or expired access token")

@@ -2,6 +2,20 @@
 
 import { useState, useRef, useEffect } from "react"
 
+/**
+ * Searchable dropdown component with optional auto-selection and required validation.
+ *
+ * @param {object} props - Component props.
+ * @param {string[]} props.items - List of selectable items.
+ * @param {string} props.itemName - Singular name for the item type (e.g., "project").
+ * @param {Function} props.onSelect - Callback fired when an item is selected.
+ * @param {string} props.containerClassName - CSS classes for the dropdown container.
+ * @param {boolean} props.required - Whether selection is required for form validation.
+ * @param {string} props.name - HTML name attribute for the hidden input.
+ * @param {boolean} props.selectFirst - Whether to auto-select the first item if none selected.
+ * @param {string} props.initialSelected - Initially selected item value.
+ * @returns {JSX.Element} The rendered dropdown component.
+ */
 export default function Dropdown({ items = [], itemName, onSelect, containerClassName = "", required = false, name, selectFirst = false, initialSelected = null })
 {
     const [isOpen, setIsOpen]       = useState(false)

@@ -9,6 +9,18 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 @router.get("/info", response_model=list[UserDisplayInformation], description="Get specific information about users either globally or per project")
 async def get_user_information(request: UserInformationRequest = Depends(), _: UserDisplayInformation = Depends(require_valid_access_token)) -> list[UserDisplayInformation]:
+    """
+    Retrieve user information globally or filtered by project membership.
+
+    Parameters
+    ----------
+    - request: Query payload containing optional project scope.
+    - _: Token validation dependency output, unused in function body.
+
+    Returns
+    -------
+    - A list of user display models with optional role context.
+    """
     try:
         if request.project_id is not None:
             user_orms = await get_users_by_project(request.project_id)

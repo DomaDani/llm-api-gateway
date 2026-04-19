@@ -8,6 +8,42 @@ from .base import Base as SQLAlchemyBase
 
 
 class UsageLog(SQLAlchemyBase):
+    """
+    ORM model representing a single gateway usage record.
+
+    Attributes
+    ----------
+    - id: The unique identifier for the usage log entry (primary key).
+    - key_id: The foreign key to the API key used for the request.
+    - project_id: The foreign key to the project billed for the request.
+    - user_id: The foreign key to the user associated with the request.
+    - request_id: Optional unique upstream or gateway request identifier.
+    - timestamp: The timestamp when the request was recorded.
+    - request_type: Optional request category.
+    - estimated_tokens: Optional token estimate captured before completion.
+    - prompt_tokens: Optional prompt token count.
+    - completion_tokens: Optional completion token count.
+    - total_tokens: Optional total and finalised token count.
+    - internal_cost_estimate: Optional pre-finalized internal cost estimate.
+    - internal_cost_final: Optional finalised internal cost.
+    - model: Optional model name used for the request.
+    - temperature: Optional sampling temperature parameter.
+    - top_p: Optional nucleus sampling parameter.
+    - top_k: Optional top-k sampling parameter.
+    - finish_reason: Optional completion stop reason.
+    - upstream_latency: Optional measured upstream service latency.
+    - gateway_overhead: Optional measured gateway processing overhead.
+    - total_latency: Optional total end-to-end request latency.
+    - ttft: Optional time-to-first-token for streaming responses.
+    - is_streaming: Optional flag indicating if response was streamed.
+    - status_code: Optional resulting HTTP status code.
+
+    Relationships
+    -------------
+    - api_key: The relationship to the APIKey associated with this request.
+    - project: The relationship to the Project associated with this request.
+    - user: The relationship to the User associated with this request.
+    """
     __tablename__ = "usage_logs"
     id: Mapped[int] = mapped_column(primary_key=True)
     key_id: Mapped[int] = mapped_column(ForeignKey("api_keys.id"))

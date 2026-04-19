@@ -6,6 +6,17 @@ from dashboard.backend.db import get_project_by_id, get_user_by_id, get_key_by_i
 from shared.models.orm_models import project
 
 async def convert_orm_to_display_info(usage_log_orm: UsageLog) -> UsageLogDisplayInformation:
+    """
+    Convert a usage log ORM entity to a usage log display DTO.
+
+    Parameters
+    ----------
+    - usage_log_orm: Source usage log ORM model.
+
+    Returns
+    -------
+    - UsageLogDisplayInformation mapped from ORM data.
+    """
 
     if usage_log_orm.project_id is not None:
         project = await get_project_by_id(usage_log_orm.project_id)
@@ -56,6 +67,17 @@ async def convert_orm_to_display_info(usage_log_orm: UsageLog) -> UsageLogDispla
 
 
 async def convert_aggregate_row_to_display_info(row: Row) -> UsageLogAggregateDisplayInformation:
+    """
+    Convert an aggregated SQL row to an aggregated usage log DTO.
+
+    Parameters
+    ----------
+    - row: SQLAlchemy Row containing aggregated usage fields.
+
+    Returns
+    -------
+    - UsageLogAggregateDisplayInformation mapped from row values.
+    """
     mapping = row._mapping
 
     if mapping["project_id"] is not None:

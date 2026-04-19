@@ -33,12 +33,18 @@ from .middleware import init_middleware
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """
+    Defines the lifespan of the Fastapi application, handling startup and shutdown events.
+    """
     try:
         yield
     finally:
         pass
 
 def create_app() -> FastAPI:
+    """
+    Creates the FastAPI application instance, sets up the lifespan context, initializes middleware, and includes the API routers for health, authentication, user management, logs, keys, projects, and quotas.
+    """
     app = FastAPI(title="LLM API Gateway Dashboard", lifespan=lifespan)
     
     init_middleware(app)

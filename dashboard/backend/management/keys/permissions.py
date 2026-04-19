@@ -4,6 +4,14 @@ from dashboard.backend.db import get_key_ownership, is_user_project_manager, is_
 
 
 async def enforce_key_deletion_permission(current_user_id: int, key_id: int) -> None:
+    """
+    Ensure the current user is allowed to delete the target API key.
+
+    Parameters
+    ----------
+    - current_user_id: Identifier of the user attempting deletion.
+    - key_id: Identifier of the API key to delete.
+    """
     if await is_user_administrator(current_user_id):
         return
     project, user = await get_key_ownership(key_id=key_id)

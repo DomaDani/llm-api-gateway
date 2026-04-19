@@ -20,6 +20,19 @@ import asyncio
 
 
 async def create_mock_data(default_only: bool = False):
+    """
+    Creates default values and mock data in the database.
+
+    This function checks for the existence of default roles, limits, an administrator user, and a global project.
+    
+    If they do not exist, it creates them.
+
+    If the default_only flag is set to True, it will only create the default roles, limits, administrator user, and global project without adding additional mock users, projects, permissions, API keys, or quotas used for testing.
+
+    Parameters
+    ----------
+    - default_only: A boolean flag indicating whether to only create default roles, limits, administrator
+    """
     async with get_transactional_session() as session:
         
         existing_roles_result = await session.execute(select(Role))        
