@@ -11,6 +11,23 @@ from .api_key import APIKey
 from .quota import Quota
 
 class Project(SQLAlchemyBase):
+    """
+    ORM model representing a project in the database.
+
+    Attributes
+    ----------
+    - id: The unique identifier for the project (primary key).
+    - name: The unique, human-readable project name.
+    - status: The lifecycle status of the project, (ACTIVE, ARCHIVED, etc.).
+    - created_date: The timestamp when the project was created.
+    - modified_date: The timestamp of the latest update, if any.
+
+    Relationships
+    -------------
+    - permissions: The relationship to ProjectPermission rows linked to this project.
+    - api_keys: The relationship to APIKey rows issued under this project.
+    - quotas: The relationship to Quota rows directly targeting this project.
+    """
     __tablename__ = "projects"
 
     id : Mapped[int] = mapped_column(primary_key=True)

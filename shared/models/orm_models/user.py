@@ -9,6 +9,26 @@ from .api_key import APIKey
 from .quota import Quota
 
 class User(SQLAlchemyBase):
+    """
+    ORM model representing a platform user.
+
+    Attributes
+    ----------
+    - id: The unique identifier for the user (primary key).
+    - email: The unique email address used by the user.
+    - username: The unique public username.
+    - profile_picture_url: Optional URL to the user's profile picture.
+    - password_hash: The secure hash of the user's password.
+    - joined_date: The timestamp when the user account was created.
+    - last_login: Optional timestamp of the user's most recent login.
+    - password_expires_at: Optional timestamp for password expiration policy.
+
+    Relationships
+    -------------
+    - permissions: The relationship to ProjectPermission rows for this user.
+    - api_keys: The relationship to APIKey rows owned by this user.
+    - quotas: The relationship to Quota rows targeting this user.
+    """
     __tablename__ = "users"
 
     id : Mapped[int] = mapped_column(primary_key=True)
