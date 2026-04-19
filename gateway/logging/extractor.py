@@ -19,6 +19,21 @@ async def prepare_usage_entry(
     status_code=200,
     failed_upstream=False
 ):
+    """
+    Extract the relevant usage information from the completion response and calls the logger to store it in the database.
+
+    Parameters
+    ----------
+    - request: The original FastAPI request object.
+    - validated_request: The validated request DTO containing estimates and user/project/key information.
+    - upstream_latency: Time taken for the upstream provider to respond.
+    - gateway_overhead: Time taken by the gateway to process the request excluding upstream latency.
+    - ttft: Time to first token, if applicable.
+    - total_time: Total time taken for the entire request processing.
+    - chat_completion: The response object from the chat completion API, None if the request failed before receiving a response.
+    - status_code: The HTTP status code of the response, defaulting to 200 for successful requests.
+    - failed_upstream: Boolean indicating if the failure was due to an upstream provider issue.
+    """
     usage = getattr(chat_completion, "usage", None)
     choices = getattr(chat_completion, "choices", None)
 
