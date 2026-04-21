@@ -81,7 +81,9 @@ export default function ApiKeysTable({ title = "API Keys", rows = [], onAction, 
         setSortDirection("asc")
     }
 
-    const columnCount = visibleColumns.length + (onAction ? 1 : 0)
+    const hasRows = sortedRows.length > 0
+    const showActionColumn = Boolean(onAction && hasRows)
+    const columnCount = visibleColumns.length + (showActionColumn ? 1 : 0)
 
     return (
         <div className="flex min-w-0 flex-col rounded-md bg-white/5 outline outline-1 outline-white/10">
@@ -107,7 +109,7 @@ export default function ApiKeysTable({ title = "API Keys", rows = [], onAction, 
                                     </button>
                                 </th>
                             ))}
-                            {onAction && (
+                            {showActionColumn && (
                                 <th className="px-4 py-2 text-right text-xs font-medium tracking-wide text-gray-500">
                                     Action
                                 </th>
@@ -116,7 +118,7 @@ export default function ApiKeysTable({ title = "API Keys", rows = [], onAction, 
                     </thead>
 
                     <tbody className="divide-y divide-white/5">
-                        {sortedRows.length > 0 ? (
+                        {hasRows ? (
                             sortedRows.map((row) => (
                                 <tr key={row.id} className="hover:bg-white/5">
                                     {showUser && (
@@ -136,7 +138,7 @@ export default function ApiKeysTable({ title = "API Keys", rows = [], onAction, 
                                     <td className="max-w-0 truncate px-4 py-2 text-gray-300" title={row.status}>
                                         {row.status}
                                     </td>
-                                    {onAction && (
+                                    {showActionColumn && (
                                         <td className="px-4 py-2 text-right">
                                             <button
                                                 type="button"
