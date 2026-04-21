@@ -3,7 +3,7 @@ services:
     image: postgres:15
     env_file: .env
     volumes:
-      - ./postgreSQL/data:/var/lib/postgresql/data
+      - pg_data:/var/lib/postgresql/data
     
   init-db:
     image: ${INIT_DB_IMAGE:-llm-api-gateway-init-db:latest}
@@ -79,3 +79,6 @@ services:
       - dashboard-backend
     ports:
       - "5173:5173"
+
+volumes:
+  pg_data:

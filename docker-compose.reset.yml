@@ -1,0 +1,4 @@
+services:
+  init-db:
+    environment:
+      RESET_DB: "true"
