@@ -40,17 +40,44 @@ async def convert_orm_to_display_info(user_orm: User, include_role: bool = False
     - UserDisplayInformation mapped from ORM data.
     """
 
+    is_admin = False
+    try:
+        is_admin = await is_user_administrator(user_orm.id)
+    except ValueError:
+        is_admin = False
+
+    is_project_manager = False
+    try:
+        if project_id is not None:
+            is_project_manager = await is_user_project_manager(user_orm.id, project_id)
+    except ValueError:
+        is_project_manager = False
+
+    is_expired = False
+    try:
+        is_expired = await is_password_expired(user_orm.id)
+    except ValueError:
+        is_expired = False
+
+    role = None
     if include_role:
         role = "User"
         if project_id is not None:
-            permission_record = await get_user_permissions_for_project(project_id, user_orm.id)
+            try:
+                permission_record = await get_user_permissions_for_project(project_id, user_orm.id)
+            except ValueError:
+                permission_record = None
             if permission_record is not None:
                 role = permission_record.role.name
         else:
-            if await is_user_administrator(user_orm.id):
+            if is_admin:
                 role = "Administrator"
-            elif await is_user_project_manager(user_orm.id):
-                role = "Project Manager"
+            else:
+                try:
+                    if await is_user_project_manager(user_orm.id):
+                        role = "Project Manager"
+                except ValueError:
+                    pass
 
     return UserDisplayInformation(
         id=user_orm.id,
@@ -61,9 +88,9 @@ async def convert_orm_to_display_info(user_orm: User, include_role: bool = False
         last_login=user_orm.last_login,
         password_expires_at=user_orm.password_expires_at,
         role=role if include_role else None,
-        is_admin=await is_user_administrator(user_orm.id),
-        is_project_manager=await is_user_project_manager(user_orm.id, project_id) if project_id is not None else False,
-        is_password_expired=await is_password_expired(user_orm.id)
+        is_admin=is_admin,
+        is_project_manager=is_project_manager if project_id is not None else False,
+        is_password_expired=is_expired
     )
 
 async def enforce_existing_user(user_id: int) -> User:

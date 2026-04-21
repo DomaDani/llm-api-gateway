@@ -29,4 +29,11 @@ async def get_user_information(request: UserInformationRequest = Depends(), _: U
     except Exception as e:
         raise HTTPException(status_code=400, detail="Something went wrong while fetching user information. Please try again later.") from e
 
-    return [await convert_orm_to_display_info(user_orm, include_role=True, project_id=request.project_id) for user_orm in user_orms]
+    user_infos: list[UserDisplayInformation] = []
+    for user_orm in user_orms:
+        try:
+            user_infos.append(await convert_orm_to_display_info(user_orm, include_role=True, project_id=request.project_id))
+        except ValueError:
+            continue
+
+    return user_infos
