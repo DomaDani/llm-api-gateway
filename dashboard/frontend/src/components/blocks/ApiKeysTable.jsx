@@ -81,7 +81,8 @@ export default function ApiKeysTable({ title = "API Keys", rows = [], onAction, 
         setSortDirection("asc")
     }
 
-    const columnCount = visibleColumns.length + (onAction ? 1 : 0)
+    const desktopColumnCount = visibleColumns.length + (onAction ? 1 : 0)
+    const mobileColumnCount = visibleColumns.filter((column) => !HIDDEN_ON_MOBILE.has(column)).length + (onAction ? 1 : 0)
 
     return (
         <div className="flex min-w-0 flex-col rounded-md bg-white/5 outline outline-1 outline-white/10">
@@ -151,7 +152,10 @@ export default function ApiKeysTable({ title = "API Keys", rows = [], onAction, 
                             ))
                         ) : (
                             <tr>
-                                <td colSpan={columnCount} className="px-4 py-6 text-center text-gray-500">
+                                <td colSpan={mobileColumnCount} className="px-4 py-6 text-center text-gray-500 sm:hidden">
+                                    No API keys found
+                                </td>
+                                <td colSpan={desktopColumnCount} className="hidden px-4 py-6 text-center text-gray-500 sm:table-cell">
                                     No API keys found
                                 </td>
                             </tr>

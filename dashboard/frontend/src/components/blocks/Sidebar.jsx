@@ -40,7 +40,7 @@ export default function Sidebar({ children })
     }, [selectedProject, selectProject])
 
     return (
-        <div className="flex h-screen bg-gray-900">
+        <div className="flex h-screen w-full overflow-x-hidden bg-gray-900">
 
             {/* Mobile backdrop */}
             {isMobileSidebarOpen && (
@@ -154,11 +154,11 @@ export default function Sidebar({ children })
             </div>
 
             {/* Main content */}
-            <div className="flex flex-1 flex-col">
+            <div className="flex min-w-0 flex-1 flex-col">
 
                 {/* Top bar */}
-                <div className="flex h-16 items-center justify-between border-b border-white/10 bg-gray-900">
-                    <div className="flex items-center px-4">
+                <div className="flex h-16 min-w-0 items-center justify-between border-b border-white/10 bg-gray-900 px-2 sm:px-0">
+                    <div className="flex min-w-0 flex-1 items-center px-2 sm:px-4">
                         <button
                             type="button"
                             aria-label="Toggle sidebar"
@@ -172,7 +172,7 @@ export default function Sidebar({ children })
                         <Dropdown
                             items={projects.map((p) => p.name)}
                             itemName="project"
-                            containerClassName="mx-4 w-64"
+                            containerClassName="mx-2 min-w-0 w-full max-w-28 sm:mx-4 sm:max-w-64"
                             selectFirst={!selectedProject}
                             initialSelected={selectedProject?.name ?? null}
                             onSelect={(name) => {
@@ -182,11 +182,11 @@ export default function Sidebar({ children })
                         />
                     </div>
 
-                    <div className="flex items-center gap-4 pr-4">
+                    <div className="flex shrink-0 items-center gap-2 pr-2 sm:gap-4 sm:pr-4">
                         <NavLink
                             to="/profile"
                             className={({ isActive }) =>
-                                `text-sm font-medium transition-colors ${
+                                `text-xs font-medium transition-colors sm:text-sm ${
                                     isActive
                                         ? "text-white font-bold"
                                         : "text-gray-400 hover:text-white"
@@ -198,7 +198,7 @@ export default function Sidebar({ children })
                         <button
                             type="button"
                             onClick={logout}
-                            className="cursor-pointer text-sm font-medium text-gray-400 transition-colors hover:text-white"
+                            className="cursor-pointer text-xs font-medium text-gray-400 transition-colors hover:text-white sm:text-sm"
                         >
                             SIGN OUT
                         </button>
@@ -206,7 +206,7 @@ export default function Sidebar({ children })
                 </div>
 
                 {/* Page content */}
-                <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-10 text-white">
+                <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto p-4 text-white sm:p-10">
                     {children}
                 </div>
 

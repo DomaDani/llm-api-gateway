@@ -53,6 +53,9 @@ export default function UsersTable({ title = "Users", rows = [], onAction, actio
         setSortDirection("asc")
     }
 
+    const desktopColumnCount = onAction ? 5 : 4
+    const mobileColumnCount = onAction ? 3 : 2
+
     return (
         <div className="flex min-w-0 flex-col rounded-md bg-white/5 outline outline-1 outline-white/10">
             <div className="border-b border-white/10 bg-indigo-500/10 px-4 py-3">
@@ -108,7 +111,10 @@ export default function UsersTable({ title = "Users", rows = [], onAction, actio
                             ))
                         ) : (
                             <tr>
-                                <td colSpan={onAction ? 5 : 4} className="px-4 py-6 text-center text-gray-500">
+                                <td colSpan={mobileColumnCount} className="px-4 py-6 text-center text-gray-500 sm:hidden">
+                                    No users found
+                                </td>
+                                <td colSpan={desktopColumnCount} className="hidden px-4 py-6 text-center text-gray-500 sm:table-cell">
                                     No users found
                                 </td>
                             </tr>
