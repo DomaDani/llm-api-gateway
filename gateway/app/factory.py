@@ -77,7 +77,8 @@ async def _quota_refresh_job():
 			logger.info(f"Quota reset completed: {change_count} quotas reset")
 
 		except Exception as e:
-			logger.exception(f"Quota reset failed with error: {e}")
+			message = str(e)
+			logger.exception(f"Quota reset failed with error: {e.__class__.__name__}: {message}")
 		await asyncio.sleep(60)
 
 async def _quota_expire_job():
@@ -95,7 +96,8 @@ async def _quota_expire_job():
 			logger.info(f"Quota expiration completed: {change_count} quotas expired")
 
 		except Exception as e:
-			logger.exception(f"Quota expiration failed with error: {e}")
+			message = str(e)
+			logger.exception(f"Quota expiration failed with error: {e.__class__.__name__}: {message}")
 		await asyncio.sleep(60)
 
 async def _price_update_job():

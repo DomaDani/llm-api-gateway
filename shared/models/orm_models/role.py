@@ -6,7 +6,7 @@ from .project_permission import ProjectPermission
 
 class Role(SQLAlchemyBase):
     """
-    ORM model representing a project membership role.
+    ORM model representing a project membership role's definition.
 
     Attributes
     ----------
