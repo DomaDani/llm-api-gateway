@@ -76,7 +76,7 @@ export default function Dropdown({ items = [], itemName, onSelect, containerClas
                 aria-required={required}
                 className="flex w-full items-center justify-between rounded-md bg-white/5 px-3 py-1.5 text-sm text-white outline-1 -outline-offset-1 outline-white/10 hover:bg-white/10 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500"
             >
-                <span className={selected ? "text-white" : "text-gray-500"}>
+                <span className={`min-w-0 flex-1 truncate text-left ${selected ? "text-white" : "text-gray-500"}`}>
                     {selected ?? `Select ${itemName}...`}
                 </span>
                 <svg
