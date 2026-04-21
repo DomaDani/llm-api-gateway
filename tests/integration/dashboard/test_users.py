@@ -177,3 +177,29 @@ def test_users_admin_can_delete_user(
     delete_again_resp = delete_user(dashboard_base_url, headers, user_id)
     assert delete_again_resp.status_code == 404
     assert "not found" in delete_again_resp.json().get("detail", "").lower()
+
+
+def test_users_register_invalid_email_returns_verbose_422_detail(
+    dashboard_base_url: str,
+    admin_token: str,
+    dashboard_request_headers: dict[str, str],
+):
+    """Verify invalid registration payload returns readable validation detail text."""
+
+    headers = auth_headers(admin_token, dashboard_request_headers)
+    resp = requests.post(
+        f"{dashboard_base_url}/auth/register",
+        headers=headers,
+        json={
+            "email": "not-an-email",
+            "username": "invalid-email-user",
+            "password": "InitPass123",
+            "mandate_reset": False,
+        },
+        timeout=10,
+    )
+
+    assert resp.status_code == 422
+    detail = resp.json().get("detail")
+    assert isinstance(detail, str)
+    assert "email" in detail.lower()
