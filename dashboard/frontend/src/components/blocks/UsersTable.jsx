@@ -53,9 +53,8 @@ export default function UsersTable({ title = "Users", rows = [], onAction, actio
         setSortDirection("asc")
     }
 
-    const hasRows = sortedRows.length > 0
-    const showActionColumn = Boolean(onAction && hasRows)
-    const columnCount = Object.keys(SORTABLE_COLUMNS).length + (showActionColumn ? 1 : 0)
+    const desktopColumnCount = onAction ? 5 : 4
+    const mobileColumnCount = onAction ? 3 : 2
 
     return (
         <div className="flex min-w-0 flex-col rounded-md bg-white/5 outline outline-1 outline-white/10">
@@ -81,7 +80,7 @@ export default function UsersTable({ title = "Users", rows = [], onAction, actio
                                     </button>
                                 </th>
                             ))}
-                            {showActionColumn && (
+                            {onAction && (
                                 <th className="px-4 py-2 text-right text-xs font-medium tracking-wide text-gray-500">
                                     Action
                                 </th>
@@ -90,14 +89,14 @@ export default function UsersTable({ title = "Users", rows = [], onAction, actio
                     </thead>
 
                     <tbody className="divide-y divide-white/5">
-                        {hasRows ? (
+                        {sortedRows.length > 0 ? (
                             sortedRows.map((row) => (
                                 <tr key={row.id} className="hover:bg-white/5">
                                     <td className="max-w-0 truncate px-4 py-2 text-gray-300" title={row.username}>{row.username}</td>
                                     <td className="max-w-0 truncate px-4 py-2 text-gray-300" title={row.email}>{row.email}</td>
                                     <td className="hidden max-w-0 truncate px-4 py-2 text-gray-400 sm:table-cell" title={row.role}>{row.role}</td>
                                     <td className="hidden max-w-0 truncate px-4 py-2 text-gray-400 sm:table-cell" title={new Date(row.createdAt)}>{new Date(row.createdAt).toLocaleDateString()}</td>
-                                    {showActionColumn && (
+                                    {onAction && (
                                         <td className="px-4 py-2 text-right">
                                             <button
                                                 type="button"
@@ -112,7 +111,10 @@ export default function UsersTable({ title = "Users", rows = [], onAction, actio
                             ))
                         ) : (
                             <tr>
-                                <td colSpan={columnCount} className="px-4 py-6 text-center text-gray-500">
+                                <td colSpan={mobileColumnCount} className="px-4 py-6 text-center text-gray-500 sm:hidden">
+                                    No users found
+                                </td>
+                                <td colSpan={desktopColumnCount} className="hidden px-4 py-6 text-center text-gray-500 sm:table-cell">
                                     No users found
                                 </td>
                             </tr>

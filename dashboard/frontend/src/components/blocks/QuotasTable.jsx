@@ -102,9 +102,8 @@ export default function QuotasTable({ title = "Quotas", rows = [], showUser = fa
         setSortDirection("asc")
     }
 
-    const hasRows = sortedRows.length > 0
-    const showActionColumn = Boolean(onAction && hasRows)
-    const columnCount = visibleColumns.length + (showActionColumn ? 1 : 0)
+    const desktopColumnCount = visibleColumns.length + (onAction ? 1 : 0)
+    const mobileColumnCount = visibleColumns.filter((column) => !HIDDEN_ON_MOBILE.has(column)).length + (onAction ? 1 : 0)
 
     return (
         <div className="flex min-w-0 flex-col rounded-md bg-white/5 outline outline-1 outline-white/10">
@@ -130,7 +129,7 @@ export default function QuotasTable({ title = "Quotas", rows = [], showUser = fa
                                     </button>
                                 </th>
                             ))}
-                            {showActionColumn && (
+                            {onAction && (
                                 <th className="px-4 py-2 text-right text-xs font-medium tracking-wide text-gray-500">
                                     Action
                                 </th>
@@ -139,7 +138,7 @@ export default function QuotasTable({ title = "Quotas", rows = [], showUser = fa
                     </thead>
 
                     <tbody className="divide-y divide-white/5">
-                        {hasRows ? (
+                        {sortedRows.length > 0 ? (
                             sortedRows.map((row) => (
                                 <tr key={row.id} className="hover:bg-white/5">
                                     {showUser && <td className="max-w-0 truncate px-4 py-2 text-gray-300" title={row.user}>{row.user}</td>}
@@ -156,7 +155,7 @@ export default function QuotasTable({ title = "Quotas", rows = [], showUser = fa
                                         {row.allocated?.toLocaleString?.() ?? row.allocated}
                                     </td>
                                     <td className="max-w-0 truncate px-4 py-2 text-gray-300" title={row.status}>{row.status}</td>
-                                    {showActionColumn && (
+                                    {onAction && (
                                         <td className="px-4 py-2 text-right">
                                             <button
                                                 type="button"
@@ -171,7 +170,10 @@ export default function QuotasTable({ title = "Quotas", rows = [], showUser = fa
                             ))
                         ) : (
                             <tr>
-                                <td colSpan={columnCount} className="px-4 py-6 text-center text-gray-500">
+                                <td colSpan={mobileColumnCount} className="px-4 py-6 text-center text-gray-500 sm:hidden">
+                                    No quotas found
+                                </td>
+                                <td colSpan={desktopColumnCount} className="hidden px-4 py-6 text-center text-gray-500 sm:table-cell">
                                     No quotas found
                                 </td>
                             </tr>

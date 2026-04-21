@@ -139,7 +139,8 @@ export default function UsageRecordsTable({
         setSortDirection("asc")
     }
 
-    const columnCount = visibleColumns.length
+    const desktopColumnCount = visibleColumns.length
+    const mobileColumnCount = visibleColumns.filter((column) => !HIDDEN_ON_MOBILE.has(column)).length
     const requestStart = rows.length > 0 ? page * pageSize + 1 : 0
     const requestEnd = page * pageSize + rows.length
     const canGoPrevious = enabled && page > 0 && !loading
@@ -180,13 +181,19 @@ export default function UsageRecordsTable({
                     <tbody className="divide-y divide-white/5">
                         {error ? (
                             <tr>
-                                <td colSpan={columnCount} className="px-4 py-6 text-center text-red-300">
+                                <td colSpan={mobileColumnCount} className="px-4 py-6 text-center text-red-300 sm:hidden">
+                                    {error}
+                                </td>
+                                <td colSpan={desktopColumnCount} className="hidden px-4 py-6 text-center text-red-300 sm:table-cell">
                                     {error}
                                 </td>
                             </tr>
                         ) : loading && sortedRows.length === 0 ? (
                             <tr>
-                                <td colSpan={columnCount} className="px-4 py-6 text-center text-gray-500">
+                                <td colSpan={mobileColumnCount} className="px-4 py-6 text-center text-gray-500 sm:hidden">
+                                    Loading usage records...
+                                </td>
+                                <td colSpan={desktopColumnCount} className="hidden px-4 py-6 text-center text-gray-500 sm:table-cell">
                                     Loading usage records...
                                 </td>
                             </tr>
@@ -274,7 +281,10 @@ export default function UsageRecordsTable({
                             })
                         ) : (
                             <tr>
-                                <td colSpan={columnCount} className="px-4 py-6 text-center text-gray-500">
+                                <td colSpan={mobileColumnCount} className="px-4 py-6 text-center text-gray-500 sm:hidden">
+                                    No usage records found
+                                </td>
+                                <td colSpan={desktopColumnCount} className="hidden px-4 py-6 text-center text-gray-500 sm:table-cell">
                                     No usage records found
                                 </td>
                             </tr>
