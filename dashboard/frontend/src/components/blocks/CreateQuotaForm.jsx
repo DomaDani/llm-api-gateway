@@ -255,7 +255,7 @@ export default function CreateQuotaForm({
                                         Permanent?
                                     </label>
                                     <p className="text-gray-400">
-                                        This quota does not expire unless it is manually changed.
+                                        This quota does not expire unless it is manually deleted.
                                     </p>
                                 </div>
                             </div>
