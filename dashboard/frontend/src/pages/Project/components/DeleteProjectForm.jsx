@@ -43,7 +43,7 @@ export default function DeleteProjectForm() {
                 <div className="pb-5">
                     <h2 className="text-base/7 font-semibold text-white">Delete Project</h2>
                     <p className="mt-1 text-sm/6 text-gray-400">
-                        Deleting a project removes its settings, quotas, keys, and users from the dashboard.
+                        Deleting a project removes its settings, quotas, keys, and user permissions from the dashboard.
                     </p>
                     <div className="mt-3 space-y-8">
                         <AlertBox message={projectError} variant="error" className="mt-0" />
