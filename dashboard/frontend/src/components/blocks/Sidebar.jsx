@@ -105,7 +105,7 @@ export default function Sidebar({ children })
                             }
                             onClick={() => setIsMobileSidebarOpen(false)}
                         >
-                            Project settings
+                            Project Settings
                         </NavLink>
                     )}
 
@@ -120,7 +120,7 @@ export default function Sidebar({ children })
                         }
                         onClick={() => setIsMobileSidebarOpen(false)}
                     >
-                        API keys
+                        API Keys
                     </NavLink>
 
                     {/* <NavLink
