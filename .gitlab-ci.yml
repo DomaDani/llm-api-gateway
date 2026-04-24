@@ -324,3 +324,13 @@ integration:
     - rm -f .env
 
     - exit $PYTEST_EXIT
+
+unit:
+  stage: tests
+  image:
+    name: python:3.12.12-alpine
+  script:
+    - python -m venv .venv
+    - . .venv/bin/activate
+    - pip install -r gateway/requirements.txt -r dashboard/backend/requirements.txt -r tests/requirements.txt
+    - python -m pytest -vv tests/unit

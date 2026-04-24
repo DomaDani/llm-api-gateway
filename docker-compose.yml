@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:15
+    image: postgres@sha256:3e43515057e113ee741fca2f621f15300be34a6d4a8dfcf2e20651288c8272f3
     env_file: .env
     volumes:
       - pg_data:/var/lib/postgresql/data

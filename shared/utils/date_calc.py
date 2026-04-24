@@ -36,7 +36,7 @@ def calculate_date_after_period(period: Period, start_date: datetime | None = No
         raise ValueError(f"Unsupported period: {period}")
     
 
-    periods_elapsed = 0
+    periods_elapsed = 1
     if fast_forward:
         time_diff = now - start_date
 
