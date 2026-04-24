@@ -5,3 +5,4 @@ asyncpg
 fastapi
 uvicorn
 requests
+freezegun
