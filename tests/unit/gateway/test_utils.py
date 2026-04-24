@@ -44,17 +44,17 @@ def test_get_token_count_joins_string_and_content_part_text(monkeypatch):
     monkeypatch.setattr(usage_mod.enc, "encode", fake_encode)
 
     messages = [
-        OpenAIMessage(role="user", content="hello"),
+        OpenAIMessage(role="user", content="Vive"),
         OpenAIMessage(role="assistant", content=[
-            {"type": "text", "text": " from-parts"},
-            {"type": "image_url", "image_url": {"url": "https://example.com/i.png"}},
+            {"type": "text", "text": " la "},
+            {"type": "image_url", "image_url": {"url": "https://example.com/gecko.png"}},
         ]),
-        OpenAIMessage(role="user", content="world"),
+        OpenAIMessage(role="user", content="Tesherv'aals!"),
     ]
 
     result = usage_mod.get_token_count(messages)
 
-    assert captured["text"] == "hello from-partsworld"
+    assert captured["text"] == "Vive la Tesherv'aals!"
     assert result == 5
 
 
