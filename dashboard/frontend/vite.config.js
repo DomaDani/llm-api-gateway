@@ -14,5 +14,6 @@ export default defineConfig({
   ],
   define: {
     'import.meta.env.FRONTEND_ADDRESS': JSON.stringify(process.env.FRONTEND_ADDRESS),
+    'import.meta.env.DASHBOARD_BACKEND_PORT': JSON.stringify(process.env.DASHBOARD_BACKEND_PORT),
   },
 })

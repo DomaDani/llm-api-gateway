@@ -10,20 +10,20 @@ from tests.integration.helpers import login, wait_for_health
 def base_url() -> str:
     """Return the gateway base URL based on local or CI environment."""
 
-    return os.environ.get(
-        "BASE_URL",
-        "http://docker:8000" if (os.environ.get("CI") or os.environ.get("GITLAB_CI")) else "http://localhost:8000",
-    )
+    is_ci = bool(os.environ.get("CI") or os.environ.get("GITLAB_CI"))
+    gateway_host = "docker" if is_ci else "localhost"
+    gateway_port = os.environ.get("GATEWAY_PORT", "8000")
+    return os.environ.get("BASE_URL", f"http://{gateway_host}:{gateway_port}")
 
 
 @pytest.fixture(scope="session")
 def dashboard_base_url() -> str:
     """Return the dashboard base URL based on local or CI environment."""
 
-    return os.environ.get(
-        "DASHBOARD_BASE_URL",
-        "http://docker:8080" if (os.environ.get("CI") or os.environ.get("GITLAB_CI")) else "http://localhost:8080",
-    )
+    is_ci = bool(os.environ.get("CI") or os.environ.get("GITLAB_CI"))
+    dashboard_host = "docker" if is_ci else "localhost"
+    dashboard_port = os.environ.get("DASHBOARD_BACKEND_PORT", "8080")
+    return os.environ.get("DASHBOARD_BASE_URL", f"http://{dashboard_host}:{dashboard_port}")
 
 
 @pytest.fixture(scope="session")
@@ -45,7 +45,8 @@ def frontend_origin() -> str:
     """Return the frontend origin value used for CORS-sensitive dashboard calls."""
 
     frontend_address = os.environ.get("FRONTEND_ADDRESS", "http://localhost")
-    return f"{frontend_address}:5173"
+    frontend_port = os.environ.get("DASHBOARD_FRONTEND_PORT", "5173")
+    return f"{frontend_address}:{frontend_port}"
 
 
 @pytest.fixture(scope="session")
