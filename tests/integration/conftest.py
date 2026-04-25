@@ -10,10 +10,10 @@ from tests.integration.helpers import login, wait_for_health
 def base_url() -> str:
     """Return the gateway base URL based on local or CI environment."""
 
-    return os.environ.get(
-        "BASE_URL",
-        "http://docker:8000" if (os.environ.get("CI") or os.environ.get("GITLAB_CI")) else "http://localhost:8000",
-    )
+    is_ci = bool(os.environ.get("CI") or os.environ.get("GITLAB_CI"))
+    gateway_host = "docker" if is_ci else "localhost"
+    gateway_port = os.environ.get("GATEWAY_PORT", "8000")
+    return os.environ.get("BASE_URL", f"http://{gateway_host}:{gateway_port}")
 
 
 @pytest.fixture(scope="session")

@@ -112,6 +112,8 @@ compose:
       
       TARGET_URL=$TARGET_URL
       TARGET_KEY=$TARGET_KEY
+      GATEWAY_HOST=${GATEWAY_HOST:-0.0.0.0}
+      GATEWAY_PORT=${GATEWAY_PORT:-8000}
       ADMINISTRATOR_PASSWORD=$ADMINISTRATOR_PASSWORD
       LOGIN_SECRET_KEY=$LOGIN_SECRET_KEY
       ENV
@@ -154,11 +156,11 @@ compose:
     - | 
       # Perform gateway health check
       elapsed=0
-      until curl -sSf http://docker:8000/health || [ $elapsed -ge 120 ]; do
+      until curl -sSf http://docker:${GATEWAY_PORT:-8000}/health || [ $elapsed -ge 120 ]; do
         sleep 1
         elapsed=$((elapsed+1))
       done
-      if ! curl -sSf http://docker:8000/health; then
+      if ! curl -sSf http://docker:${GATEWAY_PORT:-8000}/health; then
         docker-compose -f docker-compose.yml -f ci.override.yml logs gateway --tail=300
         docker-compose -f docker-compose.yml -f ci.override.yml down -v
         rm -f ci.override.yml
@@ -214,7 +216,8 @@ integration:
     DOCKER_API_VERSION: "1.43"
     TARGET_URL: http://mock-upstream:8081/v1
     TARGET_KEY: anykey
-    BASE_URL: http://docker:8000
+    GATEWAY_HOST: 0.0.0.0
+    GATEWAY_PORT: 8000
   script:
     - |
       # Write .env file
@@ -225,6 +228,8 @@ integration:
       
       TARGET_URL=$TARGET_URL
       TARGET_KEY=$TARGET_KEY
+      GATEWAY_HOST=${GATEWAY_HOST:-0.0.0.0}
+      GATEWAY_PORT=${GATEWAY_PORT:-8000}
       ADMINISTRATOR_PASSWORD=$ADMINISTRATOR_PASSWORD
       LOGIN_SECRET_KEY=$LOGIN_SECRET_KEY
       ENV
@@ -308,6 +313,8 @@ integration:
     - sleep 5
 
     - wait $PIP_PID
+
+    - export BASE_URL="http://docker:${GATEWAY_PORT:-8000}"
 
     - |
       # Run tests, capture exit code
