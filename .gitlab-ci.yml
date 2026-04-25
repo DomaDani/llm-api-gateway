@@ -71,6 +71,9 @@ build:
       /kaniko/executor \
       --context $CI_PROJECT_DIR \
       --dockerfile dashboard/frontend/Dockerfile \
+      --build-arg FRONTEND_ADDRESS=${FRONTEND_ADDRESS:-http://localhost} \
+      --build-arg DASHBOARD_BACKEND_PORT=${DASHBOARD_BACKEND_PORT:-8080} \
+      --build-arg DASHBOARD_FRONTEND_PORT=${DASHBOARD_FRONTEND_PORT:-5173} \
       --destination $CI_REGISTRY_IMAGE:dashboard-frontend-$IMAGE_TAG \
       --cache=true
 
@@ -114,6 +117,11 @@ compose:
       TARGET_KEY=$TARGET_KEY
       GATEWAY_HOST=${GATEWAY_HOST:-0.0.0.0}
       GATEWAY_PORT=${GATEWAY_PORT:-8000}
+      DASHBOARD_BACKEND_HOST=${DASHBOARD_BACKEND_HOST:-0.0.0.0}
+      DASHBOARD_BACKEND_PORT=${DASHBOARD_BACKEND_PORT:-8080}
+      DASHBOARD_FRONTEND_HOST=${DASHBOARD_FRONTEND_HOST:-0.0.0.0}
+      DASHBOARD_FRONTEND_PORT=${DASHBOARD_FRONTEND_PORT:-5173}
+      FRONTEND_ADDRESS=${FRONTEND_ADDRESS:-http://localhost}
       ADMINISTRATOR_PASSWORD=$ADMINISTRATOR_PASSWORD
       LOGIN_SECRET_KEY=$LOGIN_SECRET_KEY
       ENV
@@ -170,11 +178,11 @@ compose:
     - |
       # Perform dashboard-backend health check
       elapsed=0
-      until curl -sSf http://docker:8080/health || [ $elapsed -ge 120 ]; do
+      until curl -sSf http://docker:${DASHBOARD_BACKEND_PORT:-8080}/health || [ $elapsed -ge 120 ]; do
         sleep 1
         elapsed=$((elapsed+1))
       done
-      if ! curl -sSf http://docker:8080/health; then
+      if ! curl -sSf http://docker:${DASHBOARD_BACKEND_PORT:-8080}/health; then
         docker-compose -f docker-compose.yml -f ci.override.yml logs dashboard-backend --tail=300
         docker-compose -f docker-compose.yml -f ci.override.yml down -v
         rm -f ci.override.yml
@@ -184,11 +192,11 @@ compose:
     - |
       # Perform dashboard-frontend health check
       elapsed=0
-      until curl -sSf http://docker:5173 || [ $elapsed -ge 120 ]; do
+      until curl -sSf http://docker:${DASHBOARD_FRONTEND_PORT:-5173} || [ $elapsed -ge 120 ]; do
         sleep 1
         elapsed=$((elapsed+1))
       done
-      if ! curl -sSf http://docker:5173; then
+      if ! curl -sSf http://docker:${DASHBOARD_FRONTEND_PORT:-5173}; then
         docker-compose -f docker-compose.yml -f ci.override.yml logs dashboard-frontend --tail=300
         docker-compose -f docker-compose.yml -f ci.override.yml down -v
         rm -f ci.override.yml
@@ -218,6 +226,11 @@ integration:
     TARGET_KEY: anykey
     GATEWAY_HOST: 0.0.0.0
     GATEWAY_PORT: 8000
+    DASHBOARD_BACKEND_HOST: 0.0.0.0
+    DASHBOARD_BACKEND_PORT: 8080
+    DASHBOARD_FRONTEND_HOST: 0.0.0.0
+    DASHBOARD_FRONTEND_PORT: 5173
+    FRONTEND_ADDRESS: http://localhost
   script:
     - |
       # Write .env file
@@ -230,6 +243,11 @@ integration:
       TARGET_KEY=$TARGET_KEY
       GATEWAY_HOST=${GATEWAY_HOST:-0.0.0.0}
       GATEWAY_PORT=${GATEWAY_PORT:-8000}
+      DASHBOARD_BACKEND_HOST=${DASHBOARD_BACKEND_HOST:-0.0.0.0}
+      DASHBOARD_BACKEND_PORT=${DASHBOARD_BACKEND_PORT:-8080}
+      DASHBOARD_FRONTEND_HOST=${DASHBOARD_FRONTEND_HOST:-0.0.0.0}
+      DASHBOARD_FRONTEND_PORT=${DASHBOARD_FRONTEND_PORT:-5173}
+      FRONTEND_ADDRESS=${FRONTEND_ADDRESS:-http://localhost}
       ADMINISTRATOR_PASSWORD=$ADMINISTRATOR_PASSWORD
       LOGIN_SECRET_KEY=$LOGIN_SECRET_KEY
       ENV
@@ -315,6 +333,7 @@ integration:
     - wait $PIP_PID
 
     - export BASE_URL="http://docker:${GATEWAY_PORT:-8000}"
+    - export DASHBOARD_BASE_URL="http://docker:${DASHBOARD_BACKEND_PORT:-8080}"
 
     - |
       # Run tests, capture exit code
