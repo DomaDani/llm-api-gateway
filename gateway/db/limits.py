@@ -83,15 +83,12 @@ async def db_limit_change(api_key: APIKey, request_delta: int = 0, change_by_tok
         for r_quota in request_quotas:
             if r_quota.limit_value is not None:
                 r_quota.allocated = min(max(r_quota.allocated + request_delta, 0), r_quota.limit_value)
-                print(f"Updated request quota {r_quota.id}: allocated {r_quota.allocated}/{r_quota.limit_value}")
     for t_quota in token_quotas:
         if t_quota.limit_value is not None:
             t_quota.allocated = min(max(t_quota.allocated + change_by_tokens, 0), t_quota.limit_value)
-            print(f"Updated token quota {t_quota.id}: allocated {t_quota.allocated}/{t_quota.limit_value}")
     for p_quota in price_quotas:
         if p_quota.limit_value is not None:
             p_quota.allocated = min(max(p_quota.allocated + change_by_price, 0), p_quota.limit_value)
-            print(f"Updated price quota {p_quota.id}: allocated {p_quota.allocated}/{p_quota.limit_value}")
 
 
 async def db_get_quotas_by_key(api_key: APIKey, session = None) -> Tuple[list[Quota], list[Quota], list[Quota]]:
