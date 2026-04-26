@@ -99,3 +99,4 @@ dist-ssr
 latex/
 *.dot
 *.pdf
+*.svg
