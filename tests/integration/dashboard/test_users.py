@@ -1,6 +1,6 @@
 import requests
 
-from tests.integration.helpers import (
+from tests.integration import (
     auth_headers,
     delete_user,
     find_user_id_by_email,

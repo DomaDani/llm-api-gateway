@@ -4,9 +4,13 @@ from dashboard.backend.models import UserPasswordChangeRequest
 from dashboard.backend.auth import require_current_user
 from dashboard.backend.models import UserDisplayInformation
 from dashboard.backend.db import get_user_by_id, change_user_password, is_user_administrator
-from dashboard.backend.management.users import enforce_password_change_validity, enforce_existing_user, enforce_password_strength
+from dashboard.backend.management import (
+    enforce_password_change_validity,
+    user_enforce_existing_user as enforce_existing_user,
+    enforce_password_strength,
+)
 
-from shared.utils.password import hash_password
+from shared.utils import hash_password
 
 router = APIRouter(prefix="/users", tags=["users"])
 

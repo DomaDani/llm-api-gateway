@@ -3,7 +3,7 @@ from pathlib import Path
 import time
 
 import pytest
-from tests.integration.helpers import login, wait_for_health
+from tests.integration import login, wait_for_health
 
 
 @pytest.fixture(scope="session")

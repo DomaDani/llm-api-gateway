@@ -1,4 +1,4 @@
-from tests.integration.helpers import wait_for_health
+from tests.integration import wait_for_health
 
 def test_health_endpoint_returns_200(base_url: str):
 	"""Verify the gateway health endpoint reports an operational status."""

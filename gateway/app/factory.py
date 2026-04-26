@@ -9,8 +9,7 @@ from genai_prices.data_snapshot import DataSnapshot
 from gateway.clients import UpstreamClient
 from gateway.routes import chat_router, health_router
 from gateway.app.middleware import init_middleware
-from gateway.db.refresh import expire_quotas_by_batch, refresh_quotas_by_batch
-from gateway.db.helpers import get_quota_count
+from gateway.db import expire_quotas_by_batch, refresh_quotas_by_batch, get_quota_count
 
 from shared.config import TARGET_URL, TARGET_KEY
 from shared.utils import find_project_root

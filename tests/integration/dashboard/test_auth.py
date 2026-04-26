@@ -1,6 +1,6 @@
 import requests
 
-from tests.integration.helpers import login
+from tests.integration import login
 
 
 def test_dashboard_login_returns_bearer_token(

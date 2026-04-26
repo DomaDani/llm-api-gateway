@@ -5,7 +5,7 @@ import time
 import asyncio
 
 from gateway.models import ValidatedRequest
-from gateway.limits.quota import check_limits_costs
+from gateway.limits import check_limits_costs
 from gateway.logging import prepare_usage_entry
 from gateway.clients import UpstreamClient
 from gateway.utils import stream_generator

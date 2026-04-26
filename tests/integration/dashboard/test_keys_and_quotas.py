@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from tests.integration.helpers import (
+from tests.integration import (
     SEEDED_PROJECT_NAMES,
     auth_headers,
     load_mapping,

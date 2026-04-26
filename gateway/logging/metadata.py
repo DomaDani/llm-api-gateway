@@ -3,8 +3,8 @@ from sqlalchemy import select
 import logging
 
 from gateway.db import db_limit_change
-from shared.models.orm_models import UsageLog, APIKey
-from gateway.models.dto_models import UsageLogEntry
+from shared.models import UsageLog, APIKey
+from gateway.models import UsageLogEntry
 from shared.db import get_transactional_session
 
 async def usage_logger(entry: UsageLogEntry, failed_upstream: bool = False):
