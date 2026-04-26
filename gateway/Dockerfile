@@ -14,4 +14,4 @@ COPY --chown=gateway:gateway shared/ ./shared
 COPY --chown=gateway:gateway gateway/ ./gateway
 EXPOSE 8000
 
-CMD ["uvicorn", "gateway.app.factory:create_app", "--host", "0.0.0.0", "--factory", "--port", "8000"]
+CMD ["sh", "-c", "uvicorn gateway.app.factory:create_app --host 0.0.0.0 --factory --port ${GATEWAY_PORT:-8000}"]

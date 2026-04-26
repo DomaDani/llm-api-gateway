@@ -14,4 +14,4 @@ COPY --chown=dashboard-backend:dashboard-backend shared/ ./shared
 COPY --chown=dashboard-backend:dashboard-backend dashboard/backend/ ./dashboard/backend
 EXPOSE 8080
 
-CMD ["uvicorn", "dashboard.backend.app.factory:create_app", "--host", "0.0.0.0", "--factory", "--port", "8080"]
+CMD ["sh", "-c", "uvicorn dashboard.backend.app.factory:create_app --host 0.0.0.0 --factory --port ${DASHBOARD_BACKEND_PORT:-8080}"]

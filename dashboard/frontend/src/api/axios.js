@@ -5,8 +5,10 @@ import { isTokenExpired } from './auth/token'
 /**
  * Shared Axios client configured for the dashboard frontend API.
  */
+const dashboardBackendPort = import.meta.env.DASHBOARD_BACKEND_PORT || '8080'
+
 const api = axios.create({
-    baseURL: `${import.meta.env.FRONTEND_ADDRESS}:8080`,
+    baseURL: `${import.meta.env.FRONTEND_ADDRESS}:${dashboardBackendPort}`,
     headers: {
         'Content-Type': 'application/json'
     }
