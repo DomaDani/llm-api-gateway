@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
 
-from gateway.models.dto_models import OpenAIRequest
+from . import OpenAIRequest
 from shared.models import Status
 
 # Pydantic classes for key validation

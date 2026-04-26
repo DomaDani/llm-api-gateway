@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
-from shared.models.orm_models import Period
+from shared.models import Period
 
 def calculate_date_after_period(period: Period, start_date: datetime | None = None, fast_forward: bool = False) -> datetime:
     """

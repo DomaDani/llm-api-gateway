@@ -42,13 +42,17 @@ async def db_limit_check_and_allocation(api_key: APIKey, estimated_tokens: int, 
         # If a quota has no limit (limit_value is None), it is considered unlimited and will not block the request.
         # The order of checks gives priority to request count, then tokens, then price, but all must be within limits for the request to be allowed.
         # Finally, the quotas are updated atomically within the same transaction.
-        if strictest_request_quota and strictest_request_quota.limit_value is None:
+        if (
+            (strictest_request_quota is None or strictest_request_quota.limit_value is None) and
+            (strictest_token_quota is None or strictest_token_quota.limit_value is None) and
+            (strictest_price_quota is None or strictest_price_quota.limit_value is None)
+        ):
             return True
-        elif strictest_request_quota and new_allocated_request > strictest_request_quota.limit_value:
-            return False
-        elif strictest_token_quota and new_allocated_token > strictest_token_quota.limit_value:
-            return False
-        elif strictest_price_quota and new_allocated_price > strictest_price_quota.limit_value:
+        elif (
+            (strictest_request_quota and strictest_request_quota.limit_value is not None and new_allocated_request > strictest_request_quota.limit_value) or
+            (strictest_token_quota and strictest_token_quota.limit_value is not None and new_allocated_token > strictest_token_quota.limit_value) or
+            (strictest_price_quota and strictest_price_quota.limit_value is not None and new_allocated_price > strictest_price_quota.limit_value)
+        ):
             return False
         else:
             await db_limit_change(api_key, request_delta=1, change_by_tokens=estimated_tokens, change_by_price=estimated_price, session=session)

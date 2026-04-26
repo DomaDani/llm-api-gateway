@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from tests.integration.helpers import load_mapping, post_chat_completion
+from tests.integration import load_mapping, post_chat_completion
 
 def test_chat_end_to_end(completions_url: str, unlimited_api_key: str, completions_dir: Path):
     """Verify a valid chat completion request returns the expected mock completion payload."""

@@ -1,6 +1,6 @@
 import requests
 from pathlib import Path
-from tests.integration.helpers import build_chat_url, load_mapping
+from tests.integration import build_chat_url, load_mapping
 
 def _build_chat_url(completions_url: str) -> str:
     """Build the chat completions URL used by this test module."""

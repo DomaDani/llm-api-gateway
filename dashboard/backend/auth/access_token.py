@@ -4,7 +4,7 @@ from jose import JWTError, jwt
 from datetime import datetime, timezone, timedelta
 
 from dashboard.backend.management import user_convert_orm_to_display_info as convert_orm_to_display_info
-from dashboard.backend.models.dto_models import UserDisplayInformation, AccessTokenInfo
+from dashboard.backend.models import UserDisplayInformation, AccessTokenInfo
 from dashboard.backend.db import get_user_by_id, is_user_administrator, is_user_project_manager
 
 from shared.config import LOGIN_SECRET_KEY, TOKEN_EXPIRATION_MINS, TOKEN_ENCODING_ALGORITHM

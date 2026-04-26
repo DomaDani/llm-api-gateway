@@ -3,7 +3,6 @@ from sqlalchemy import Row
 from shared.models import UsageLog
 from dashboard.backend.models import UsageLogDisplayInformation, UsageLogAggregateDisplayInformation
 from dashboard.backend.db import get_project_by_id, get_user_by_id, get_key_by_id
-from shared.models.orm_models import project
 
 async def convert_orm_to_display_info(usage_log_orm: UsageLog) -> UsageLogDisplayInformation:
     """

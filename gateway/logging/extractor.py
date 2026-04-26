@@ -4,7 +4,7 @@ from genai_prices import Usage
 
 from gateway.models import ValidatedRequest, UsageLogEntry
 from gateway.logging import usage_logger
-from gateway.utils.price import calculate_cost
+from gateway.utils import calculate_cost
 
 from shared.config import PROVIDER_ID
 

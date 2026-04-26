@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 
-from dashboard.backend.db.users import is_password_expired
+from dashboard.backend.db import is_password_expired
 from shared.models import User
 from dashboard.backend.models import UserDisplayInformation
 from dashboard.backend.db import user_email_free, user_username_free, get_user_permissions_for_project, is_user_administrator, is_user_project_manager, get_user_by_id

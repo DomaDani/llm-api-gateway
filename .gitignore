@@ -93,3 +93,10 @@ node_modules
 dist
 dist-ssr
 *.local
+
+# Documentation
+
+latex/
+*.dot
+*.pdf
+*.svg

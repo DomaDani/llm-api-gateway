@@ -3,7 +3,7 @@ import time
 
 import requests
 
-from tests.tools.load_mappings import load_mappings_from_dir
+from tests.tools import load_mappings_from_dir
 
 
 SEEDED_PROJECT_NAMES = {"Test Project 1", "Test Project 2"}

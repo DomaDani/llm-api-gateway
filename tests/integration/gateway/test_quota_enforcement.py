@@ -1,6 +1,6 @@
 import requests
 from pathlib import Path
-from tests.integration.helpers import bearer_headers, build_chat_url, load_mapping
+from tests.integration import bearer_headers, build_chat_url, load_mapping
 
 def _load_request_and_expected(completions_dir: Path) -> tuple[dict, dict]:
     """Load request and expected completion payload for quota test scenarios."""

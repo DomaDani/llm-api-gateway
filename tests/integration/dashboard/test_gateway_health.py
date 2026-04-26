@@ -1,4 +1,4 @@
-from tests.integration.helpers import wait_for_health
+from tests.integration import wait_for_health
 
 
 def test_dashboard_health_endpoint_returns_200(

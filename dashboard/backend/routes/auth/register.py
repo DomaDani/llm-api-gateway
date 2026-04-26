@@ -7,7 +7,7 @@ from dashboard.backend.auth import require_administrator_user
 from dashboard.backend.db import create_user
 from dashboard.backend.models import UserDisplayInformation
 
-from shared.utils.password import hash_password
+from shared.utils import hash_password
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 

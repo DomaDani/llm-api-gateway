@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from tests.integration.helpers import load_mapping, post_chat_completion
+from tests.integration import load_mapping, post_chat_completion
 
 def test_upstream_error(completions_url: str, unlimited_api_key: str, completions_dir: Path):
     """Verify upstream error mappings are propagated with expected status and payload."""
