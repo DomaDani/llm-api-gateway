@@ -36,4 +36,4 @@ async def add_user_to_project(
     except Exception as e:
         raise HTTPException(status_code=400, detail="Something went wrong while adding user to project. Please try again later.") from e
 
-    return {"message": f"User with added successfully."}
+    return {"message": f"User added successfully."}
