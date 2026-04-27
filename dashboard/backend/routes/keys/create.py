@@ -8,7 +8,7 @@ from dashboard.backend.management import (
     project_enforce_existing_project,
 )
 from dashboard.backend.models import ApiKeyDisplayInformation, CreateApiKeyRequest, UserDisplayInformation
-from shared.config import FINGERPRINT_LENGTH
+from shared.config import FINGERPRINT_LENGTH, EXPECTED_KEY_LENGTH
 from shared.utils import hash_key
 
 router = APIRouter(prefix="/keys", tags=["keys"])
@@ -38,7 +38,7 @@ async def create_api_key(
             if not await is_user_administrator(current_user.id):
                 raise HTTPException(status_code=400, detail="User is not a member of this project.")
 
-        api_key_value = generate_api_key(64)
+        api_key_value = generate_api_key(EXPECTED_KEY_LENGTH)
         fingerprint = api_key_value[:FINGERPRINT_LENGTH]
         created_key = await db_create_key(
             project_id=request.project_id,
