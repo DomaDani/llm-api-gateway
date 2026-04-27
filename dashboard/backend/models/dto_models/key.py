@@ -22,15 +22,6 @@ class KeyInformationRequest(BaseModel):
     project_id: int | None = None
     user_id: int | None = None
 
-    @model_validator(mode="after")
-    def validate_request(self):
-        if sum(x is not None for x in [self.project_id, self.user_id]) != 1:
-            raise PydanticCustomError(
-                "invalid_combination",
-                "Exactly one of project_id or user_id must be provided."
-                )
-        return self
-
 
 class ApiKeyDisplayInformation(BaseModel):
     """DTO representing API key information returned to clients."""

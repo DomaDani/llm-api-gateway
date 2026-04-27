@@ -44,9 +44,9 @@ async def get_key_by_id(
     result = await session.execute(stmt)
     return result.scalars().first()
 
-async def get_keys_for_user(user_id: int, session = None, active_only: bool = True) -> list[APIKey]:
+async def get_keys_for_user(user_id: int, project_id = None, session = None, active_only: bool = True) -> list[APIKey]:
     """
-    Retrieve all API keys belonging to a user.
+    Retrieve all API keys belonging to a user, or the user's keys in a project if a project is provided.
     If a session is provided, it uses that session; otherwise, it creates a new session for the query.
 
     Parameters
@@ -61,14 +61,14 @@ async def get_keys_for_user(user_id: int, session = None, active_only: bool = Tr
     """
     if session is None:
         async with get_session() as session:
-            return await get_keys_for_user(user_id=user_id, session=session, active_only=active_only)
+            return await get_keys_for_user(user_id=user_id, project_id=project_id, session=session, active_only=active_only)
 
     status_filter = (APIKey.status == Status.ACTIVE) if active_only else True
 
     result = await session.execute(
         select(APIKey)
         .join(Project, APIKey.project_id == Project.id)
-        .where(and_(APIKey.user_id == user_id, status_filter, Project.status == Status.ACTIVE))
+        .where(and_(APIKey.user_id == user_id, status_filter, Project.status == Status.ACTIVE, True if project_id is None else APIKey.project_id == project_id))
         .options(selectinload(APIKey.user))
     )
     return result.scalars().all()

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import { fetchKeyInfos } from "../../api/management/keys/Info"
 import { useAuth } from "../../api/auth/AuthProvider"
 import useApiKeyDeletion from "../../hooks/useApiKeyDeletion"
+import { useProject } from "../../components/shared/ProjectContext"
 
 /**
  * API keys management page for creating and managing user API keys.
@@ -15,6 +16,7 @@ export default function ApiKeys() {
     const { user } = useAuth()
     const [apiKeys, setApiKeys] = useState([])
     const { apiKeyError, apiKeySuccess, apiKeyReloadKey, handleDeleteApiKey } = useApiKeyDeletion({ apiKeys, setApiKeys })
+    const { selectedProject } = useProject()
 
     const handleApiKeyCreated = (createdKey) => {
         if (!createdKey?.id) {
@@ -32,7 +34,7 @@ export default function ApiKeys() {
             return
         }
 
-        fetchKeyInfos(null, user.id)
+        fetchKeyInfos(selectedProject.id, user.id)
             .then((data) => {
                 if (!mounted) return
                 setApiKeys(data || [])
@@ -42,7 +44,7 @@ export default function ApiKeys() {
             })
 
         return () => { mounted = false }
-    }, [user, apiKeyReloadKey])
+    }, [user, apiKeyReloadKey, selectedProject])
 
     return (
         <>
