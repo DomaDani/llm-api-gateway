@@ -14,7 +14,7 @@ async def get_key_information(
     _: None = Depends(require_valid_access_token),
 ) -> list[ApiKeyDisplayInformation]:
     """
-    Retrieve API keys scoped either to a project or to a specific user.
+    Retrieve API keys scoped either to a project or to a specific user or a specified user's keys in a project.
 
     Parameters
     ----------
@@ -26,13 +26,14 @@ async def get_key_information(
     - A list of API key display models matching the requested scope.
     """
     try:
-        if request.project_id is not None:
+        if request.user_id is None and request.project_id is not None:
             key_orms = await get_keys_for_project(request.project_id)
         else:
-            key_orms = await get_keys_for_user(request.user_id)
+            key_orms = await get_keys_for_user(user_id = request.user_id, project_id = request.project_id)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception as e:
+        print(f"Error fetching API keys: {e}")
         raise HTTPException(status_code=400, detail="Something went wrong while fetching API keys. Please try again later.") from e
 
     return [convert_orm_to_display_info(key_orm) for key_orm in key_orms]
