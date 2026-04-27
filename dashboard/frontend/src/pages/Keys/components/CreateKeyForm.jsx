@@ -1,10 +1,10 @@
 import { useState } from "react"
 
-import { createApiKey } from "../../../api/management/keys/Create"
 import { useAuth } from "../../../api/auth/AuthProvider"
 import { useProject } from "../../../components/shared/ProjectContext"
 import AlertBox from "../../../components/primitives/AlertBox"
 import InfoBox from "../../../components/primitives/InfoBox"
+import useApiKeyCreation from "../../../hooks/useApiKeyCreation"
 
 /**
  * Form for creating a new API key for the selected project.
@@ -17,42 +17,27 @@ export default function CreateKeyForm({ onCreated }) {
     const { user } = useAuth()
     const { selectedProject } = useProject()
     const [keyName, setKeyName] = useState("")
-    const [loading, setLoading] = useState(false)
-    const [error, setError] = useState("")
-    const [success, setSuccess] = useState("")
-    const [apiKeyValue, setApiKeyValue] = useState("")
+    const {
+        apiKeyCreateError,
+        apiKeyCreateSuccess,
+        apiKeyCreateLoading,
+        createdApiKeyValue,
+        handleCreateApiKey,
+    } = useApiKeyCreation({
+        projectId: selectedProject?.id ?? null,
+        userId: user?.id ?? null,
+    })
 
     const handleSubmit = async (event) => {
         event.preventDefault()
-        setError("")
-        setSuccess("")
 
-        if (!selectedProject?.id) {
-            setError("Select a project before creating an API key.")
-            return
-        }
+        const createdKey = await handleCreateApiKey({
+            name: keyName,
+        })
 
-        if (!user?.id) {
-            setError("You must be signed in to create API keys.")
-            return
-        }
-
-        setLoading(true)
-
-        try {
-            const createdKey = await createApiKey({
-                project_id: selectedProject.id,
-                name: keyName,
-            })
-
-            setApiKeyValue(createdKey.api_key || "")
-            setSuccess("API key created successfully.")
+        if (createdKey) {
             setKeyName("")
             onCreated?.(createdKey)
-        } catch (err) {
-            setError(err.message || "Could not create API key. Please try again.")
-        } finally {
-            setLoading(false)
         }
     }
 
@@ -65,11 +50,11 @@ export default function CreateKeyForm({ onCreated }) {
                         {/* <p className="mt-1 text-sm/6 text-gray-400">
                         </p> */}
                         <div className="mt-3 space-y-6">
-                            <AlertBox message={error} variant="error" className="mt-0" />
-                            <AlertBox message={success} variant="success" className="mt-0" />
+                            <AlertBox message={apiKeyCreateError} variant="error" className="mt-0" />
+                            <AlertBox message={apiKeyCreateSuccess} variant="success" className="mt-0" />
                         </div>
                         <div className="mt-3 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                            <InfoBox value={apiKeyValue} className="sm:col-span-10" />
+                            <InfoBox value={createdApiKeyValue} className="sm:col-span-10" />
                             <div className="sm:col-span-4">
                                 <label htmlFor="key-name" className="block text-sm/6 font-medium text-white">
                                     Key Name
@@ -92,10 +77,10 @@ export default function CreateKeyForm({ onCreated }) {
                         <div className="pt-6">
                             <button
                                 type="submit"
-                                disabled={loading}
-                                className={`rounded-md px-3 py-2 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 ${loading ? 'cursor-not-allowed bg-indigo-400' : 'cursor-pointer bg-indigo-500 hover:bg-indigo-400'}`}
+                                disabled={apiKeyCreateLoading}
+                                className={`rounded-md px-3 py-2 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 ${apiKeyCreateLoading ? 'cursor-not-allowed bg-indigo-400' : 'cursor-pointer bg-indigo-500 hover:bg-indigo-400'}`}
                             >
-                                {loading ? "Creating key..." : "Submit"}
+                                {apiKeyCreateLoading ? "Creating key..." : "Submit"}
                             </button>
                         </div>
                     </div>

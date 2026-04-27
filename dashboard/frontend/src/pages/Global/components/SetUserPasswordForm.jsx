@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react'
 
 import Dropdown from '../../../components/primitives/Dropdown'
 import { fetchUserInfos } from '../../../api/management/user/Info'
-import { changePassword } from '../../../api/management/user/ChangePassword'
 import { useAuth } from '../../../api/auth/AuthProvider'
 import { isTokenExpired } from '../../../api/auth/token'
 import AlertBox from '../../../components/primitives/AlertBox'
+import useUserPasswordUpdate from '../../../hooks/useUserPasswordUpdate'
 
 /**
  * Form for admin users to set another user's password and optionally mark it as expired.
@@ -20,17 +20,23 @@ export default function SetUserPasswordForm() {
     const [selectedUserId, setSelectedUserId] = useState(null)
     const [password, setPassword] = useState('')
     const [mandateReset, setMandateReset] = useState(false)
-    const [error, setError] = useState('')
-    const [success, setSuccess] = useState('')
-    const [loading, setLoading] = useState(false)
+    const [loadError, setLoadError] = useState('')
 
     const sessionExpired = !token || isTokenExpired(token)
+    const {
+        userPasswordError,
+        userPasswordSuccess,
+        userPasswordLoading,
+        handleUpdateUserPassword,
+    } = useUserPasswordUpdate({ sessionExpired })
 
     useEffect(() => {
         if (sessionExpired) {
-            setError('Your session has expired. Please sign in again.')
+            setLoadError('Your session has expired. Please sign in again.')
             return
         }
+
+        setLoadError('')
 
         let mounted = true
 
@@ -48,7 +54,7 @@ export default function SetUserPasswordForm() {
                 }
             })
             .catch((err) => {
-                setError(err.message || 'Failed to load users.')
+                setLoadError(err.message || 'Failed to load users.')
             })
 
         return () => { mounted = false }
@@ -56,31 +62,17 @@ export default function SetUserPasswordForm() {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
+        setLoadError('')
 
-        if (sessionExpired) {
-            setError('Your session has expired. Please sign in again.')
-            return
-        }
+        const updated = await handleUpdateUserPassword({
+            userId: selectedUserId,
+            newPassword: password,
+            mandateReset,
+        })
 
-        setError('')
-        setSuccess('')
-        setLoading(true)
-
-        try {
-            const message = await changePassword({
-                userId: selectedUserId ? Number(selectedUserId) : null,
-                newPassword: password,
-                newPasswordConfirm: password,
-                mandateReset
-            })
-
-            setSuccess(message)
+        if (updated) {
             setPassword('')
             setMandateReset(false)
-        } catch (err) {
-            setError(err.message || 'Could not update password. Please try again.')
-        } finally {
-            setLoading(false)
         }
     }
 
@@ -90,8 +82,9 @@ export default function SetUserPasswordForm() {
                 <div className="pb-5">
                     <h2 className="text-base/7 font-semibold text-white">Set User Password</h2>
                     <div className="mt-3 space-y-8">
-                        <AlertBox message={error} variant="error" className="mt-0" />
-                        <AlertBox message={success} variant="success" className="mt-0" />
+                        <AlertBox message={loadError} variant="error" className="mt-0" />
+                        <AlertBox message={userPasswordError} variant="error" className="mt-0" />
+                        <AlertBox message={userPasswordSuccess} variant="success" className="mt-0" />
 
                         <div>
                             <label htmlFor="user-id" className="block text-sm/6 font-medium text-white">
@@ -179,10 +172,10 @@ export default function SetUserPasswordForm() {
                     <div className="pt-6">
                         <button
                             type="submit"
-                            disabled={loading || sessionExpired}
-                            className={`rounded-md px-3 py-2 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 ${loading || sessionExpired ? 'cursor-not-allowed bg-indigo-400' : 'cursor-pointer bg-indigo-500 hover:bg-indigo-400'}`}
+                            disabled={userPasswordLoading || sessionExpired}
+                            className={`rounded-md px-3 py-2 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 ${userPasswordLoading || sessionExpired ? 'cursor-not-allowed bg-indigo-400' : 'cursor-pointer bg-indigo-500 hover:bg-indigo-400'}`}
                         >
-                            {sessionExpired ? 'Session expired' : loading ? 'Updating...' : 'Submit'}
+                            {sessionExpired ? 'Session expired' : userPasswordLoading ? 'Updating...' : 'Submit'}
                         </button>
                     </div>
                 </div>

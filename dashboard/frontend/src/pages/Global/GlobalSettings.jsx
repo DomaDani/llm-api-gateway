@@ -43,6 +43,7 @@ export default function GlobalSettings() {
 
     const [quotas, setQuotas] = useState([])
     const [users, setUsers] = useState([])
+    const [userCreateReloadKey, setUserCreateReloadKey] = useState(0)
     const { quotaError, quotaSuccess, quotaReloadKey, handleDeleteQuota } = useQuotaDeletion({ quotas, setQuotas })
     const { quotaCreateError, quotaCreateSuccess, quotaCreateReloadKey, handleCreateQuota } = useQuotaCreation({ projectId: null })
     const { userError, userSuccess, userReloadKey, handleDeleteUser } = useUserDeletion({ users, setUsers })
@@ -77,14 +78,14 @@ export default function GlobalSettings() {
             })
 
         return () => { mounted = false }
-    }, [userReloadKey])
+    }, [userReloadKey, userCreateReloadKey])
 
     return (
         <>
             <div className="flex flex-col gap-5">
                 <h1 className="shrink-0 text-3xl font-bold text-white">Global Settings</h1>
                 <div className="border-b border-white/10">
-                    <CreateUserForm />
+                    <CreateUserForm onCreated={() => setUserCreateReloadKey((prev) => prev + 1)} />
                 </div>
                 <div className="border-b border-white/10">
                     <SetUserPasswordForm />

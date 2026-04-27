@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react"
 
-import { changeIdentity } from "../../../api/management/user/ChangeIdentity";
 import { useAuth, } from "../../../api/auth/AuthProvider";
 import { isTokenExpired } from "../../../api/auth/token";
 import AlertBox from "../../../components/primitives/AlertBox";
+import useProfileIdentityUpdate from "../../../hooks/useProfileIdentityUpdate";
 
 /**
  * Form for updating user profile identity (username and email).
@@ -15,17 +15,13 @@ export default function ProfileIdentityForm() {
 
     const [username, setUsername] = useState(user?.username || '');
     const [email, setEmail] = useState(user?.email || '');
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
-    const [loading, setLoading] = useState(false);
-
     const sessionExpired = !token || isTokenExpired(token)
-
-    useEffect(() => {
-        if (sessionExpired) {
-            setError("Your session has expired. Please sign in again.")
-        }
-    }, [sessionExpired])
+    const {
+        profileIdentityError,
+        profileIdentitySuccess,
+        profileIdentityLoading,
+        handleUpdateProfileIdentity,
+    } = useProfileIdentityUpdate({ sessionExpired })
 
     useEffect(() => {
         if (user) {
@@ -37,25 +33,14 @@ export default function ProfileIdentityForm() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (sessionExpired) {
-            setError("Your session has expired. Please sign in again.")
-            return
-        }
+        const updated = await handleUpdateProfileIdentity({
+            email,
+            username,
+        })
 
-        setError('');
-        setSuccess('');
-        setLoading(true);
-
-        try {
-            const message = await changeIdentity({ email, username });
-
-            setSuccess(message)
+        if (updated) {
             setUsername(username)
             setEmail(email)
-        } catch (error) {
-            setError(error.message || 'Failed to update identity.')
-        } finally {
-            setLoading(false)
         }
     }
 
@@ -65,8 +50,8 @@ export default function ProfileIdentityForm() {
                 <div className="pb-5">
                     <h2 className="text-base/7 font-semibold text-white">Update Profile</h2>
                     <div className="mt-3 space-y-8">
-                        <AlertBox message={error} variant="error" className="mt-0" />
-                        <AlertBox message={success} variant="success" className="mt-0" />
+                        <AlertBox message={profileIdentityError} variant="error" className="mt-0" />
+                        <AlertBox message={profileIdentitySuccess} variant="success" className="mt-0" />
 
                         <div>
                             <label htmlFor="profile-username" className="block text-sm/6 font-medium text-white">
@@ -109,10 +94,10 @@ export default function ProfileIdentityForm() {
                     <div className="pt-6">
                         <button
                             type="submit"
-                            disabled={loading || sessionExpired}
-                            className={`rounded-md px-3 py-2 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 ${loading || sessionExpired ? 'cursor-not-allowed bg-indigo-400' : 'cursor-pointer bg-indigo-500 hover:bg-indigo-400'}`}
+                            disabled={profileIdentityLoading || sessionExpired}
+                            className={`rounded-md px-3 py-2 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 ${profileIdentityLoading || sessionExpired ? 'cursor-not-allowed bg-indigo-400' : 'cursor-pointer bg-indigo-500 hover:bg-indigo-400'}`}
                         >
-                            {sessionExpired ? 'Session Expired' : loading ? 'Updating...' : 'Update'}
+                            {sessionExpired ? 'Session Expired' : profileIdentityLoading ? 'Updating...' : 'Update'}
                         </button>
                     </div>
                 </div>

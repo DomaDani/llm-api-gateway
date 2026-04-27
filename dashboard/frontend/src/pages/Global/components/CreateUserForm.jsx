@@ -1,63 +1,49 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
-import { registerUser } from '../../../api/auth/Registration'
 import { useAuth } from '../../../api/auth/AuthProvider'
 import { isTokenExpired } from '../../../api/auth/token'
 import AlertBox from '../../../components/primitives/AlertBox'
+import useUserCreation from '../../../hooks/useUserCreation'
 
 /**
  * Form for admin users to create new dashboard user accounts.
  *
+ * @param {object} props - Component props.
+ * @param {Function} props.onCreated - Callback fired when a user is successfully created.
  * @returns {JSX.Element} The rendered form.
  */
-export default function CreateUserForm() {
+export default function CreateUserForm({ onCreated }) {
     const { token } = useAuth()
 
     const [username, setUsername] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [mandateReset, setMandateReset] = useState(false)
-    const [error, setError] = useState('')
-    const [success, setSuccess] = useState('')
-    const [loading, setLoading] = useState(false)
 
     const sessionExpired = !token || isTokenExpired(token)
-
-    useEffect(() => {
-        if (sessionExpired) {
-            setError('Your session has expired. Please sign in again.')
-        }
-    }, [sessionExpired])
+    const {
+        userCreateError,
+        userCreateSuccess,
+        userCreateLoading,
+        handleCreateUser,
+    } = useUserCreation({ sessionExpired })
 
     const handleSubmit = async (e) => {
         e.preventDefault()
 
-        if (sessionExpired) {
-            setError('Your session has expired. Please sign in again.')
-            return
-        }
+        const created = await handleCreateUser({
+            username,
+            email,
+            password,
+            mandateReset,
+        })
 
-        setError('')
-        setSuccess('')
-        setLoading(true)
-
-        try {
-            const message = await registerUser({
-                username,
-                email,
-                password,
-                mandateReset
-            })
-
-            setSuccess(message)
+        if (created) {
             setUsername('')
             setEmail('')
             setPassword('')
             setMandateReset(false)
-        } catch (err) {
-            setError(err.message || 'Could not create user. Please try again.')
-        } finally {
-            setLoading(false)
+            onCreated?.()
         }
     }
 
@@ -70,8 +56,8 @@ export default function CreateUserForm() {
                     </p> */}
 
                     <div className="mt-3 space-y-8">
-                        <AlertBox message={error} variant="error" className="mt-0" />
-                        <AlertBox message={success} variant="success" className="mt-0" />
+                        <AlertBox message={userCreateError} variant="error" className="mt-0" />
+                        <AlertBox message={userCreateSuccess} variant="success" className="mt-0" />
 
                         <div>
                             <label htmlFor="username" className="block text-sm/6 font-medium text-white">
@@ -179,10 +165,10 @@ export default function CreateUserForm() {
                     <div className="pt-6">
                         <button
                             type="submit"
-                            disabled={loading || sessionExpired}
-                            className={`rounded-md px-3 py-2 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 ${loading || sessionExpired ? 'cursor-not-allowed bg-indigo-400' : 'cursor-pointer bg-indigo-500 hover:bg-indigo-400'}`}
+                            disabled={userCreateLoading || sessionExpired}
+                            className={`rounded-md px-3 py-2 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 ${userCreateLoading || sessionExpired ? 'cursor-not-allowed bg-indigo-400' : 'cursor-pointer bg-indigo-500 hover:bg-indigo-400'}`}
                         >
-                            {sessionExpired ? 'Session expired' : loading ? 'Creating user...' : 'Submit'}
+                            {sessionExpired ? 'Session expired' : userCreateLoading ? 'Creating user...' : 'Submit'}
                         </button>
                     </div>
                 </div>
