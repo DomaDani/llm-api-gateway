@@ -13,13 +13,17 @@ async def db_limit_check_and_allocation(api_key: APIKey, estimated_tokens: int, 
 
     Parameters
     ----------
-    - api_key: The APIKey ORM object for which the quotas should be checked and allocated.
-    - estimated_tokens: The estimated number of tokens that the request will consume, used for token quota checking.
-    - estimated_price: The estimated price of the request, used for price quota checking.
+    api_key : APIKey
+        The APIKey ORM object for which the quotas should be checked and allocated.
+    estimated_tokens : int
+        The estimated number of tokens that the request will consume, used for token quota checking.
+    estimated_price : float
+        The estimated price of the request, used for price quota checking.
 
     Returns
     -------
-    - bool: True if the request is within the quotas and the estimated tokens/price have been allocated, False if any quota would be exceeded.
+    bool
+        True if the request is within the quotas and the estimated tokens/price have been allocated, False if any quota would be exceeded.
     """
     async with get_transactional_session() as session:
         
@@ -65,11 +69,16 @@ async def db_limit_change(api_key: APIKey, request_delta: int = 0, change_by_tok
 
     Parameters
     ----------
-    - api_key: The APIKey ORM object for which the quotas should be updated.
-    - request_delta: The change in the number of requests to allocate (positive to allocate, negative to deallocate).
-    - change_by_tokens: The change in the number of tokens to allocate (positive to allocate, negative to deallocate).
-    - change_by_price: The change in the price to allocate (positive to allocate, negative to deallocate).
-    - session: An optional SQLAlchemy session to use for the database operations. If None, a new transactional session will be created for this operation.
+    api_key : APIKey
+        The APIKey ORM object for which the quotas should be updated.
+    request_delta : int, optional
+        The change in the number of requests to allocate (positive to allocate, negative to deallocate).
+    change_by_tokens : int, optional
+        The change in the number of tokens to allocate (positive to allocate, negative to deallocate).
+    change_by_price : float, optional
+        The change in the price to allocate (positive to allocate, negative to deallocate).
+    session : optional
+        An optional SQLAlchemy session to use for the database operations. If None, a new transactional session will be created for this operation.
     """
     # Check if a session was provided, if not, create a new transactional session
     if session is None:
@@ -98,12 +107,15 @@ async def db_get_quotas_by_key(api_key: APIKey, session = None) -> Tuple[list[Qu
 
     Parameters
     ----------
-    - api_key: The APIKey ORM object for which the quotas should be retrieved.
-    - session: An optional SQLAlchemy session to use for the database operations. If None, a new transactional session will be created for this operation.
+    api_key : APIKey
+        The APIKey ORM object for which the quotas should be retrieved.
+    session : optional
+        An optional SQLAlchemy session to use for the database operations. If None, a new transactional session will be created for this operation.
 
     Returns
     -------
-    - Tuple[list[Quota], list[Quota], list[Quota]]: A tuple containing three lists of Quota objects: (request_quotas, token_quotas, price_quotas) that are relevant to the given API key.
+    Tuple[list[Quota], list[Quota], list[Quota]]
+        A tuple containing three lists of Quota objects: (request_quotas, token_quotas, price_quotas) that are relevant to the given API key.
     """
     # Check if a session was provided, if not, create a new transactional session
     if session is None:
@@ -173,11 +185,13 @@ async def _get_limit_ids(session = None) -> Tuple[int, int, int]:
 
     Parameters
     ----------
-    - session: An optional SQLAlchemy session to use for the database operations. If None, a new session will be created for this operation.
+	session : optional
+	    An optional SQLAlchemy session to use for the database operations. If None, a new session will be created for this operation.
 
     Returns
     -------
-    - Tuple[int, int, int]: A tuple containing the IDs of the request limit, token limit, and price limit in the database. If a limit type is not found, its corresponding ID will be None.
+	Tuple[int, int, int]
+	    A tuple containing the IDs of the request limit, token limit, and price limit in the database. If a limit type is not found, its corresponding ID will be None.
     """
     if session is None:
         async with get_session() as session:

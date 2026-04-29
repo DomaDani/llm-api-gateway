@@ -8,7 +8,8 @@ class UsageLogEntry(BaseModel):
 
     See Also
     --------
-    - UsageEntry: The model used for storing usage data in the database.
+    UsageEntry
+        The model used for storing usage data in the database.
     """
     key_id : int
     project_id : int

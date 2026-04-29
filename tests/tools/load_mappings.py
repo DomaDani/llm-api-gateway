@@ -7,12 +7,15 @@ def load_mappings_from_dir(directory: str|Path, file: str = None) -> dict:
 
     Parameters
     ----------
-    - directory: Directory path containing mapping JSON files.
-    - file: Optional single file stem to load.
+    directory : str | Path
+        Directory path containing mapping JSON files.
+    file : str, optional
+        Optional single file stem to load.
 
     Returns
     -------
-    - A dictionary keyed by file stem with parsed JSON content.
+    dict
+        A dictionary keyed by file stem with parsed JSON content.
     """
     mappings = {}
     if isinstance(directory, str):

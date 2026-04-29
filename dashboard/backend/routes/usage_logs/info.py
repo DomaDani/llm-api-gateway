@@ -22,12 +22,15 @@ async def get_log_information(
 
     Parameters
     ----------
-    - request: Query payload with filters, pagination, and aggregation options.
-    - _: Token validation dependency output, unused in function body.
+    request : UsageLogInformationRequest
+        Query payload with filters, pagination, and aggregation options.
+    _ : None
+        Token validation dependency output, unused in function body.
 
     Returns
     -------
-    - A list of detailed usage logs or aggregated rows based on request.aggregate.
+    list[UsageLogDisplayInformation] | list[UsageLogAggregateDisplayInformation]
+        A list of detailed usage logs or aggregated rows based on request.aggregate.
     """
     try:
         logs = await get_usage_logs(

@@ -9,11 +9,13 @@ async def enforce_password_strength(password: str) -> None:
 
     Parameters
     ----------
-    - password: Password value to validate.
+    password : str
+        Password value to validate.
 
     Returns
     -------
-    - None.
+    None
+        None.
     """
     if len(password) < 8:
         raise HTTPException(status_code=400, detail="Password must be at least 8 characters long.")
@@ -33,14 +35,19 @@ async def enforce_password_change_validity(current_password: str, current_passwo
 
     Parameters
     ----------
-    - current_password: Current plain-text password provided by the user.
-    - current_password_hash: Stored password hash for the user.
-    - new_password: Requested new plain-text password.
-    - new_password_confirm: Confirmation of the new password.
+    current_password : str
+        Current plain-text password provided by the user.
+    current_password_hash : str
+        Stored password hash for the user.
+    new_password : str
+        Requested new plain-text password.
+    new_password_confirm : str
+        Confirmation of the new password.
 
     Returns
     -------
-    - None.
+    None
+        None.
     """
     if not verify_password(stored_hash=current_password_hash, provided_password=current_password):
         raise HTTPException(status_code=400, detail="Your current password is incorrect.")

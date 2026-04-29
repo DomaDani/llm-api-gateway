@@ -14,11 +14,13 @@ async def get_all_projects(_: None = Depends(require_valid_access_token)) -> lis
 
     Parameters
     ----------
-    - _: Token validation dependency output, unused in function body.
+    _ : None
+        Token validation dependency output, unused in function body.
 
     Returns
     -------
-    - A list of project display models.
+    list[ProjectDisplayInfo]
+        A list of project display models.
     """
     try:
         project_orms = await db_get_all_projects()

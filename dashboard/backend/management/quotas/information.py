@@ -8,12 +8,15 @@ async def convert_orm_to_display_info(quota_orm: Quota, add_name: bool = False) 
 
     Parameters
     ----------
-    - quota_orm: Source quota ORM model.
-    - add_name: Whether a generated human-readable name should be included.
+    quota_orm : Quota
+        Source quota ORM model.
+    add_name : bool, optional
+        Whether a generated human-readable name should be included.
 
     Returns
     -------
-    - QuotaDisplayInformation mapped from ORM data.
+    QuotaDisplayInformation
+        QuotaDisplayInformation mapped from ORM data.
     """
     limit = await get_limit_by_id(limit_id=quota_orm.limit_id)
 

@@ -18,12 +18,15 @@ async def delete_project(
 
     Parameters
     ----------
-    - request: Payload containing the project identifier to archive.
-    - credentials: Optional bearer credentials used for permission validation.
+    request : ProjectDeleteRequest
+        Payload containing the project identifier to archive.
+    credentials : HTTPAuthorizationCredentials | None, optional
+        Optional bearer credentials used for permission validation.
 
     Returns
     -------
-    - A success message dictionary when archival completes.
+    dict
+        A success message dictionary when archival completes.
     """
     await require_project_manager_user(request.project_id, credentials)
 

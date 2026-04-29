@@ -18,16 +18,23 @@ async def get_usage_logs(
 
     Parameters
     ----------
-    - user_id: Optional user identifier filter.
-    - project_id: Optional project identifier filter.
-    - aggregate_by_fifteen_minutes: Whether to return 15-minute aggregate rows.
-    - limit: Optional maximum number of rows to return.
-    - offset: Number of rows to skip.
-    - session: Optional SQLAlchemy session.
+    user_id : int | None, optional
+        Optional user identifier filter.
+    project_id : int | None, optional
+        Optional project identifier filter.
+    aggregate_by_fifteen_minutes : bool, optional
+        Whether to return 15-minute aggregate rows.
+    limit : int | None, optional
+        Optional maximum number of rows to return.
+    offset : int, optional
+        Number of rows to skip.
+    session : optional
+        Optional SQLAlchemy session.
 
     Returns
     -------
-    - A list of UsageLog ORM objects or aggregated SQL rows.
+    list[UsageLog] | list[Row]
+        A list of UsageLog ORM objects or aggregated SQL rows.
     """
 
     if session is None:
@@ -82,12 +89,15 @@ def _get_filter(
 
     Parameters
     ----------
-    - user_id: Optional user identifier filter.
-    - project_id: Optional project identifier filter.
+    user_id : int | None, optional
+        Optional user identifier filter.
+    project_id : int | None, optional
+        Optional project identifier filter.
 
     Returns
     -------
-    - A list of SQLAlchemy filter expressions.
+    list
+        A list of SQLAlchemy filter expressions.
     """
     
     filters = []
@@ -104,11 +114,13 @@ def _get_time_chunk(interval : int = 15*60):
 
     Parameters
     ----------
-    - interval: Bucket width in seconds.
+    interval : int, optional
+        Bucket width in seconds.
 
     Returns
     -------
-    - A labeled SQLAlchemy expression for grouped time chunks.
+    SQLAlchemy expression
+        A labeled SQLAlchemy expression for grouped time chunks.
     """
     return (
         func.to_timestamp(

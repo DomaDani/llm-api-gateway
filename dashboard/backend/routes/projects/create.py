@@ -14,12 +14,15 @@ async def create_project(request: CreateProjectRequest, _: UserDisplayInformatio
 
     Parameters
     ----------
-    - request: Project creation payload including name and manager user identifier.
-    - _: Administrator authorization dependency output, unused in function body.
+    request : CreateProjectRequest
+        Project creation payload including name and manager user identifier.
+    _ : UserDisplayInformation
+        Administrator authorization dependency output, unused in function body.
 
     Returns
     -------
-    - A success message dictionary containing the created project name.
+    dict
+        A success message dictionary containing the created project name.
     """
     await project_enforce_availability(request.name)
     await user_enforce_existing_user(request.manager_id)

@@ -9,7 +9,8 @@ async def health(request: Request):
 
     Returns
     -------
-    - A simple JSON response indicating OK status and optionally the version of the gateway.
+	dict
+	    A simple JSON response indicating OK status and optionally the version of the gateway.
     """
     app_state = getattr(request.app, "state", None)
     version = getattr(app_state, "version", None) if app_state else None
@@ -26,6 +27,7 @@ async def root(request: Request):
 
     See Also
     --------
-    - health: The main health check endpoint that this function calls to get the gateway status.
+	health
+	    The main health check endpoint that this function calls to get the gateway status.
     """
     return await health(request)

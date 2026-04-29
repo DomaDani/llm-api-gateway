@@ -14,11 +14,13 @@ async def get_all_users(_: None = Depends(require_valid_access_token)) -> list[U
 
     Parameters
     ----------
-    - _: Token validation dependency output, unused in function body.
+    _ : None
+        Token validation dependency output, unused in function body.
 
     Returns
     -------
-    - A list of user display models.
+    list[UserDisplayInformation]
+        A list of user display models.
     """
     try:
         user_orms = await db_get_all_users()

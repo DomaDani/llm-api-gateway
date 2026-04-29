@@ -19,12 +19,15 @@ async def register(request: UserRegistrationRequest, _: UserDisplayInformation =
 
     Parameters
     ----------
-    - request: A UserRegistrationRequest object containing the new user's email, username, password, and mandate_reset flag.
-    - _: An unused UserDisplayInformation object injected by the require_administrator_user dependency to enforce admin permissions.
+    request : UserRegistrationRequest
+        A UserRegistrationRequest object containing the new user's email, username, password, and mandate_reset flag.
+    _ : UserDisplayInformation
+        An unused UserDisplayInformation object injected by the require_administrator_user dependency to enforce admin permissions.
 
     Returns
     -------
-    - A dictionary containing a success message with the new user's username if registration is successful.
+    dict
+        A dictionary containing a success message with the new user's username if registration is successful.
     """
     await user_enforce_availability(email=request.email, username=request.username)
 

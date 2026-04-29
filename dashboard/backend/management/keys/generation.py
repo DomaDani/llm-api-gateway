@@ -10,11 +10,13 @@ def generate_api_key(length: int = 64) -> str:
 
     Parameters
     ----------
-    - length: Number of random bytes used before Base64 URL-safe encoding.
+    length : int, optional
+        Number of random bytes used before Base64 URL-safe encoding.
 
     Returns
     -------
-    - A generated API key string.
+    str
+        A generated API key string.
     """
     bytes_data = os.urandom(length)
     return base64.urlsafe_b64encode(bytes_data).rstrip(b"=").decode("utf-8")

@@ -10,11 +10,13 @@ async def get_quota_count(session=None) -> int:
 
     Parameters
     ----------
-    - session: An optional SQLAlchemy session to use for the database query. If None, a new session will be created.
+	session : optional
+	    An optional SQLAlchemy session to use for the database query. If None, a new session will be created.
 
     Returns
     -------
-    - int: The total number of quota entries in the database.
+	int
+	    The total number of quota entries in the database.
     """
     if session is None:
         async with get_transactional_session() as session:

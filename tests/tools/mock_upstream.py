@@ -24,11 +24,13 @@ async def lifespan(app: FastAPI):
 
     Parameters
     ----------
-    - app: The FastAPI application instance.
+    app : FastAPI
+        The FastAPI application instance.
 
     Returns
     -------
-    - An async context manager controlling app lifespan events.
+    Async context manager
+        An async context manager controlling app lifespan events.
     """
     log.info(f"Mock upstream starting; {len(_mappings)} mappings available")
     yield
@@ -44,11 +46,13 @@ async def _choose_mapping(request: Request) -> Dict[str, Any]:
 
     Parameters
     ----------
-    - request: Incoming FastAPI request containing chat-completion JSON payload.
+    request : Request
+        Incoming FastAPI request containing chat-completion JSON payload.
 
     Returns
     -------
-    - A tuple of HTTP status code and response payload dictionary.
+    tuple[int, dict]
+        A tuple of HTTP status code and response payload dictionary.
     """
     incoming = await request.json()
 
@@ -88,12 +92,15 @@ def _matches(expected, actual):
 
     Parameters
     ----------
-    - expected: Expected structure from mapping fixture.
-    - actual: Actual value from incoming request payload.
+    expected : Any
+        Expected structure from mapping fixture.
+    actual : Any
+        Actual value from incoming request payload.
 
     Returns
     -------
-    - True if the actual payload satisfies the expected structure, else False.
+    bool
+        True if the actual payload satisfies the expected structure, else False.
     """
     if isinstance(expected, dict) and isinstance(actual, dict):
         for k, v in expected.items():
@@ -118,11 +125,13 @@ async def chat_completions(request: Request):
 
     Parameters
     ----------
-    - request: Incoming FastAPI request.
+    request : Request
+        Incoming FastAPI request.
 
     Returns
     -------
-    - A JSONResponse containing mocked completion or upstream-error payload.
+    JSONResponse
+        A JSONResponse containing mocked completion or upstream-error payload.
     """
     status, response = await _choose_mapping(request)
     if status == 200:
@@ -143,11 +152,13 @@ def main(argv=None):
 
     Parameters
     ----------
-    - argv: Optional CLI argument list.
+    argv : list[str] | None
+        Optional CLI argument list.
 
     Returns
     -------
-    - None.
+    None
+        None.
     """
     p = argparse.ArgumentParser()
     p.add_argument("--port", type=int, default=8081)

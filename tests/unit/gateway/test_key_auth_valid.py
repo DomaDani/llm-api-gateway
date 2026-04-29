@@ -13,6 +13,11 @@ from shared.models import Status
 async def test_validate_api_key_accepts_valid_and_rejects_invalid_inputs(monkeypatch):
 	"""
 	Verify API key validation accepts a valid active key and rejects missing, short, inactive, fingerprint, and signature failures.
+
+	Parameters
+	----------
+	monkeypatch : pytest.MonkeyPatch
+		Monkeypatch fixture used to override `EXPECTED_KEY_LENGTH`, `db_key_check`, and `verify_key` during the test.
 	"""
 
 	monkeypatch.setattr(auth_mod, "EXPECTED_KEY_LENGTH", 8)
@@ -78,6 +83,11 @@ async def test_validate_api_key_accepts_valid_and_rejects_invalid_inputs(monkeyp
 async def test_check_limits_costs_returns_validated_request_and_blocks_over_quota(monkeypatch):
 	"""
 	Verify quota checking returns a validated request when allocation succeeds and raises 429 when allocation fails.
+
+	Parameters
+	----------
+	monkeypatch : pytest.MonkeyPatch
+		Monkeypatch fixture used to replace quota module helpers (`get_token_count`, `calculate_cost`, `db_limit_check_and_allocation`).
 	"""
 
 	monkeypatch.setattr(quota_mod, "QUOTA_STRICTNESS", 0.5)

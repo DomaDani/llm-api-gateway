@@ -18,12 +18,15 @@ async def create_quota(
 
     Parameters
     ----------
-    - request: Quota creation payload with target, limit, period, and optional expiry.
-    - current_user: Authenticated user used for permission enforcement.
+    request : QuotaCreateRequest
+        Quota creation payload with target, limit, period, and optional expiry.
+    current_user : UserDisplayInformation
+        Authenticated user used for permission enforcement.
 
     Returns
     -------
-    - QuotaDisplayInformation for the newly created quota.
+    QuotaDisplayInformation
+        QuotaDisplayInformation for the newly created quota.
     """
     try:
         await quota_enforce_existing_limit(request.limit_id)

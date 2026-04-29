@@ -24,12 +24,15 @@ async def change_password(
 
     Parameters
     ----------
-    - request: Password change payload with current and new password fields.
-    - current_user: Authenticated user requesting the password change.
+    request : UserPasswordChangeRequest
+        Password change payload with current and new password fields.
+    current_user : UserDisplayInformation
+        Authenticated user requesting the password change.
 
     Returns
     -------
-    - A success message dictionary when password update completes.
+    dict
+        A success message dictionary when password update completes.
     """
     user_record = await get_user_by_id(current_user.id)
     if user_record is None:

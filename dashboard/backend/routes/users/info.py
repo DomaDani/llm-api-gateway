@@ -14,12 +14,15 @@ async def get_user_information(request: UserInformationRequest = Depends(), _: U
 
     Parameters
     ----------
-    - request: Query payload containing optional project scope.
-    - _: Token validation dependency output, unused in function body.
+    request : UserInformationRequest
+        Query payload containing optional project scope.
+    _ : UserDisplayInformation
+        Token validation dependency output, unused in function body.
 
     Returns
     -------
-    - A list of user display models with optional role context.
+    list[UserDisplayInformation]
+        A list of user display models with optional role context.
     """
     try:
         if request.project_id is not None:

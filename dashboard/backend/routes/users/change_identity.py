@@ -17,12 +17,15 @@ async def change_identity(
 
     Parameters
     ----------
-    - request: Identity update payload containing new email and or username values.
-    - current_user: Authenticated user whose profile is being updated.
+    request : UserIdentityChangeRequest
+        Identity update payload containing new email and or username values.
+    current_user : UserDisplayInformation
+        Authenticated user whose profile is being updated.
 
     Returns
     -------
-    - A success message dictionary when profile data is updated.
+    dict
+        A success message dictionary when profile data is updated.
     """
     await enforce_availability(email=request.email, username=request.username, exclude_user_id=current_user.id)
 

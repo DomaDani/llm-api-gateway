@@ -16,14 +16,19 @@ async def get_project_by_id(project_id: int, session = None, options = None, act
 
     Parameters
     ----------
-    - project_id: Identifier of the project.
-    - session: Optional SQLAlchemy session.
-    - options: Optional relationship loading options.
-    - active_only: Whether to restrict results to active projects.
+    project_id : int
+        Identifier of the project.
+    session : optional
+        Optional SQLAlchemy session.
+    options : optional
+        Optional relationship loading options.
+    active_only : bool, optional
+        Whether to restrict results to active projects.
 
     Returns
     -------
-    - The matching Project ORM object, or None.
+    Project | None
+        The matching Project ORM object, or None.
     """
     if session is None:
         async with get_session() as session:
@@ -45,14 +50,19 @@ async def get_project_by_name(project_name: str, session = None, options = None,
 
     Parameters
     ----------
-    - project_name: Name of the project.
-    - session: Optional SQLAlchemy session.
-    - options: Optional relationship loading options.
-    - active_only: Whether to restrict results to active projects.
+    project_name : str
+        Name of the project.
+    session : optional
+        Optional SQLAlchemy session.
+    options : optional
+        Optional relationship loading options.
+    active_only : bool, optional
+        Whether to restrict results to active projects.
 
     Returns
     -------
-    - The matching Project ORM object, or None.
+    Project | None
+        The matching Project ORM object, or None.
     """
     if session is None:
         async with get_session() as session:
@@ -74,12 +84,15 @@ async def get_projects_for_user(user_id: int, session = None) -> list[Project]:
 
     Parameters
     ----------
-    - user_id: Identifier of the user.
-    - session: Optional SQLAlchemy session.
+    user_id : int
+        Identifier of the user.
+    session : optional
+        Optional SQLAlchemy session.
 
     Returns
     -------
-    - A list of Project ORM objects.
+    list[Project]
+        A list of Project ORM objects.
     """
     if session is None:
         async with get_session() as session:
@@ -101,13 +114,17 @@ async def create_project(name: str, manager_id: int, session = None) -> Project:
 
     Parameters
     ----------
-    - name: Name for the project.
-    - manager_id: Identifier of the initial project manager.
-    - session: Optional transactional SQLAlchemy session.
+    name : str
+        Name for the project.
+    manager_id : int
+        Identifier of the initial project manager.
+    session : optional
+        Optional transactional SQLAlchemy session.
 
     Returns
     -------
-    - The created Project ORM object.
+    Project
+        The created Project ORM object.
     """
     if session is None:
         async with get_transactional_session() as session:
@@ -135,12 +152,15 @@ async def delete_project(project_id: int, session = None) -> None:
 
     Parameters
     ----------
-    - project_id: Identifier of the project to archive.
-    - session: Optional transactional SQLAlchemy session.
+    project_id : int
+        Identifier of the project to archive.
+    session : optional
+        Optional transactional SQLAlchemy session.
 
     Returns
     -------
-    - None.
+    None
+        None.
     """
     if session is None:
         async with get_transactional_session() as session:
@@ -177,11 +197,13 @@ async def get_all_projects(session = None) -> list[Project]:
 
     Parameters
     ----------
-    - session: Optional SQLAlchemy session.
+    session : optional
+        Optional SQLAlchemy session.
 
     Returns
     -------
-    - A list of Project ORM objects.
+    list[Project]
+        A list of Project ORM objects.
     """
     if session is None:
         async with get_session() as session:

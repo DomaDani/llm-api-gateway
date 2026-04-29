@@ -9,12 +9,15 @@ async def get_role_by_name(role_name: str, session = None) -> Role | None:
 
     Parameters
     ----------
-    - role_name: Name of the role.
-    - session: Optional SQLAlchemy session.
+    role_name : str
+        Name of the role.
+    session : optional
+        Optional SQLAlchemy session.
 
     Returns
     -------
-    - The matching Role ORM object, or None.
+    Role | None
+        The matching Role ORM object, or None.
     """
     if session is None:
         async with get_session() as session:

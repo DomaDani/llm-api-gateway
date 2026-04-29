@@ -15,6 +15,11 @@ from tests.tools.mock_db import FakeResult, FakeSession
 async def test_user_availability_checks_with_and_without_exclusion(monkeypatch):
 	"""
 	Verify email and username availability checks for free, taken, and excluded-owner cases.
+
+	Parameters
+	----------
+	monkeypatch : pytest.MonkeyPatch
+		Monkeypatch fixture used to replace `get_user_by_email` and `get_user_by_username` lookups.
 	"""
 
 	async def fake_get_user_by_email(email):
@@ -59,6 +64,11 @@ async def test_is_password_expired_returns_expected_flags():
 async def test_delete_key_archives_and_missing(monkeypatch):
 	"""
 	Verify key deletion archives active key, removes quotas, and raises when key is missing.
+
+	Parameters
+	----------
+	monkeypatch : pytest.MonkeyPatch
+		Monkeypatch fixture used to control lookup behavior for keys and quotas.
 	"""
 
 	active_quota_one = SimpleNamespace(id=101)
@@ -82,6 +92,11 @@ async def test_delete_key_archives_and_missing(monkeypatch):
 async def test_permission_role_checks_project_scoped_and_global(monkeypatch):
 	"""
 	Verify member, manager, and administrator checks across scoped, global, and missing-user cases.
+
+	Parameters
+	----------
+	monkeypatch : pytest.MonkeyPatch
+		Monkeypatch fixture used to replace permission and user lookup helpers.
 	"""
 
 	async def fake_get_user_permissions_for_project(project_id, user_id, session=None):
@@ -135,6 +150,11 @@ async def test_permission_role_checks_project_scoped_and_global(monkeypatch):
 async def test_delete_user_success_and_guard_rails(monkeypatch):
 	"""
 	Verify user deletion removes related records and blocks missing, administrator, and project-manager deletions.
+
+	Parameters
+	----------
+	monkeypatch : pytest.MonkeyPatch
+		Monkeypatch fixture used to replace admin/project-manager checks and delete helpers.
 	"""
 
 	user = SimpleNamespace(

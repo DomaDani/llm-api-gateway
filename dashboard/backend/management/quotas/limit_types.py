@@ -8,11 +8,13 @@ def convert_limit_orm_to_display_info(limit_orm: Limit) -> LimitTypeDisplayInfor
 
     Parameters
     ----------
-    - limit_orm: Source limit ORM model.
+    limit_orm : Limit
+        Source limit ORM model.
 
     Returns
     -------
-    - LimitTypeDisplayInformation mapped from ORM data.
+    LimitTypeDisplayInformation
+        LimitTypeDisplayInformation mapped from ORM data.
     """
     return LimitTypeDisplayInformation(
         id=limit_orm.id,

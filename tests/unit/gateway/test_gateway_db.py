@@ -30,6 +30,11 @@ async def test_db_key_check_returns_key_and_raises_for_missing():
 async def test_get_quota_count_and_get_quotas_by_key(monkeypatch):
     """
     Verify quota counting returns the scalar count and quotas are grouped by their limit IDs.
+
+    Parameters
+    ----------
+    monkeypatch : pytest.MonkeyPatch
+        Monkeypatch fixture used to replace module-level helpers such as `_get_limit_ids`.
     """
 
     async def fake_get_limit_ids(session=None):
@@ -63,6 +68,11 @@ async def test_get_quota_count_and_get_quotas_by_key(monkeypatch):
 async def test_db_limit_change_clamps_allocations(monkeypatch):
     """
     Verify quota allocation updates clamp limited quotas and leave unlimited quotas unchanged.
+
+    Parameters
+    ----------
+    monkeypatch : pytest.MonkeyPatch
+        Monkeypatch fixture used to replace quota retrieval helpers (e.g. `db_get_quotas_by_key`).
     """
 
     request_limited = SimpleNamespace(id=1, allocated=4, limit_value=5)
@@ -93,6 +103,11 @@ async def test_db_limit_change_clamps_allocations(monkeypatch):
 async def test_db_limit_check_and_allocation_handles_common_branches(monkeypatch):
     """
     Verify quota allocation succeeds with no or unlimited quotas and fails when a strict quota would be exceeded.
+
+    Parameters
+    ----------
+    monkeypatch : pytest.MonkeyPatch
+        Monkeypatch fixture used to replace quota change and retrieval functions (`db_limit_change`, `db_get_quotas_by_key`).
     """
 
     change_calls = []
@@ -139,6 +154,11 @@ async def test_db_limit_check_and_allocation_handles_common_branches(monkeypatch
 async def test_refresh_and_expire_quotas_by_batch_update_rows(monkeypatch):
     """
     Verify batch refresh resets quotas and batch expiry marks active quotas as expired.
+
+    Parameters
+    ----------
+    monkeypatch : pytest.MonkeyPatch
+        Monkeypatch fixture used to replace time advancing helpers such as `calculate_date_after_period`.
     """
 
     refreshed_row = SimpleNamespace(id=1, allocated=7, period="day", next_reset="old")

@@ -18,12 +18,15 @@ async def get_key_information(
 
     Parameters
     ----------
-    - request: Query parameters selecting project or user scope.
-    - _: Token validation dependency output, unused in function body.
+    request : KeyInformationRequest
+        Query parameters selecting project or user scope.
+    _ : None
+        Token validation dependency output, unused in function body.
 
     Returns
     -------
-    - A list of API key display models matching the requested scope.
+    list[ApiKeyDisplayInformation]
+        A list of API key display models matching the requested scope.
     """
     try:
         if request.user_id is None and request.project_id is not None:

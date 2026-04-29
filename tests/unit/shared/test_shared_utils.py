@@ -36,6 +36,11 @@ def test_password_hash_and_verify():
 def test_find_project_root_and_missing(tmp_path):
     """
     Tests that find_project_root can correctly locate the root directory based on the marker and raises FileNotFoundError when the marker is not found.
+
+    Parameters
+    ----------
+    tmp_path : pathlib.Path
+        Temporary filesystem path provided by pytest for creating test directories and markers.
     """
     project_root = tmp_path / "projroot"
     marker_dir = project_root / "shared"
@@ -61,8 +66,19 @@ def test_find_project_root_and_missing(tmp_path):
 def test_calculate_date_after_period_behaviour(period, expected_no_ff, expected_ff):
     """Verify behaviour for both fast_forward False and True.
 
-    - fast_forward=False: returns the next period after the start date
-    - fast_forward=True: returns the next period after now
+    Parameters
+    ----------
+    period : Period
+        Period value under test.
+    expected_no_ff : datetime
+        Expected result for fast_forward=False.
+    expected_ff : datetime
+        Expected result for fast_forward=True.
+
+    Returns
+    -------
+    None
+        None.
     """
     start = datetime(2025, 12, 12, 21, 21, 48, tzinfo=timezone.utc)
 
