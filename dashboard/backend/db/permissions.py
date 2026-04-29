@@ -17,13 +17,17 @@ async def add_user_to_project(project_id: int, user_id: int, session = None) -> 
 
     Parameters
     ----------
-    - project_id: Identifier of the project.
-    - user_id: Identifier of the user to add.
-    - session: Optional transactional SQLAlchemy session.
+    project_id : int
+        Identifier of the project.
+    user_id : int
+        Identifier of the user to add.
+    session : optional
+        Optional transactional SQLAlchemy session.
 
     Returns
     -------
-    - None.
+    None
+        None.
     """
     if session is None:
         async with get_transactional_session() as session:
@@ -50,14 +54,19 @@ async def remove_user_from_project(project_id: int, user_id: int, session = None
 
     Parameters
     ----------
-    - project_id: Identifier of the project.
-    - user_id: Identifier of the user to remove.
-    - session: Optional transactional SQLAlchemy session.
-    - users_only: Whether project managers are protected from removal.
+    project_id : int
+        Identifier of the project.
+    user_id : int
+        Identifier of the user to remove.
+    session : optional
+        Optional transactional SQLAlchemy session.
+    users_only : bool, optional
+        Whether project managers are protected from removal.
 
     Returns
     -------
-    - None.
+    None
+        None.
     """
     if session is None:
         async with get_transactional_session() as session:
@@ -106,13 +115,17 @@ async def get_user_permissions_for_project(project_id: int, user_id: int, sessio
 
     Parameters
     ----------
-    - project_id: Identifier of the project.
-    - user_id: Identifier of the user.
-    - session: Optional SQLAlchemy session.
+    project_id : int
+        Identifier of the project.
+    user_id : int
+        Identifier of the user.
+    session : optional
+        Optional SQLAlchemy session.
 
     Returns
     -------
-    - ProjectPermission ORM object if found, otherwise None.
+    ProjectPermission | None
+        ProjectPermission ORM object if found, otherwise None.
     """
     if session is None:
         async with get_session() as session:
@@ -150,13 +163,17 @@ async def is_user_project_member(project_id: int, user_id: int, session = None) 
 
     Parameters
     ----------
-    - project_id: Identifier of the project.
-    - user_id: Identifier of the user.
-    - session: Optional SQLAlchemy session.
+    project_id : int
+        Identifier of the project.
+    user_id : int
+        Identifier of the user.
+    session : optional
+        Optional SQLAlchemy session.
 
     Returns
     -------
-    - True if membership exists, otherwise False.
+    bool
+        True if membership exists, otherwise False.
     """
     if session is None:
         async with get_session() as session:
@@ -171,13 +188,17 @@ async def is_user_project_manager(user_id: int, project_id: int | None = None, s
 
     Parameters
     ----------
-    - user_id: Identifier of the user.
-    - project_id: Optional project identifier for project-scoped check.
-    - session: Optional SQLAlchemy session.
+    user_id : int
+        Identifier of the user.
+    project_id : int | None, optional
+        Optional project identifier for project-scoped check.
+    session : optional
+        Optional SQLAlchemy session.
 
     Returns
     -------
-    - True if the user is a project manager in the requested scope.
+    bool
+        True if the user is a project manager in the requested scope.
     """
     if session is None:
         async with get_session() as session:
@@ -203,12 +224,15 @@ async def is_user_administrator(user_id: int, session = None) -> bool:
 
     Parameters
     ----------
-    - user_id: Identifier of the user.
-    - session: Optional SQLAlchemy session.
+    user_id : int
+        Identifier of the user.
+    session : optional
+        Optional SQLAlchemy session.
 
     Returns
     -------
-    - True if the user is a global administrator, otherwise False.
+    bool
+        True if the user is a global administrator, otherwise False.
     """
     if session is None:
         async with get_session() as session:

@@ -18,128 +18,129 @@ logger = logging.getLogger("uvicorn.error")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-	"""
-	Defines the lifespan of the FastAPI application, handling startup and shutdown events.
-	On startup, it initializes the upstream client, merges any custom providers, and starts background tasks for refreshing and expiring quotas and updating prices.
-	On shutdown, it cancels the background tasks and shuts down the upstream client gracefully.
+    """
+    Defines the lifespan of the FastAPI application, handling startup and shutdown events.
+    On startup, it initializes the upstream client, merges any custom providers, and starts background tasks for refreshing and expiring quotas and updating prices.
+    On shutdown, it cancels the background tasks and shuts down the upstream client gracefully.
 
-	Parameters
-	----------
-	- app: The FastAPI application instance for which the lifespan is being defined.
-	"""
-	await app.state.upstream_client.startup()
-	_merge_custom_providers()
-	app.state.reset_task = asyncio.create_task(_quota_refresh_job())
-	app.state.expire_task = asyncio.create_task(_quota_expire_job())
-	app.state.price_update_task = asyncio.create_task(_price_update_job())
-	try:
-		yield
-	finally:
-		app.state.reset_task.cancel()
-		app.state.expire_task.cancel()
-		app.state.price_update_task.cancel()
-		try:
-			await app.state.reset_task
-			await app.state.expire_task
-			await app.state.price_update_task
-		except asyncio.CancelledError:
-			pass
-		await app.state.upstream_client.shutdown()
+    Parameters
+    ----------
+    app : FastAPI
+        The FastAPI application instance for which the lifespan is being defined.
+    """
+    await app.state.upstream_client.startup()
+    _merge_custom_providers()
+    app.state.reset_task = asyncio.create_task(_quota_refresh_job())
+    app.state.expire_task = asyncio.create_task(_quota_expire_job())
+    app.state.price_update_task = asyncio.create_task(_price_update_job())
+    try:
+        yield
+    finally:
+        app.state.reset_task.cancel()
+        app.state.expire_task.cancel()
+        app.state.price_update_task.cancel()
+        try:
+            await app.state.reset_task
+            await app.state.expire_task
+            await app.state.price_update_task
+        except asyncio.CancelledError:
+            pass
+        await app.state.upstream_client.shutdown()
 
 def create_app() -> FastAPI:
-	"""
-	Creates the fastapi application instance, sets up the lifespan context, initializes middleware, and includes the API routers for chat and health endpoints.
-	"""
-	app = FastAPI(title="LLM API Gateway", lifespan=lifespan)
+    """
+    Creates the fastapi application instance, sets up the lifespan context, initializes middleware, and includes the API routers for chat and health endpoints.
+    """
+    app = FastAPI(title="LLM API Gateway", lifespan=lifespan)
 
-	logger.info("TARGET_URL=%s", TARGET_URL)
-	app.state.upstream_client = UpstreamClient(TARGET_URL, TARGET_KEY)
+    logger.info("TARGET_URL=%s", TARGET_URL)
+    app.state.upstream_client = UpstreamClient(TARGET_URL, TARGET_KEY)
 
-	init_middleware(app)
-	app.include_router(chat_router)
-	app.include_router(health_router)
+    init_middleware(app)
+    app.include_router(chat_router)
+    app.include_router(health_router)
 
-	return app
+    return app
 
 async def _quota_refresh_job():
-	"""
-	Helper async function that runs in the background to periodically refresh quotas by calling the refresh_quotas_by_batch function in batches until there are no more quotas to refresh, and then sleeps for a specified interval before checking again.
-	"""
-	while True:
-		try:
-			total_count = await get_quota_count()
-			change_count = 0
-			for _ in range(0, (total_count // 100) + 1):
-				change_count += await refresh_quotas_by_batch(batch_size=100)
-				if change_count == 0:
-					break
-			logger.info(f"Quota reset completed: {change_count} quotas reset")
+    """
+    Helper async function that runs in the background to periodically refresh quotas by calling the refresh_quotas_by_batch function in batches until there are no more quotas to refresh, and then sleeps for a specified interval before checking again.
+    """
+    while True:
+        try:
+            total_count = await get_quota_count()
+            change_count = 0
+            for _ in range(0, (total_count // 100) + 1):
+                change_count += await refresh_quotas_by_batch(batch_size=100)
+                if change_count == 0:
+                    break
+            logger.info(f"Quota reset completed: {change_count} quotas reset")
 
-		except Exception as e:
-			message = str(e)
-			logger.exception(f"Quota reset failed with error: {e.__class__.__name__}: {message}")
-		await asyncio.sleep(60)
+        except Exception as e:
+            message = str(e)
+            logger.exception(f"Quota reset failed with error: {e.__class__.__name__}: {message}")
+        await asyncio.sleep(60)
 
 async def _quota_expire_job():
-	"""
-	Helper async function that runs in the background to periodically expire quotas by calling the expire_quotas_by_batch function in batches until there are no more quotas to expire, and then sleeps for a specified interval before checking again.
-	"""
-	while True:
-		try:
-			total_count = await get_quota_count()
-			change_count = 0
-			for _ in range(0, (total_count // 100) + 1):
-				change_count += await expire_quotas_by_batch(batch_size=100)
-				if change_count == 0:
-					break
-			logger.info(f"Quota expiration completed: {change_count} quotas expired")
+    """
+    Helper async function that runs in the background to periodically expire quotas by calling the expire_quotas_by_batch function in batches until there are no more quotas to expire, and then sleeps for a specified interval before checking again.
+    """
+    while True:
+        try:
+            total_count = await get_quota_count()
+            change_count = 0
+            for _ in range(0, (total_count // 100) + 1):
+                change_count += await expire_quotas_by_batch(batch_size=100)
+                if change_count == 0:
+                    break
+            logger.info(f"Quota expiration completed: {change_count} quotas expired")
 
-		except Exception as e:
-			message = str(e)
-			logger.exception(f"Quota expiration failed with error: {e.__class__.__name__}: {message}")
-		await asyncio.sleep(60)
+        except Exception as e:
+            message = str(e)
+            logger.exception(f"Quota expiration failed with error: {e.__class__.__name__}: {message}")
+        await asyncio.sleep(60)
 
 async def _price_update_job():
-	"""
-	Helper async function that runs in the background to periodically update prices.
-	"""
-	while True:
-		try:
-			with UpdatePrices() as updater:
-				updater.wait()
-			_merge_custom_providers(verbose=True)
-			logger.info("Price update completed.")
-		except Exception as e:
-			logger.exception(f"Price update failed with error: {e}")
-		await asyncio.sleep(3600)
+    """
+    Helper async function that runs in the background to periodically update prices.
+    """
+    while True:
+        try:
+            with UpdatePrices() as updater:
+                updater.wait()
+            _merge_custom_providers(verbose=True)
+            logger.info("Price update completed.")
+        except Exception as e:
+            logger.exception(f"Price update failed with error: {e}")
+        await asyncio.sleep(3600)
 
 def _merge_custom_providers(verbose: bool = False):
-	"""
-	Helper function to load custom providers from a JSON file located at "shared/config/providers.json", validate and merge them with the existing providers from the genai_prices data module, and update the data snapshot with the merged list of providers. If the file does not exist, it logs that no custom providers were found.
-	"""
-	providers_file = find_project_root() / "shared/config/providers.json"
+    """
+    Helper function to load custom providers from a JSON file located at "shared/config/providers.json", validate and merge them with the existing providers from the genai_prices data module, and update the data snapshot with the merged list of providers. If the file does not exist, it logs that no custom providers were found.
+    """
+    providers_file = find_project_root() / "shared/config/providers.json"
 
-	if providers_file.exists():
-		raw = providers_file.read_bytes()
-		
-		try:
-			custom_providers = data_module.providers_schema.validate_json(raw)
-			merged = list(data_module.providers)[:]
-			existing_ids = {p.id for p in merged}
-			for provider in custom_providers:
-				if provider.id in existing_ids:
-					orig_id = provider.id
-					i = 1
-					while f"{orig_id}_{i}" in existing_ids:
-						i += 1
-					provider.id = f"{orig_id}_{i}"
-				merged.append(provider)
-				existing_ids.add(provider.id)
+    if providers_file.exists():
+        raw = providers_file.read_bytes()
+        
+        try:
+            custom_providers = data_module.providers_schema.validate_json(raw)
+            merged = list(data_module.providers)[:]
+            existing_ids = {p.id for p in merged}
+            for provider in custom_providers:
+                if provider.id in existing_ids:
+                    orig_id = provider.id
+                    i = 1
+                    while f"{orig_id}_{i}" in existing_ids:
+                        i += 1
+                    provider.id = f"{orig_id}_{i}"
+                merged.append(provider)
+                existing_ids.add(provider.id)
 
-			data_snapshot.set_custom_snapshot(DataSnapshot(providers=merged, from_auto_update=False))
-			if verbose:
-				logger.info(f"Loaded and merged {len(custom_providers)} custom providers from {providers_file}")
-		except Exception as e:
-			logger.error(f"Failed to load custom providers from {providers_file}: {e}")
-	else:
-		logger.info(f"No custom providers file found at {providers_file}, using bundled providers.")
+            data_snapshot.set_custom_snapshot(DataSnapshot(providers=merged, from_auto_update=False))
+            if verbose:
+                logger.info(f"Loaded and merged {len(custom_providers)} custom providers from {providers_file}")
+        except Exception as e:
+            logger.error(f"Failed to load custom providers from {providers_file}: {e}")
+    else:
+        logger.info(f"No custom providers file found at {providers_file}, using bundled providers.")

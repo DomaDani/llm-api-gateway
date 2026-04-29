@@ -11,13 +11,17 @@ async def get_user_by_id(user_id: int, session = None, options = None) -> User |
 
     Parameters
     ----------
-    - user_id: Identifier of the user.
-    - session: Optional SQLAlchemy session.
-    - options: Optional relationship loading options.
+    user_id : int
+        Identifier of the user.
+    session : optional
+        Optional SQLAlchemy session.
+    options : optional
+        Optional relationship loading options.
 
     Returns
     -------
-    - The matching User ORM object, or None.
+    User | None
+        The matching User ORM object, or None.
     """
     if session is None:
         async with get_session() as session:
@@ -39,13 +43,17 @@ async def get_user_by_email(email: str, session = None, options = None) -> User 
 
     Parameters
     ----------
-    - email: Email address to search for.
-    - session: Optional SQLAlchemy session.
-    - options: Optional relationship loading options.
+    email : str
+        Email address to search for.
+    session : optional
+        Optional SQLAlchemy session.
+    options : optional
+        Optional relationship loading options.
 
     Returns
     -------
-    - The matching User ORM object, or None.
+    User | None
+        The matching User ORM object, or None.
     """
     if session is None:
         async with get_session() as session:
@@ -67,13 +75,17 @@ async def get_user_by_username(username: str, session = None, options = None) ->
 
     Parameters
     ----------
-    - username: Username to search for.
-    - session: Optional SQLAlchemy session.
-    - options: Optional relationship loading options.
+    username : str
+        Username to search for.
+    session : optional
+        Optional SQLAlchemy session.
+    options : optional
+        Optional relationship loading options.
 
     Returns
     -------
-    - The matching User ORM object, or None.
+    User | None
+        The matching User ORM object, or None.
     """
     if session is None:
         async with get_session() as session:
@@ -95,12 +107,15 @@ async def user_email_free(email: str, exclude_user_id: int | None = None) -> boo
 
     Parameters
     ----------
-    - email: Email address to validate.
-    - exclude_user_id: Optional user id to ignore in uniqueness checks.
+    email : str
+        Email address to validate.
+    exclude_user_id : int | None, optional
+        Optional user id to ignore in uniqueness checks.
 
     Returns
     -------
-    - True if the email can be used, otherwise False.
+    bool
+        True if the email can be used, otherwise False.
     """
     user = await get_user_by_email(email)
     return user is None or (exclude_user_id is not None and user.id == exclude_user_id)
@@ -112,12 +127,15 @@ async def user_username_free(username: str, exclude_user_id: int | None = None) 
 
     Parameters
     ----------
-    - username: Username to validate.
-    - exclude_user_id: Optional user id to ignore in uniqueness checks.
+    username : str
+        Username to validate.
+    exclude_user_id : int | None, optional
+        Optional user id to ignore in uniqueness checks.
 
     Returns
     -------
-    - True if the username can be used, otherwise False.
+    bool
+        True if the username can be used, otherwise False.
     """
     user = await get_user_by_username(username)
     return user is None or (exclude_user_id is not None and user.id == exclude_user_id)
@@ -128,12 +146,15 @@ async def get_users_by_project(project_id: int, session = None) -> list[User]:
 
     Parameters
     ----------
-    - project_id: Identifier of the project.
-    - session: Optional SQLAlchemy session.
+    project_id : int
+        Identifier of the project.
+    session : optional
+        Optional SQLAlchemy session.
 
     Returns
     -------
-    - A list of User ORM objects.
+    list[User]
+        A list of User ORM objects.
     """
     if session is None:
         async with get_session() as session:
@@ -154,12 +175,15 @@ async def get_limit_by_id(limit_id: int, session = None) -> Limit | None:
 
     Parameters
     ----------
-    - limit_id: Identifier of the limit type.
-    - session: Optional SQLAlchemy session.
+    limit_id : int
+        Identifier of the limit type.
+    session : optional
+        Optional SQLAlchemy session.
 
     Returns
     -------
-    - The matching Limit ORM object, or None.
+    Limit | None
+        The matching Limit ORM object, or None.
     """
     if session is None:
         async with get_session() as session:
@@ -175,11 +199,13 @@ async def get_all_limits(session = None) -> list[Limit]:
 
     Parameters
     ----------
-    - session: Optional SQLAlchemy session.
+    session : optional
+        Optional SQLAlchemy session.
 
     Returns
     -------
-    - A list of Limit ORM objects.
+    list[Limit]
+        A list of Limit ORM objects.
     """
     if session is None:
         async with get_session() as session:

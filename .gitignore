@@ -102,3 +102,7 @@ latex/
 *.svg
 *.tex
 doxyfiles/
+docs/
+make.bat
+Makefile
+*.rst

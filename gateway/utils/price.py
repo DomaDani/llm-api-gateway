@@ -10,13 +10,17 @@ def calculate_cost(usage: Usage, model_ref: str, provider_id: str) -> float:
 
     Parameters
     ----------
-    - usage: A genai_prices.Usage object containing the input and output token counts.
-    - model_ref: A string reference to the model being used (e.g., "zai-org/GLM-4.5-Air-FP8").
-    - provider_id: A string identifying the provider (e.g., "zai-org").
+    usage : Usage
+        A genai_prices.Usage object containing the input and output token counts.
+    model_ref : str
+        A string reference to the model being used (e.g., "zai-org/GLM-4.5-Air-FP8").
+    provider_id : str
+        A string identifying the provider (e.g., "zai-org").
 
     Returns
     -------
-    - A float representing the estimated cost of the request in USD.
+    float
+        A float representing the estimated cost of the request in USD.
     """
     try:
         cost = calc_price(

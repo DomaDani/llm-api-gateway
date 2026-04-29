@@ -9,11 +9,13 @@ async def enforce_existing_limit(limit_id: int) -> None:
 
     Parameters
     ----------
-    - limit_id: Identifier of the limit type.
+    limit_id : int
+        Identifier of the limit type.
 
     Returns
     -------
-    - None.
+    None
+        None.
     """
     limit = await get_limit_by_id(limit_id)
     if limit is None:
@@ -30,13 +32,17 @@ async def enforce_existing_quota_target(
 
     Parameters
     ----------
-    - project_id: Optional project identifier.
-    - user_id: Optional user identifier.
-    - key_id: Optional API key identifier.
+    project_id : int | None
+        Optional project identifier.
+    user_id : int | None
+        Optional user identifier.
+    key_id : int | None
+        Optional API key identifier.
 
     Returns
     -------
-    - None.
+    None
+        None.
     """
     if project_id is not None:
         project = await get_project_by_id(project_id)

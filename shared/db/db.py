@@ -23,7 +23,8 @@ async def get_session() -> AsyncGenerator[AsyncSession, None]:
 
     Returns
     -------
-    - AsyncSession: An asynchronous SQLAlchemy session for interacting with the database.
+    AsyncSession
+        An asynchronous SQLAlchemy session for interacting with the database.
     """
     async with SessionLocal() as session:
         yield session
@@ -36,7 +37,8 @@ async def get_transactional_session() -> AsyncGenerator[AsyncSession, None]:
 
     Returns
     -------
-    - AsyncSession: An asynchronous transactional SQLAlchemy session for interacting with the database.
+    AsyncSession
+        An asynchronous transactional SQLAlchemy session for interacting with the database.
     """
     async with SessionLocal() as session:
         async with session.begin():

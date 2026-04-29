@@ -17,12 +17,15 @@ async def check_limits_costs(body: OpenAIRequest, key_info: APIKey = Depends(val
 
     Parameters
     ----------
-    - body: The OpenAIRequest DTO containing the details of the incoming request.
-    - key_info: The APIKey ORM object for the authenticated API key, injected by the validate_api_key dependency.
+    body : OpenAIRequest
+        The OpenAIRequest DTO containing the details of the incoming request.
+    key_info : APIKey
+        The APIKey ORM object for the authenticated API key, injected by the validate_api_key dependency.
 
     Returns
     -------
-    - ValidatedRequest: A DTO containing the validated request information along with the estimated tokens and cost.
+    ValidatedRequest
+        A DTO containing the validated request information along with the estimated tokens and cost.
     """
     # est_input_tokens = await run_in_threadpool(get_token_count, body.messages)
     est_input_tokens = get_token_count(body.messages)

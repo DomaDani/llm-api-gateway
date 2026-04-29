@@ -13,6 +13,11 @@ from dashboard.backend.management.keys import permissions as key_perms_mod
 async def test_enforce_password_strength_valid_and_invalid(monkeypatch):
     """
     Verify strong passwords pass, weak passwords raise with appropriate detail.
+
+    Parameters
+    ----------
+    monkeypatch : pytest.MonkeyPatch
+        Monkeypatch fixture available if password verification helpers need replacing (not used in this specific assertion-based test).
     """
     assert await pwd_mod.enforce_password_strength("ValidPass1") is None
     
@@ -41,6 +46,11 @@ async def test_enforce_password_strength_valid_and_invalid(monkeypatch):
 async def test_enforce_password_change_validity_scenarios(monkeypatch):
     """
     Verify password change: correct current, strength check, no reuse, confirmation match.
+
+    Parameters
+    ----------
+    monkeypatch : pytest.MonkeyPatch
+        Monkeypatch fixture used to replace `verify_password` helper during the test.
     """
     def fake_verify_password(stored_hash, provided_password):
         return provided_password == "CurrentCorrect1"
@@ -69,6 +79,11 @@ async def test_enforce_password_change_validity_scenarios(monkeypatch):
 async def test_enforce_quota_creation_permission_scenarios(monkeypatch):
     """
     Verify quota creation: admin for global, project manager for scoped, non-admin denied.
+
+    Parameters
+    ----------
+    monkeypatch : pytest.MonkeyPatch
+        Monkeypatch fixture used to replace permission-check helpers (`is_user_administrator`, `is_user_project_manager`).
     """
     async def fake_is_user_administrator(user_id):
         return user_id == 1
@@ -97,6 +112,11 @@ async def test_enforce_quota_creation_permission_scenarios(monkeypatch):
 async def test_enforce_quota_deletion_permission_scenarios(monkeypatch):
     """
     Verify quota deletion: admin unrestricted, project manager for their project, others denied.
+
+    Parameters
+    ----------
+    monkeypatch : pytest.MonkeyPatch
+        Monkeypatch fixture used to replace permission and quota lookup helpers.
     """
     async def fake_is_user_administrator(user_id):
         return user_id == 1
@@ -141,6 +161,11 @@ async def test_enforce_quota_deletion_permission_scenarios(monkeypatch):
 async def test_enforce_existing_limit_found_and_not_found(monkeypatch):
     """
     Verify limit check passes when exists, raises 404 when not.
+
+    Parameters
+    ----------
+    monkeypatch : pytest.MonkeyPatch
+        Monkeypatch fixture used to replace `get_limit_by_id` during the test.
     """
     async def fake_get_limit_by_id(limit_id):
         if limit_id == 1:
@@ -161,6 +186,11 @@ async def test_enforce_existing_limit_found_and_not_found(monkeypatch):
 async def test_enforce_existing_quota_target_scenarios(monkeypatch):
     """
     Verify quota target check validates all present entities, raises 404 for missing.
+
+    Parameters
+    ----------
+    monkeypatch : pytest.MonkeyPatch
+        Monkeypatch fixture used to replace project/user/key lookup helpers.
     """
     async def fake_get_project_by_id(project_id):
         return SimpleNamespace(id=5) if project_id == 5 else None
@@ -198,6 +228,11 @@ async def test_enforce_existing_quota_target_scenarios(monkeypatch):
 async def test_enforce_key_deletion_permission_scenarios(monkeypatch):
     """
     Verify key deletion: admin unrestricted, owner or project manager allowed, others denied.
+
+    Parameters
+    ----------
+    monkeypatch : pytest.MonkeyPatch
+        Monkeypatch fixture used to replace admin and ownership lookup helpers.
     """
     async def fake_is_user_administrator(user_id):
         return user_id == 1

@@ -10,12 +10,15 @@ async def db_key_check(api_key: str, session=None) -> APIKey:
     
     Parameters
     ----------
-    - api_key: The API key to check.
-    - session: An optional SQLAlchemy session to use for the database query. If None, a new session will be created.
+    api_key : str
+        The API key to check.
+    session : optional
+        An optional SQLAlchemy session to use for the database query. If None, a new session will be created.
 
     Returns
     -------
-    - APIKey: The API key record if it is valid and associated with an active project.
+    APIKey
+        The API key record if it is valid and associated with an active project.
     """
     if session is None:
         async with get_session() as session:

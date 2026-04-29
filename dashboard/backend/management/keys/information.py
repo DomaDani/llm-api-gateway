@@ -12,13 +12,17 @@ def convert_orm_to_display_info(
 
     Parameters
     ----------
-    - key_orm: Source API key ORM model.
-    - api_key: Optional raw API key value to include in the DTO.
-    - username: Optional username override for display.
+    key_orm : APIKey
+        Source API key ORM model.
+    api_key : str | None, optional
+        Optional raw API key value to include in the DTO.
+    username : str | None, optional
+        Optional username override for display.
 
     Returns
     -------
-    - ApiKeyDisplayInformation built from ORM data.
+    ApiKeyDisplayInformation
+        ApiKeyDisplayInformation built from ORM data.
     """
     return ApiKeyDisplayInformation(
         id=key_orm.id,

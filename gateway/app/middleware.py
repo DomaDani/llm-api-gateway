@@ -16,8 +16,10 @@ class RequestTimingMiddleware(BaseHTTPMiddleware):
 
         Parameters
         ----------
-        - request: The incoming FastAPI Request object.
-        - call_next: A callable that takes a Request and returns a Response, representing the next step in the middleware chain or the final route handler.
+        request : Request
+            The incoming FastAPI Request object.
+        call_next : Callable
+            A callable that takes a Request and returns a Response, representing the next step in the middleware chain or the final route handler.
         """
         request.state.start_time = time.perf_counter()
         response = await call_next(request)
@@ -31,9 +33,9 @@ def init_middleware(app: FastAPI) -> None:
 
     app.add_middleware(RequestTimingMiddleware)
     app.add_middleware(
-		CORSMiddleware,
-		allow_origins=["*"],
-		allow_credentials=True,
-		allow_methods=["*"],
-		allow_headers=["*"],
-	)
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )

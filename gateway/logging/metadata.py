@@ -13,8 +13,10 @@ async def usage_logger(entry: UsageLogEntry, failed_upstream: bool = False):
 
     Parameters
     ----------
-    - entry: The UsageLogEntry DTO containing all the relevant usage information to be logged.
-    - failed_upstream: Boolean indicating if the failure was due to an upstream provider issue, which affects how limits are adjusted.
+    entry : UsageLogEntry
+        The UsageLogEntry DTO containing all the relevant usage information to be logged.
+    failed_upstream : bool, optional
+        Boolean indicating if the failure was due to an upstream provider issue, which affects how limits are adjusted.
     """
     async with get_transactional_session() as session:
 

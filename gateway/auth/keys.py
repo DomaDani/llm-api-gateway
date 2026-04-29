@@ -19,11 +19,13 @@ async def validate_api_key(auth: HTTPAuthorizationCredentials = Security(securit
 
     Parameters
     ----------
-    - auth: The HTTPAuthorizationCredentials object provided by the HTTPBearer security scheme, containing the API key from the request headers.
+	auth : HTTPAuthorizationCredentials
+	    The HTTPAuthorizationCredentials object provided by the HTTPBearer security scheme, containing the API key from the request headers.
     
     Returns
     -------
-    - APIKey: The APIKey ORM object corresponding to the valid API key provided in the request.
+	APIKey
+	    The APIKey ORM object corresponding to the valid API key provided in the request.
     """
     api_key = auth.credentials
 

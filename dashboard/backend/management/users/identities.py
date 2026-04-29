@@ -11,13 +11,17 @@ async def enforce_availability(email: str, username: str, exclude_user_id: int |
 
     Parameters
     ----------
-    - email: Email value to validate.
-    - username: Username value to validate.
-    - exclude_user_id: Optional user identifier to exclude from uniqueness checks.
+    email : str
+        Email value to validate.
+    username : str
+        Username value to validate.
+    exclude_user_id : int | None, optional
+        Optional user identifier to exclude from uniqueness checks.
 
     Returns
     -------
-    - None.
+    None
+        None.
     """
     if not await user_email_free(email, exclude_user_id):
         raise HTTPException(status_code=409, detail="Email is already in use.")
@@ -31,13 +35,17 @@ async def convert_orm_to_display_info(user_orm: User, include_role: bool = False
 
     Parameters
     ----------
-    - user_orm: Source user ORM model.
-    - include_role: Whether role information should be resolved and included.
-    - project_id: Optional project scope for role resolution.
+    user_orm : User
+        Source user ORM model.
+    include_role : bool, optional
+        Whether role information should be resolved and included.
+    project_id : int | None, optional
+        Optional project scope for role resolution.
 
     Returns
     -------
-    - UserDisplayInformation mapped from ORM data.
+    UserDisplayInformation
+        UserDisplayInformation mapped from ORM data.
     """
 
     is_admin = False
@@ -99,11 +107,13 @@ async def enforce_existing_user(user_id: int) -> User:
 
     Parameters
     ----------
-    - user_id: Identifier of the user to fetch.
+    user_id : int
+        Identifier of the user to fetch.
 
     Returns
     -------
-    - The found User ORM entity.
+    User
+        The found User ORM entity.
     """
     user = await get_user_by_id(user_id)
     if user is None:

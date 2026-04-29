@@ -11,18 +11,20 @@ from shared.config import LOGIN_SECRET_KEY, TOKEN_EXPIRATION_MINS, TOKEN_ENCODIN
 
 _bearer = HTTPBearer(auto_error=False)
 
-def create_access_token(data: AccessTokenInfo):
+def create_access_token(data: AccessTokenInfo) -> str:
     """
     Create a JWT access token containing the user information and an expiration time.
 
     Parameters
     ----------
 
-    - data: An AccessTokenInfo object containing the user ID and optionally the project ID to be included in the token payload.
+    data : AccessTokenInfo 
+        An AccessTokenInfo object containing the user ID and optionally the project ID to be included in the token payload.
         
     Returns
     -------
-    - A JWT-encoded string that can be used as an access token for authenticating requests to protected endpoints.
+    str
+        A JWT-encoded string that can be used as an access token for authenticating requests to protected endpoints.
     """
     to_encode = data.model_dump()
 
@@ -39,12 +41,15 @@ async def get_user_from_token(token: str, project_id: int | None = None) -> User
 
     Parameters
     ----------
-    - token: The JWT access token string to be decoded and validated.
-    - project_id: Optional project ID to include permissions in the information.
+    token : str
+        The JWT access token string to be decoded and validated.
+    project_id : int | None, optional
+        Optional project ID to include permissions in the information.
 
     Returns
     -------
-    - A UserDisplayInformation object containing the user's information if the token is valid and the user exists, or None if the token is invalid or the user cannot be found.
+    UserDisplayInformation | None
+        A UserDisplayInformation object containing the user's information if the token is valid and the user exists, or None if the token is invalid or the user cannot be found.
     """
     try:
         payload = jwt.decode(token, LOGIN_SECRET_KEY, algorithms=[TOKEN_ENCODING_ALGORITHM])
@@ -68,11 +73,13 @@ def verify_access_token(token: str) -> bool:
 
     Parameters
     ----------
-    - token: The JWT access token string to be verified.
+    token : str
+        The JWT access token string to be verified.
 
     Returns
     -------
-    - True if the token is valid and can be decoded successfully, False otherwise (including if the token is expired or malformed).
+    bool
+        True if the token is valid and can be decoded successfully, False otherwise (including if the token is expired or malformed).
     """
     try:
         _ = jwt.decode(token, LOGIN_SECRET_KEY, algorithms=[TOKEN_ENCODING_ALGORITHM])
@@ -90,7 +97,8 @@ async def require_valid_access_token(
     
     Parameters
     ----------
-    - credentials: An optional HTTPAuthorizationCredentials object provided by the HTTPBearer security scheme, containing the access token from the request headers.
+    credentials : HTTPAuthorizationCredentials | None, optional
+        An optional HTTPAuthorizationCredentials object provided by the HTTPBearer security scheme, containing the access token from the request headers.
     """
     if credentials is None:
         raise HTTPException(status_code=401, detail="Missing access token")
@@ -107,11 +115,13 @@ async def require_current_user(
 
     Parameters
     ----------
-    - credentials: An optional HTTPAuthorizationCredentials object provided by the HTTPBearer security scheme, containing the access token from the request headers.
+    credentials : HTTPAuthorizationCredentials | None, optional
+        An optional HTTPAuthorizationCredentials object provided by the HTTPBearer security scheme, containing the access token from the request headers.
 
     Returns
     -------
-    - A UserDisplayInformation object containing the authenticated user's information if the token is valid and the user exists, or raises an HTTPException if authentication fails.
+    UserDisplayInformation
+        A UserDisplayInformation object containing the authenticated user's information if the token is valid and the user exists, or raises an HTTPException if authentication fails.
     """
     if credentials is None:
         raise HTTPException(status_code=401, detail="Missing access token")
@@ -130,11 +140,13 @@ async def require_administrator_user(
 
     Parameters
     ----------
-    - credentials: An optional HTTPAuthorizationCredentials object provided by the HTTPBearer security scheme, containing the access token from the request headers.
+    credentials : HTTPAuthorizationCredentials | None, optional
+        An optional HTTPAuthorizationCredentials object provided by the HTTPBearer security scheme, containing the access token from the request headers.
 
     Returns
     -------
-    - A UserDisplayInformation object containing the authenticated user's information if the user is an administrator, or raises an HTTPException if the user is not an administrator or if authentication fails.
+    UserDisplayInformation
+        A UserDisplayInformation object containing the authenticated user's information if the user is an administrator, or raises an HTTPException if the user is not an administrator or if authentication fails.
     """
     user = await require_current_user(credentials)
 
@@ -152,12 +164,15 @@ async def require_project_manager_user(
 
     Parameters
     ----------
-    - project_id: The ID of the project for which project manager privileges are required.
-    - credentials: An optional HTTPAuthorizationCredentials object provided by the HTTPBearer security scheme, containing the access token from the request headers.
+    project_id : int
+        The ID of the project for which project manager privileges are required.
+    credentials : HTTPAuthorizationCredentials | None, optional
+        An optional HTTPAuthorizationCredentials object provided by the HTTPBearer security scheme, containing the access token from the request headers.
 
     Returns
     -------
-    - A UserDisplayInformation object containing the authenticated user's information if the user has project manager privileges for the specified project, or raises an HTTPException if the user does not have the required privileges or if authentication fails.
+    UserDisplayInformation
+        A UserDisplayInformation object containing the authenticated user's information if the user has project manager privileges for the specified project, or raises an HTTPException if the user does not have the required privileges or if authentication fails.
     """
     user = await require_current_user(credentials)
 

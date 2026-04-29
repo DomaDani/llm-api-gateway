@@ -8,11 +8,13 @@ def convert_period_enum_to_display_info(period: Period) -> PeriodDisplayInformat
 
     Parameters
     ----------
-    - period: Period enum value.
+    period : Period
+        Period enum value.
 
     Returns
     -------
-    - PeriodDisplayInformation with the enum name.
+    PeriodDisplayInformation
+        PeriodDisplayInformation with the enum name.
     """
     return PeriodDisplayInformation(
         name=period.name

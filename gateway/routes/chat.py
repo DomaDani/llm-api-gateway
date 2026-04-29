@@ -19,11 +19,13 @@ def _get_upstream_client(request: Request) -> UpstreamClient:
 
     Parameters
     ----------
-    - request: The FastAPI request object, which contains the application state.
+	request : Request
+	    The FastAPI request object, which contains the application state.
 
     Returns
     -------
-    - An instance of the UpstreamClient class, which is used to communicate with the upstream LLM service.
+	UpstreamClient
+	    An instance of the UpstreamClient class, which is used to communicate with the upstream LLM service.
     """
     return request.app.state.upstream_client
 
@@ -36,13 +38,16 @@ async def forward_request(request: Request, validated_request: ValidatedRequest 
 
     Parameters
     ----------
-    - request: The FastAPI request object, which contains information about the incoming request and the application state.
-    - validated_request: A DTO containing the validated request data, including authentication, authorization and estimated usage information. This is provided by the check_limits_costs dependency, which also enforces quotas and limits.
+    request : Request
+        The FastAPI request object, which contains information about the incoming request and the application state.
+    validated_request : ValidatedRequest
+        A DTO containing the validated request data, including authentication, authorization and estimated usage information. This is provided by the check_limits_costs dependency, which also enforces quotas and limits.
 
     Returns
     -------
-    - If the request is not a streaming request, it returns the response from the upstream LLM service directly to the client.
-    - If the request is a streaming request, it returns a StreamingResponse that streams the response from the upstream LLM service to the client as it is generated, using server-sent events (SSE).
+    StreamingResponse or any
+        If the request is not a streaming request, it returns the response from the upstream LLM service directly to the client.
+        If the request is a streaming request, it returns a StreamingResponse that streams the response from the upstream LLM service to the client as it is generated, using server-sent events (SSE).
     """
     upstream_client = _get_upstream_client(request)
     payload = validated_request.body.model_dump(exclude_unset=True)

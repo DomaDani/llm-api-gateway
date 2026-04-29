@@ -10,11 +10,13 @@ async def convert_orm_to_display_info(usage_log_orm: UsageLog) -> UsageLogDispla
 
     Parameters
     ----------
-    - usage_log_orm: Source usage log ORM model.
+    usage_log_orm : UsageLog
+        Source usage log ORM model.
 
     Returns
     -------
-    - UsageLogDisplayInformation mapped from ORM data.
+    UsageLogDisplayInformation
+        UsageLogDisplayInformation mapped from ORM data.
     """
 
     if usage_log_orm.project_id is not None:
@@ -71,11 +73,13 @@ async def convert_aggregate_row_to_display_info(row: Row) -> UsageLogAggregateDi
 
     Parameters
     ----------
-    - row: SQLAlchemy Row containing aggregated usage fields.
+    row : Row
+        SQLAlchemy Row containing aggregated usage fields.
 
     Returns
     -------
-    - UsageLogAggregateDisplayInformation mapped from row values.
+    UsageLogAggregateDisplayInformation
+        UsageLogAggregateDisplayInformation mapped from row values.
     """
     mapping = row._mapping
 

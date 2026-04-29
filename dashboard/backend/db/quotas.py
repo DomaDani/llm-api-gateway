@@ -14,13 +14,17 @@ async def get_quota_by_id(quota_id: int, session = None, options = None) -> Quot
 
     Parameters
     ----------
-    - quota_id: Identifier of the quota.
-    - session: Optional SQLAlchemy session.
-    - options: Optional relationship loading options.
+    quota_id : int
+        Identifier of the quota.
+    session : optional
+        Optional SQLAlchemy session.
+    options : optional
+        Optional relationship loading options.
 
     Returns
     -------
-    - The matching Quota ORM object, or None.
+    Quota | None
+        The matching Quota ORM object, or None.
     """
     if session is None:
         async with get_session() as session:
@@ -46,14 +50,19 @@ async def get_global_quotas(
 
     Parameters
     ----------
-    - session: Optional SQLAlchemy session.
-    - include_targeted: Whether targeted global quotas are included.
-    - active_only: Whether to restrict results to active quotas.
-    - options: Optional relationship loading options.
+    session : optional
+        Optional SQLAlchemy session.
+    include_targeted : bool, optional
+        Whether targeted global quotas are included.
+    active_only : bool, optional
+        Whether to restrict results to active quotas.
+    options : optional
+        Optional relationship loading options.
 
     Returns
     -------
-    - A list of Quota ORM objects.
+    list[Quota]
+        A list of Quota ORM objects.
     """
 
     if session is None:
@@ -107,16 +116,23 @@ async def get_quotas_for_project(
 
     Parameters
     ----------
-    - project_id: Identifier of the project.
-    - session: Optional SQLAlchemy session.
-    - include_targeted: Whether targeted project quotas are included.
-    - include_inherited: Whether global quotas are appended.
-    - active_only: Whether to restrict results to active quotas.
-    - options: Optional relationship loading options.
+    project_id : int
+        Identifier of the project.
+    session : optional
+        Optional SQLAlchemy session.
+    include_targeted : bool, optional
+        Whether targeted project quotas are included.
+    include_inherited : bool, optional
+        Whether global quotas are appended.
+    active_only : bool, optional
+        Whether to restrict results to active quotas.
+    options : optional
+        Optional relationship loading options.
 
     Returns
     -------
-    - A list of Quota ORM objects.
+    list[Quota]
+        A list of Quota ORM objects.
     """
     
     if session is None:
@@ -186,16 +202,23 @@ async def get_quotas_for_user(
 
     Parameters
     ----------
-    - user_id: Identifier of the user.
-    - session: Optional SQLAlchemy session.
-    - include_inherited: Whether global and project quotas are included.
-    - include_keys: Whether key-level quotas are included.
-    - active_only: Whether to restrict results to active quotas.
-    - options: Optional relationship loading options.
+    user_id : int
+        Identifier of the user.
+    session : optional
+        Optional SQLAlchemy session.
+    include_inherited : bool, optional
+        Whether global and project quotas are included.
+    include_keys : bool, optional
+        Whether key-level quotas are included.
+    active_only : bool, optional
+        Whether to restrict results to active quotas.
+    options : optional
+        Optional relationship loading options.
 
     Returns
     -------
-    - A list of Quota ORM objects.
+    list[Quota]
+        A list of Quota ORM objects.
     """
     
     if session is None:
@@ -274,15 +297,21 @@ async def get_quotas_for_api_key(
 
     Parameters
     ----------
-    - key_id: Identifier of the API key.
-    - session: Optional SQLAlchemy session.
-    - include_inherited: Whether inherited user quotas are included.
-    - active_only: Whether to restrict results to active quotas.
-    - options: Optional relationship loading options.
+    key_id : int
+        Identifier of the API key.
+    session : optional
+        Optional SQLAlchemy session.
+    include_inherited : bool, optional
+        Whether inherited user quotas are included.
+    active_only : bool, optional
+        Whether to restrict results to active quotas.
+    options : optional
+        Optional relationship loading options.
 
     Returns
     -------
-    - A list of Quota ORM objects.
+    list[Quota]
+        A list of Quota ORM objects.
     """
 
     if session is None:
@@ -350,18 +379,27 @@ async def create_quota(
 
     Parameters
     ----------
-    - project_id: Optional project identifier target.
-    - user_id: Optional user identifier target.
-    - key_id: Optional API key identifier target.
-    - limit_id: Limit type identifier.
-    - limit_value: Optional numeric quota limit.
-    - period: Quota period enum value.
-    - expires_at: Optional quota expiration timestamp.
-    - session: Optional transactional SQLAlchemy session.
+    project_id : int | None
+        Optional project identifier target.
+    user_id : int | None
+        Optional user identifier target.
+    key_id : int | None
+        Optional API key identifier target.
+    limit_id : int
+        Limit type identifier.
+    limit_value : float | None
+        Optional numeric quota limit.
+    period : Period
+        Quota period enum value.
+    expires_at : datetime | None
+        Optional quota expiration timestamp.
+    session : optional
+        Optional transactional SQLAlchemy session.
 
     Returns
     -------
-    - The created Quota ORM object.
+    Quota
+        The created Quota ORM object.
     """
     
     if session is None:
@@ -399,12 +437,15 @@ async def delete_quota(quota_id: int, session = None) -> None:
 
     Parameters
     ----------
-    - quota_id: Identifier of the quota to delete.
-    - session: Optional transactional SQLAlchemy session.
+    quota_id : int
+        Identifier of the quota to delete.
+    session : optional
+        Optional transactional SQLAlchemy session.
 
     Returns
     -------
-    - None.
+    None
+        None.
     """
     if session is None:
         async with get_transactional_session() as session:

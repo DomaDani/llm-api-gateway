@@ -15,11 +15,13 @@ async def login(request: LoginRequest):
 
     Parameters
     ----------
-    - request: A LoginRequest object containing the user's email and password.
+    request : LoginRequest
+        A LoginRequest object containing the user's email and password.
 
     Returns
     -------
-    - TokenResponse: An object containing the access token and token type if authentication is successful.
+    TokenResponse
+        An object containing the access token and token type if authentication is successful.
     """
     try:
         user = await get_user_by_email(request.email)

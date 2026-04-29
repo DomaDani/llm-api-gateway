@@ -9,8 +9,10 @@ async def enforce_key_deletion_permission(current_user_id: int, key_id: int) -> 
 
     Parameters
     ----------
-    - current_user_id: Identifier of the user attempting deletion.
-    - key_id: Identifier of the API key to delete.
+    current_user_id : int
+        Identifier of the user attempting deletion.
+    key_id : int
+        Identifier of the API key to delete.
     """
     if await is_user_administrator(current_user_id):
         return

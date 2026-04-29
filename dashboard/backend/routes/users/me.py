@@ -16,12 +16,15 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(_
 
     Parameters
     ----------
-    - credentials: Bearer authorization credentials containing the access token.
-    - project_id: Optional project context used when resolving role-specific fields.
+    credentials : HTTPAuthorizationCredentials
+        Bearer authorization credentials containing the access token.
+    project_id : Optional[int], optional
+        Optional project context used when resolving role-specific fields.
 
     Returns
     -------
-    - UserDisplayInformation for the token subject.
+    UserDisplayInformation
+        UserDisplayInformation for the token subject.
     """
     user = await get_user_from_token(credentials.credentials, project_id=project_id)
     if user is None:

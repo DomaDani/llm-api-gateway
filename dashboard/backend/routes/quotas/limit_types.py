@@ -15,11 +15,13 @@ async def get_limit_types(_: None = Depends(require_valid_access_token)) -> list
 
     Parameters
     ----------
-    - _: Token validation dependency output, unused in function body.
+    _ : None
+        Token validation dependency output, unused in function body.
 
     Returns
     -------
-    - A list of limit type display models.
+    list[LimitTypeDisplayInformation]
+        A list of limit type display models.
     """
     try:
         limit_orms = await get_all_limits()

@@ -31,11 +31,13 @@ def get_token_count(messages: List[OpenAIMessage]) -> int:
 
     Parameters
     ----------
-    - messages: A list of OpenAIMessage DTOs, where each message contains a 'content' field that can be a string or an array of content-part dictionaries.
+	messages : List[OpenAIMessage]
+	    A list of OpenAIMessage DTOs, where each message contains a 'content' field that can be a string or an array of content-part dictionaries.
 
     Returns
     -------
-    - An integer representing the total number of tokens in the messages.
+	int
+	    An integer representing the total number of tokens in the messages.
     """
     text = "".join(_extract_message_text(m.content) for m in messages)
     

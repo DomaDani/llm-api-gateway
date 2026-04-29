@@ -14,12 +14,15 @@ async def get_user_information(request: QuotaInformationRequest = Depends(), _: 
 
     Parameters
     ----------
-    - request: Query payload selecting scope and inclusion flags.
-    - _: Token validation dependency output, unused in function body.
+    request : QuotaInformationRequest
+        Query payload selecting scope and inclusion flags.
+    _ : None
+        Token validation dependency output, unused in function body.
 
     Returns
     -------
-    - A list of quota display models matching the requested scope.
+    list[QuotaDisplayInformation]
+        A list of quota display models matching the requested scope.
     """
     try:
         if request.project_id is not None:

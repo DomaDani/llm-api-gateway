@@ -12,8 +12,10 @@ class UpstreamClient:
 
         Parameters
         ----------
-        - base_url: The base URL of the upstream LLM provider's API.
-        - api_key: The API key to authenticate with the upstream provider.
+        base_url : str
+            The base URL of the upstream LLM provider's API.
+        api_key : str
+            The API key to authenticate with the upstream provider.
         """
         self._client = None
         self._base_url = base_url
@@ -43,7 +45,8 @@ class UpstreamClient:
 
         Parameters
         ----------
-        - payload: A dictionary containing the parameters for the chat completion request, such as model, messages, max_tokens, etc.
+        payload : dict
+            A dictionary containing the parameters for the chat completion request, such as model, messages, max_tokens, etc.
         """
         if self._client is None:
             raise RuntimeError("Upstream client not initialized.")

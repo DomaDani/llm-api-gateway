@@ -18,7 +18,7 @@ class Project(SQLAlchemyBase):
     ----------
     - id: The unique identifier for the project (primary key).
     - name: The unique, human-readable project name.
-    - status: The lifecycle status of the project, (ACTIVE, ARCHIVED, etc.).
+    - status: The lifecycle status of the project (e.g., ``ACTIVE``, ``ARCHIVED``).
     - created_date: The timestamp when the project was created.
     - modified_date: The timestamp of the latest update, if any.
 

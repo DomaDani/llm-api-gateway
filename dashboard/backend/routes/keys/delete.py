@@ -18,12 +18,15 @@ async def delete_api_key(
 
     Parameters
     ----------
-    - request: API key deletion payload containing the target key identifier.
-    - current_user: Authenticated user attempting the deletion.
+    request : ApiKeyDeleteRequest
+        API key deletion payload containing the target key identifier.
+    current_user : UserDisplayInformation
+        Authenticated user attempting the deletion.
 
     Returns
     -------
-    - A success message dictionary when archival completes.
+    dict
+        A success message dictionary when archival completes.
     """
     try:
         await key_enforce_deletion_permission(current_user_id=current_user.id, key_id=request.key_id)

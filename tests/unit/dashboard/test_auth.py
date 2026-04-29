@@ -42,6 +42,11 @@ def test_verify_access_token_valid_and_invalid():
 async def test_get_user_from_token_valid_invalid_missing_user(monkeypatch):
     """
     Verify user extraction from token: valid user found returns DTO, invalid token returns None, user not found returns None.
+
+    Parameters
+    ----------
+    monkeypatch : pytest.MonkeyPatch
+        Monkeypatch fixture used to replace `get_user_by_id` and `convert_orm_to_display_info` helpers.
     """
     token_info = AccessTokenInfo(sub="bob@example.com", user_id=77)
     valid_token = auth_mod.create_access_token(token_info)
@@ -69,6 +74,11 @@ async def test_get_user_from_token_valid_invalid_missing_user(monkeypatch):
 async def test_get_user_from_token_found_user(monkeypatch):
     """
     Verify user extraction returns DTO when token is valid and user exists in database.
+
+    Parameters
+    ----------
+    monkeypatch : pytest.MonkeyPatch
+        Monkeypatch fixture used to replace `get_user_by_id` and `convert_orm_to_display_info` helpers.
     """
     token_info = AccessTokenInfo(sub="charlie@example.com", user_id=55)
     valid_token = auth_mod.create_access_token(token_info)

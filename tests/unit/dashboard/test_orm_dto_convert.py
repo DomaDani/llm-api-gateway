@@ -95,6 +95,11 @@ def test_convert_project_orm_to_display_info():
 async def test_convert_quota_orm_to_display_info_with_name(monkeypatch):
 	"""
 	Verify quota ORM to DTO conversion maps fields and generated name with lookups.
+
+	Parameters
+	----------
+	monkeypatch : pytest.MonkeyPatch
+		Monkeypatch fixture used to replace lookup helpers (`get_limit_by_id`, `get_user_by_id`, `get_key_by_id`).
 	"""
 	now = datetime(2026, 4, 24, 12, 0, 0, tzinfo=timezone.utc)
 	quota_orm = SimpleNamespace(
@@ -170,6 +175,11 @@ def test_convert_period_enum_to_display_info():
 async def test_convert_user_orm_to_display_info_with_role(monkeypatch):
 	"""
 	Verify user ORM to DTO conversion maps fields and resolved role flags.
+
+	Parameters
+	----------
+	monkeypatch : pytest.MonkeyPatch
+		Monkeypatch fixture used to replace role/permission helper functions (`is_user_administrator`, `is_user_project_manager`, etc.).
 	"""
 	joined_at = datetime(2026, 2, 1, 10, 0, 0, tzinfo=timezone.utc)
 	login_at = datetime(2026, 2, 2, 10, 0, 0, tzinfo=timezone.utc)
@@ -224,6 +234,11 @@ async def test_convert_user_orm_to_display_info_with_role(monkeypatch):
 async def test_convert_usage_log_orm_to_display_info(monkeypatch):
 	"""
 	Verify usage log ORM to DTO conversion maps values and resolved display names.
+
+	Parameters
+	----------
+	monkeypatch : pytest.MonkeyPatch
+		Monkeypatch fixture used to replace project/user/key lookup helpers used when resolving names.
 	"""
 	now = datetime(2026, 4, 1, 0, 0, 0, tzinfo=timezone.utc)
 	usage_log_orm = SimpleNamespace(
@@ -282,6 +297,11 @@ async def test_convert_usage_log_orm_to_display_info(monkeypatch):
 async def test_convert_aggregate_row_to_display_info(monkeypatch):
 	"""
 	Verify aggregate row to DTO conversion maps row values and resolved display names.
+
+	Parameters
+	----------
+	monkeypatch : pytest.MonkeyPatch
+		Monkeypatch fixture used to replace project/user/key lookup helpers used when resolving names.
 	"""
 	now = datetime(2026, 4, 2, 0, 0, 0, tzinfo=timezone.utc)
 	row = SimpleNamespace(

@@ -15,6 +15,18 @@ def test_calculate_cost_falls_back_to_default_pricing(monkeypatch, capsys):
     """
     Tests that calculate_cost falls back to default pricing and logs a warning when calc_price raises an exception, and that it returns the default input token price multiplied by the input tokens in usage.
     Actual calculation uses the genai_prices package. As such, tests of genai_prices functionality are out of scope, but the fallback should be tested.
+
+    Parameters
+    ----------
+    monkeypatch : pytest.MonkeyPatch
+        Monkeypatch fixture used to replace pricing dependencies.
+    capsys : pytest.CaptureFixture
+        Capture fixture used to inspect fallback warnings.
+
+    Returns
+    -------
+    None
+        None.
     """
     usage = price_mod.Usage(input_tokens=1_000_000, output_tokens=1_000_000)
 
@@ -34,6 +46,16 @@ def test_calculate_cost_falls_back_to_default_pricing(monkeypatch, capsys):
 def test_get_token_count_joins_string_and_content_part_text(monkeypatch):
     """
     Tests that get_token_count joins plain string message content and text fields from content-part dictionaries, while ignoring non-text content parts.
+
+    Parameters
+    ----------
+    monkeypatch : pytest.MonkeyPatch
+        Monkeypatch fixture used to replace the tokenizer encode function.
+
+    Returns
+    -------
+    None
+        None.
     """
     captured = {}
 
@@ -62,6 +84,18 @@ def test_get_token_count_joins_string_and_content_part_text(monkeypatch):
 async def test_stream_generator_emits_chunks_and_schedules_usage(monkeypatch, validated_request):
     """
     Tests that stream_generator emits properly formatted SSE chunks from the raw stream, schedules a usage entry with the correct parameters after iteration, and handles upstream completion without marking failure.
+
+    Parameters
+    ----------
+    monkeypatch : pytest.MonkeyPatch
+        Monkeypatch fixture used to replace stream handling dependencies.
+    validated_request : ValidatedRequest
+        Validated request fixture used to drive stream generation.
+
+    Returns
+    -------
+    None
+        None.
     """
     start_time = asyncio.get_running_loop().time()
     request = SimpleNamespace(state=SimpleNamespace(start_time=start_time))
@@ -107,6 +141,18 @@ async def test_stream_generator_emits_chunks_and_schedules_usage(monkeypatch, va
 async def test_stream_generator_emits_error_and_marks_failure(monkeypatch, validated_request):
     """
     Tests that stream_generator emits an error chunk and a done chunk when the raw stream raises an exception on the first iteration, schedules a usage entry marked as failed with the correct parameters, and returns early without further iterations.
+
+    Parameters
+    ----------
+    monkeypatch : pytest.MonkeyPatch
+        Monkeypatch fixture used to replace stream handling dependencies.
+    validated_request : ValidatedRequest
+        Validated request fixture used to drive stream generation.
+
+    Returns
+    -------
+    None
+        None.
     """
     start_time = asyncio.get_running_loop().time()
     request = SimpleNamespace(state=SimpleNamespace(start_time=start_time))

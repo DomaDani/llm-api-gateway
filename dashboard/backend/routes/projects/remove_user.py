@@ -18,12 +18,15 @@ async def remove_user_from_project(
 
     Parameters
     ----------
-    - request: Payload containing project and user identifiers.
-    - credentials: Optional bearer credentials used for permission validation.
+    request : AddUserToProjectRequest
+        Payload containing project and user identifiers.
+    credentials : HTTPAuthorizationCredentials | None, optional
+        Optional bearer credentials used for permission validation.
 
     Returns
     -------
-    - A success message dictionary when membership removal completes.
+    dict
+        A success message dictionary when membership removal completes.
     """
     await require_project_manager_user(request.project_id, credentials)
 

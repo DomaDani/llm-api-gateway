@@ -10,11 +10,13 @@ def convert_orm_to_display_info(project_orm: Project) -> ProjectDisplayInfo:
 
     Parameters
     ----------
-    - project_orm: Source project ORM model.
+    project_orm : Project
+        Source project ORM model.
 
     Returns
     -------
-    - ProjectDisplayInfo mapped from ORM values.
+    ProjectDisplayInfo
+        ProjectDisplayInfo mapped from ORM values.
     """
     return ProjectDisplayInfo(
         id=project_orm.id,
@@ -30,11 +32,13 @@ async def enforce_name_availability(name: str) -> None:
 
     Parameters
     ----------
-    - name: Project name to validate.
+    name : str
+        Project name to validate.
 
     Returns
     -------
-    - None.
+    None
+        None.
     """
     existing_project = await get_project_by_name(name, active_only=False)
     if existing_project is not None:
@@ -47,11 +51,13 @@ async def enforce_existing_project(project_id: int) -> Project:
 
     Parameters
     ----------
-    - project_id: Identifier of the project to fetch.
+    project_id : int
+        Identifier of the project to fetch.
 
     Returns
     -------
-    - The found Project ORM entity.
+    Project
+        The found Project ORM entity.
     """
     project = await get_project_by_id(project_id)
     if project is None:
@@ -65,12 +71,15 @@ async def enforce_user_not_in_project(user_id: int, project_id: int) -> None:
 
     Parameters
     ----------
-    - user_id: Identifier of the user to check.
-    - project_id: Identifier of the target project.
+    user_id : int
+        Identifier of the user to check.
+    project_id : int
+        Identifier of the target project.
 
     Returns
     -------
-    - None.
+    None
+        None.
     """
     project = await get_project_by_id(project_id)
     if project is None:

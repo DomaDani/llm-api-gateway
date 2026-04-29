@@ -22,14 +22,19 @@ def wait_for_health(
 
     Parameters
     ----------
-    - url: The health-check URL to poll.
-    - timeout: Maximum wait time in seconds.
-    - interval: Sleep interval in seconds between retries.
-    - headers: Optional HTTP headers sent with each request.
+    url : str
+        The health-check URL to poll.
+    timeout : int, optional
+        Maximum wait time in seconds.
+    interval : float, optional
+        Sleep interval in seconds between retries.
+    headers : dict[str, str] | None, optional
+        Optional HTTP headers sent with each request.
 
     Returns
     -------
-    - The successful HTTP response with status code 200.
+    requests.Response
+        The successful HTTP response with status code 200.
     """
     end = time.time() + timeout
     while time.time() < end:
@@ -49,11 +54,13 @@ def build_chat_url(completions_url: str) -> str:
 
     Parameters
     ----------
-    - completions_url: The base URL prefix for completions requests.
+    completions_url : str
+        The base URL prefix for completions requests.
 
     Returns
     -------
-    - The fully qualified chat completions endpoint URL.
+    str
+        The fully qualified chat completions endpoint URL.
     """
     return f"{completions_url}/chat/completions"
 
@@ -64,11 +71,13 @@ def bearer_headers(token: str) -> dict[str, str]:
 
     Parameters
     ----------
-    - token: The bearer token value.
+    token : str
+        The bearer token value.
 
     Returns
     -------
-    - A headers dictionary containing the Authorization header.
+    dict[str, str]
+        A headers dictionary containing the Authorization header.
     """
     return {"Authorization": f"Bearer {token}"}
 
@@ -79,13 +88,17 @@ def post_chat_completion(completions_url: str, api_key: str, request_data: dict)
 
     Parameters
     ----------
-    - completions_url: The base URL prefix for completions requests.
-    - api_key: The API key used as a bearer token.
-    - request_data: The JSON payload for the completion request.
+    completions_url : str
+        The base URL prefix for completions requests.
+    api_key : str
+        The API key used as a bearer token.
+    request_data : dict
+        The JSON payload for the completion request.
 
     Returns
     -------
-    - The HTTP response returned by the completions endpoint.
+    requests.Response
+        The HTTP response returned by the completions endpoint.
     """
     return requests.post(
         build_chat_url(completions_url),
@@ -101,12 +114,15 @@ def load_mapping(completions_dir: Path, mapping_name: str) -> dict:
 
     Parameters
     ----------
-    - completions_dir: Directory containing completion mapping JSON files.
-    - mapping_name: File stem of the mapping to load.
+    completions_dir : Path
+        Directory containing completion mapping JSON files.
+    mapping_name : str
+        File stem of the mapping to load.
 
     Returns
     -------
-    - The mapping dictionary, or an empty dictionary if not found.
+    dict
+        The mapping dictionary, or an empty dictionary if not found.
     """
     mappings = load_mappings_from_dir(completions_dir, mapping_name)
     return mappings.get(mapping_name, {})
@@ -118,12 +134,15 @@ def auth_headers(admin_token: str, dashboard_request_headers: dict[str, str]) ->
 
     Parameters
     ----------
-    - admin_token: Access token for an authenticated administrator.
-    - dashboard_request_headers: Baseline request headers required by dashboard routes.
+    admin_token : str
+        Access token for an authenticated administrator.
+    dashboard_request_headers : dict[str, str]
+        Baseline request headers required by dashboard routes.
 
     Returns
     -------
-    - A headers dictionary with the Authorization header included.
+    dict[str, str]
+        A headers dictionary with the Authorization header included.
     """
     return {**dashboard_request_headers, "Authorization": f"Bearer {admin_token}"}
 
@@ -140,15 +159,21 @@ def login(
 
     Parameters
     ----------
-    - dashboard_base_url: Base URL of the dashboard backend service.
-    - dashboard_request_headers: Required dashboard request headers.
-    - email: Login email address.
-    - password: Login password.
-    - expected_status: Expected HTTP status code.
+    dashboard_base_url : str
+        Base URL of the dashboard backend service.
+    dashboard_request_headers : dict[str, str]
+        Required dashboard request headers.
+    email : str
+        Login email address.
+    password : str
+        Login password.
+    expected_status : int, optional
+        Expected HTTP status code.
 
     Returns
     -------
-    - The HTTP response from the login endpoint.
+    requests.Response
+        The HTTP response from the login endpoint.
     """
     resp = requests.post(
         f"{dashboard_base_url}/auth/login",
@@ -166,12 +191,15 @@ def get_users(dashboard_base_url: str, headers: dict[str, str]) -> list[dict]:
 
     Parameters
     ----------
-    - dashboard_base_url: Base URL of the dashboard backend service.
-    - headers: Authenticated request headers.
+    dashboard_base_url : str
+        Base URL of the dashboard backend service.
+    headers : dict[str, str]
+        Authenticated request headers.
 
     Returns
     -------
-    - A list of user dictionaries.
+    list[dict]
+        A list of user dictionaries.
     """
     resp = requests.get(f"{dashboard_base_url}/users/everyone", headers=headers, timeout=10)
     assert resp.status_code == 200, f"Failed to fetch users: {resp.status_code} {resp.text}"
@@ -184,12 +212,15 @@ def find_user_id_by_username(users: list[dict], username: str) -> int:
 
     Parameters
     ----------
-    - users: List of user dictionaries.
-    - username: Username to search for.
+    users : list[dict]
+        List of user dictionaries.
+    username : str
+        Username to search for.
 
     Returns
     -------
-    - The matching user ID.
+    int
+        The matching user ID.
     """
     for user in users:
         if user.get("username") == username:
@@ -203,12 +234,15 @@ def find_user_id_by_email(users: list[dict], email: str) -> int:
 
     Parameters
     ----------
-    - users: List of user dictionaries.
-    - email: Email address to search for.
+    users : list[dict]
+        List of user dictionaries.
+    email : str
+        Email address to search for.
 
     Returns
     -------
-    - The matching user ID.
+    int
+        The matching user ID.
     """
     for user in users:
         if user.get("email") == email:
@@ -229,16 +263,23 @@ def register_user(
 
     Parameters
     ----------
-    - dashboard_base_url: Base URL of the dashboard backend service.
-    - headers: Authenticated request headers.
-    - email: New user's email address.
-    - username: New user's username.
-    - password: Initial password for the user.
-    - mandate_reset: Whether the user must reset password on first login.
+    dashboard_base_url : str
+        Base URL of the dashboard backend service.
+    headers : dict[str, str]
+        Authenticated request headers.
+    email : str
+        New user's email address.
+    username : str
+        New user's username.
+    password : str
+        Initial password for the user.
+    mandate_reset : bool
+        Whether the user must reset password on first login.
 
     Returns
     -------
-    - The HTTP response from the register endpoint.
+    requests.Response
+        The HTTP response from the register endpoint.
     """
     resp = requests.post(
         f"{dashboard_base_url}/auth/register",
@@ -261,13 +302,17 @@ def delete_user(dashboard_base_url: str, headers: dict[str, str], user_id: int) 
 
     Parameters
     ----------
-    - dashboard_base_url: Base URL of the dashboard backend service.
-    - headers: Authenticated request headers.
-    - user_id: Identifier of the user to delete.
+    dashboard_base_url : str
+        Base URL of the dashboard backend service.
+    headers : dict[str, str]
+        Authenticated request headers.
+    user_id : int
+        Identifier of the user to delete.
 
     Returns
     -------
-    - The HTTP response from the delete endpoint.
+    requests.Response
+        The HTTP response from the delete endpoint.
     """
     return requests.delete(
         f"{dashboard_base_url}/users/delete",
@@ -283,12 +328,15 @@ def get_all_projects(dashboard_base_url: str, headers: dict[str, str]) -> list[d
 
     Parameters
     ----------
-    - dashboard_base_url: Base URL of the dashboard backend service.
-    - headers: Authenticated request headers.
+    dashboard_base_url : str
+        Base URL of the dashboard backend service.
+    headers : dict[str, str]
+        Authenticated request headers.
 
     Returns
     -------
-    - A list of project dictionaries.
+    list[dict]
+        A list of project dictionaries.
     """
     resp = requests.get(f"{dashboard_base_url}/projects/all", headers=headers, timeout=10)
     assert resp.status_code == 200, f"Failed to fetch projects: {resp.status_code} {resp.text}"
@@ -301,12 +349,15 @@ def get_project_id_by_name(projects: list[dict], project_name: str) -> int:
 
     Parameters
     ----------
-    - projects: List of project dictionaries.
-    - project_name: Project name to search for.
+    projects : list[dict]
+        List of project dictionaries.
+    project_name : str
+        Project name to search for.
 
     Returns
     -------
-    - The matching project ID.
+    int
+        The matching project ID.
     """
     for project in projects:
         if project.get("name") == project_name:
@@ -325,14 +376,19 @@ def create_project(
 
     Parameters
     ----------
-    - dashboard_base_url: Base URL of the dashboard backend service.
-    - headers: Authenticated request headers.
-    - project_name: Name for the new project.
-    - manager_id: User ID assigned as project manager.
+    dashboard_base_url : str
+        Base URL of the dashboard backend service.
+    headers : dict[str, str]
+        Authenticated request headers.
+    project_name : str
+        Name for the new project.
+    manager_id : int
+        User ID assigned as project manager.
 
     Returns
     -------
-    - The HTTP response from the create endpoint.
+    requests.Response
+        The HTTP response from the create endpoint.
     """
     resp = requests.post(
         f"{dashboard_base_url}/projects/create",
@@ -350,13 +406,17 @@ def delete_project(dashboard_base_url: str, headers: dict[str, str], project_id:
 
     Parameters
     ----------
-    - dashboard_base_url: Base URL of the dashboard backend service.
-    - headers: Authenticated request headers.
-    - project_id: Identifier of the project to delete.
+    dashboard_base_url : str
+        Base URL of the dashboard backend service.
+    headers : dict[str, str]
+        Authenticated request headers.
+    project_id : int
+        Identifier of the project to delete.
 
     Returns
     -------
-    - The HTTP response from the delete endpoint.
+    requests.Response
+        The HTTP response from the delete endpoint.
     """
     return requests.delete(
         f"{dashboard_base_url}/projects/delete",
@@ -372,12 +432,15 @@ def get_limit_types(dashboard_base_url: str, headers: dict[str, str]) -> list[di
 
     Parameters
     ----------
-    - dashboard_base_url: Base URL of the dashboard backend service.
-    - headers: Authenticated request headers.
+    dashboard_base_url : str
+        Base URL of the dashboard backend service.
+    headers : dict[str, str]
+        Authenticated request headers.
 
     Returns
     -------
-    - A list of quota limit type dictionaries.
+    list[dict]
+        A list of quota limit type dictionaries.
     """
     resp = requests.get(f"{dashboard_base_url}/quotas/limit-types", headers=headers, timeout=10)
     assert resp.status_code == 200, f"Failed to fetch limit types: {resp.status_code} {resp.text}"
@@ -390,12 +453,15 @@ def find_limit_id_by_name(limit_types: list[dict], limit_name: str) -> int:
 
     Parameters
     ----------
-    - limit_types: List of limit type dictionaries.
-    - limit_name: Limit type name to search for.
+    limit_types : list[dict]
+        List of limit type dictionaries.
+    limit_name : str
+        Limit type name to search for.
 
     Returns
     -------
-    - The matching limit type ID.
+    int
+        The matching limit type ID.
     """
     for limit_type in limit_types:
         if limit_type.get("name") == limit_name:
@@ -414,14 +480,19 @@ def create_api_key(
 
     Parameters
     ----------
-    - dashboard_base_url: Base URL of the dashboard backend service.
-    - headers: Authenticated request headers.
-    - project_id: Project ID the API key will belong to.
-    - name: Human-readable API key label.
+    dashboard_base_url : str
+        Base URL of the dashboard backend service.
+    headers : dict[str, str]
+        Authenticated request headers.
+    project_id : int
+        Project ID the API key will belong to.
+    name : str
+        Human-readable API key label.
 
     Returns
     -------
-    - The HTTP response from the create key endpoint.
+    requests.Response
+        The HTTP response from the create key endpoint.
     """
     resp = requests.post(
         f"{dashboard_base_url}/keys/create",
@@ -439,13 +510,17 @@ def delete_api_key(dashboard_base_url: str, headers: dict[str, str], key_id: int
 
     Parameters
     ----------
-    - dashboard_base_url: Base URL of the dashboard backend service.
-    - headers: Authenticated request headers.
-    - key_id: Identifier of the API key to delete.
+    dashboard_base_url : str
+        Base URL of the dashboard backend service.
+    headers : dict[str, str]
+        Authenticated request headers.
+    key_id : int
+        Identifier of the API key to delete.
 
     Returns
     -------
-    - The HTTP response from the delete key endpoint.
+    requests.Response
+        The HTTP response from the delete key endpoint.
     """
     return requests.delete(
         f"{dashboard_base_url}/keys/delete",
@@ -471,18 +546,27 @@ def create_quota(
 
     Parameters
     ----------
-    - dashboard_base_url: Base URL of the dashboard backend service.
-    - headers: Authenticated request headers.
-    - key_id: Optional API key ID target for the quota.
-    - project_id: Optional project ID target for the quota.
-    - user_id: Optional user ID target for the quota.
-    - limit_id: Limit type identifier.
-    - limit_value: Numeric quota amount.
-    - period: Quota period value as API string.
+    dashboard_base_url : str
+        Base URL of the dashboard backend service.
+    headers : dict[str, str]
+        Authenticated request headers.
+    key_id : int | None, optional
+        Optional API key ID target for the quota.
+    project_id : int | None, optional
+        Optional project ID target for the quota.
+    user_id : int | None, optional
+        Optional user ID target for the quota.
+    limit_id : int
+        Limit type identifier.
+    limit_value : float
+        Numeric quota amount.
+    period : str
+        Quota period value as API string.
 
     Returns
     -------
-    - The HTTP response from the quota create endpoint.
+    requests.Response
+        The HTTP response from the quota create endpoint.
     """
     resp = requests.post(
         f"{dashboard_base_url}/quotas/create",
@@ -507,13 +591,17 @@ def delete_quota(dashboard_base_url: str, headers: dict[str, str], quota_id: int
 
     Parameters
     ----------
-    - dashboard_base_url: Base URL of the dashboard backend service.
-    - headers: Authenticated request headers.
-    - quota_id: Identifier of the quota to delete.
+    dashboard_base_url : str
+        Base URL of the dashboard backend service.
+    headers : dict[str, str]
+        Authenticated request headers.
+    quota_id : int
+        Identifier of the quota to delete.
 
     Returns
     -------
-    - The HTTP response from the quota delete endpoint.
+    requests.Response
+        The HTTP response from the quota delete endpoint.
     """
     return requests.delete(
         f"{dashboard_base_url}/quotas/delete",
