@@ -98,11 +98,10 @@ dist-ssr
 
 latex/
 *.dot
-*.pdf
 *.svg
 *.tex
 doxyfiles/
-docs/
+docs/tools/
 make.bat
 Makefile
 *.rst
