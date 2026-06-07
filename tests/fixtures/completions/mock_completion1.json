@@ -46,6 +46,7 @@
     },
     "prompt_logprobs": null,
     "prompt_token_ids": null,
-    "kv_transfer_params": null
+    "kv_transfer_params": null,
+    "moderation": null
   }
 }

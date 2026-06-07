@@ -32,4 +32,4 @@ def calculate_cost(usage: Usage, model_ref: str, provider_id: str) -> float:
         cost = (usage.input_tokens / 1_000_000) * DEFAULT_INPUT_MTOKEN_PRICE + (usage.output_tokens / 1_000_000) * DEFAULT_OUTPUT_MTOKEN_PRICE
         print(f"WARNING: Price calculation failed with error: {e}. Falling back to default pricing. Estimated cost: ${cost:.6f}")
     
-    return cost
+    return float(cost)
