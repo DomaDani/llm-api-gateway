@@ -1,9 +1,9 @@
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.orm import selectinload
 from datetime import datetime, timezone
 
 from shared.db import get_session, get_transactional_session
-from shared.models import User, Status
+from shared.models import User, Status, UsageLog
 
 from .permissions import is_user_project_manager, is_user_administrator
 from .keys import delete_key
@@ -153,6 +153,12 @@ async def delete_user(user_id: int, session = None) -> None:
             await delete_key(key_id=api_key.id, session=session)
     for quota in user.quotas:
         await delete_quota(quota_id=quota.id, session=session)
+
+    await session.execute(
+        update(UsageLog)
+        .where(UsageLog.user_id == user_id)
+        .values(user_id=None)
+    )
 
     await session.delete(user)
 

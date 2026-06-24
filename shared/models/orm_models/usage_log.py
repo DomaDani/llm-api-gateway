@@ -48,7 +48,7 @@ class UsageLog(SQLAlchemyBase):
     id: Mapped[int] = mapped_column(primary_key=True)
     key_id: Mapped[int] = mapped_column(ForeignKey("api_keys.id"))
     project_id: Mapped[int] = mapped_column(ForeignKey("projects.id"))
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    user_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"), nullable=True)
     request_id: Mapped[Optional[str]] = mapped_column(String(255), unique=True)
     timestamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 

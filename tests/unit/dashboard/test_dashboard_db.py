@@ -187,13 +187,15 @@ async def test_delete_user_success_and_guard_rails(monkeypatch):
 	monkeypatch.setattr(users_mod, "delete_key", fake_delete_key)
 	monkeypatch.setattr(users_mod, "delete_quota", fake_delete_quota)
 
-	success_session = FakeSession([FakeResult(rows=[user])])
+	success_session = FakeSession([FakeResult(rows=[user]), FakeResult()])
 	missing_session = FakeSession([FakeResult(rows=[])])
 	admin_session = FakeSession([FakeResult(rows=[user])])
 	manager_session = FakeSession([FakeResult(rows=[user])])
 
 	await users_mod.delete_user(user_id=5, session=success_session)
 
+	assert len(success_session.executed) == 2
+	assert "usage_logs" in str(success_session.executed[1]).lower()
 	assert [obj.id for obj in success_session.deleted] == [1, 2, 5]
 	assert delete_key_calls == [11]
 	assert delete_quota_calls == [21, 22]

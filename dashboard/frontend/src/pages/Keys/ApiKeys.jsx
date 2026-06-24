@@ -34,7 +34,7 @@ export default function ApiKeys() {
             return
         }
 
-        fetchKeyInfos(selectedProject.id, user.id)
+        fetchKeyInfos(selectedProject?.id, user.id)
             .then((data) => {
                 if (!mounted) return
                 setApiKeys(data || [])
