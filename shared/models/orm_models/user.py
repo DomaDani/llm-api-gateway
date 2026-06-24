@@ -40,7 +40,11 @@ class User(SQLAlchemyBase):
     last_login : Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
     password_expires_at : Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
 
-    permissions : Mapped[list["ProjectPermission"]] = relationship("ProjectPermission", back_populates="user")
+    permissions : Mapped[list["ProjectPermission"]] = relationship(
+        "ProjectPermission",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
     api_keys : Mapped[list["APIKey"]] = relationship("APIKey", back_populates="user")
     quotas : Mapped[list["Quota"]] = relationship("Quota", back_populates="user")
 

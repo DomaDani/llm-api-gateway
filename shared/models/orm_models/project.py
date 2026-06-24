@@ -36,6 +36,10 @@ class Project(SQLAlchemyBase):
     created_date : Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.now(timezone.utc))
     modified_date : Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), onupdate=datetime.now(timezone.utc))
 
-    permissions : Mapped[list["ProjectPermission"]] = relationship("ProjectPermission", back_populates="project")
+    permissions : Mapped[list["ProjectPermission"]] = relationship(
+        "ProjectPermission",
+        back_populates="project",
+        cascade="all, delete-orphan",
+    )
     api_keys : Mapped[list["APIKey"]] = relationship("APIKey", back_populates="project")
     quotas : Mapped[list["Quota"]] = relationship("Quota", back_populates="project")
