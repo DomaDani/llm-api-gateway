@@ -2,7 +2,7 @@
 
 ## Note
 
-A projekt az egyetem belső GitLab szerverén készült, a CI/CD pipeline ezáltal GitLab környezetre lett elkészítve. Ez a repozitórium archiválási célokat szolgál.
+A projekt az egyetem belső GitLab szerverén készült, a CI/CD pipeline ezáltal GitLab környezetre lett elkészítve. Ez a repozitórium archiválási célokat szolgál.\
 \
 This project was developed on the university's internal GitLab server. As such, the CI/CD pipeline was made for a GitLab environment. This repository is for archival purposes.
 
